@@ -50,7 +50,9 @@ node ~/clawd/skills/vercel-image-upload/scripts/upload-image.js <imagen-url-o-pa
 ### Sistema de Scraping - Fase 2: Scrapers
 **Ubicación:** `~/clawd/scripts/vehicle-scraper/`
 
-**Estado:** Solo estructura creada, scripts NO implementados
+**Estado:** Claude Code trabajando (session: oceanic-ocean, lanzado: 2026-01-29 13:10 UTC)
+
+**Objetivo:** Implementar 5 scripts completos
 
 **Archivos existentes:**
 - ✅ `README.md` - Documentación del sistema
