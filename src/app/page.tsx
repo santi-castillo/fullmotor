@@ -1,33 +1,9 @@
 import Link from "next/link";
-import { prisma } from "@/lib/prisma";
-import { CATEGORIES } from "@/types/vehicle";
+import { getLatestVehicles, getCountByCategory } from "@/lib/data";
 
-async function getLatestVehicles() {
-  const vehicles = await prisma.vehicle.findMany({
-    take: 6,
-    orderBy: { createdAt: 'desc' }
-  });
-  return vehicles.map(v => ({
-    ...v,
-    images: v.images ? JSON.parse(v.images) : []
-  }));
-}
-
-async function getCountByCategory() {
-  const counts = await Promise.all(
-    CATEGORIES.map(async (cat) => ({
-      ...cat,
-      count: await prisma.vehicle.count({ where: { category: cat.id } })
-    }))
-  );
-  return counts;
-}
-
-export default async function Home() {
-  const [latestVehicles, categoryStats] = await Promise.all([
-    getLatestVehicles(),
-    getCountByCategory()
-  ]);
+export default function Home() {
+  const latestVehicles = getLatestVehicles(6);
+  const categoryStats = getCountByCategory();
 
   return (
     <div className="fade-in">
@@ -35,12 +11,12 @@ export default async function Home() {
       <section className="hero text-center">
         <div className="max-w-4xl mx-auto px-4">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Fichas Técnicas de Vehículos
+            Fichas Tecnicas de Vehiculos
           </h1>
           <p className="text-xl text-slate-300 mb-8">
             Encuentra especificaciones completas de autos, SUVs, camionetas y motos disponibles en Uruguay
           </p>
-          
+
           <Link href="/buscar" className="inline-block">
             <div className="relative max-w-xl mx-auto">
               <input
@@ -64,7 +40,7 @@ export default async function Home() {
             <Link key={cat.id} href={`/${cat.id}`} className="card p-6 text-center hover:border-[var(--primary)]">
               <span className="text-4xl mb-3 block">{cat.icon}</span>
               <h3 className="font-semibold text-lg">{cat.name}</h3>
-              <p className="text-[var(--secondary)] text-sm">{cat.count} vehículos</p>
+              <p className="text-[var(--secondary)] text-sm">{cat.count} vehiculos</p>
             </Link>
           ))}
         </div>
@@ -73,7 +49,7 @@ export default async function Home() {
       {/* Latest Vehicles */}
       <section className="max-w-7xl mx-auto px-4 mt-16">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-2xl font-bold">Últimos Agregados</h2>
+          <h2 className="text-2xl font-bold">Ultimos Agregados</h2>
           <Link href="/buscar" className="text-[var(--primary)] hover:underline">
             Ver todos →
           </Link>
@@ -85,7 +61,7 @@ export default async function Home() {
               <article className="card group">
                 <div className="aspect-[16/10] bg-[var(--muted)] flex items-center justify-center">
                   <span className="text-6xl opacity-30">
-                    {vehicle.category === 'motos' ? '🏍️' : 
+                    {vehicle.category === 'motos' ? '🏍️' :
                      vehicle.category === 'camionetas' ? '🛻' :
                      vehicle.category === 'suvs' ? '🚙' : '🚗'}
                   </span>
@@ -100,11 +76,11 @@ export default async function Home() {
                     </div>
                     <span className="category-badge">{vehicle.year}</span>
                   </div>
-                  
+
                   {vehicle.version && (
                     <p className="text-sm text-[var(--secondary)] mb-3">{vehicle.version}</p>
                   )}
-                  
+
                   <div className="flex items-center justify-between pt-3 border-t border-[var(--border)]">
                     {vehicle.priceUSD ? (
                       <div>
@@ -113,7 +89,7 @@ export default async function Home() {
                     ) : (
                       <p className="text-[var(--secondary)]">Consultar precio</p>
                     )}
-                    
+
                     <div className="flex items-center gap-2 text-sm text-[var(--secondary)]">
                       {vehicle.engineHp && <span>{vehicle.engineHp} HP</span>}
                     </div>
@@ -132,21 +108,21 @@ export default async function Home() {
             <span className="text-4xl mb-4 block">📋</span>
             <h3 className="font-bold text-lg mb-2">Fichas Completas</h3>
             <p className="text-[var(--secondary)]">
-              Motor, dimensiones, seguridad, equipamiento y más
+              Motor, dimensiones, seguridad, equipamiento y mas
             </p>
           </div>
           <div className="text-center p-6">
             <span className="text-4xl mb-4 block">💰</span>
             <h3 className="font-bold text-lg mb-2">Precios Actualizados</h3>
             <p className="text-[var(--secondary)]">
-              Precios de referencia en pesos y dólares
+              Precios de referencia en pesos y dolares
             </p>
           </div>
           <div className="text-center p-6">
-            <span className="text-4xl mb-4 block">🔌</span>
-            <h3 className="font-bold text-lg mb-2">API Disponible</h3>
+            <span className="text-4xl mb-4 block">⚡</span>
+            <h3 className="font-bold text-lg mb-2">100% Estatico</h3>
             <p className="text-[var(--secondary)]">
-              Accede a los datos via REST API
+              Carga ultrarapida sin base de datos
             </p>
           </div>
         </div>

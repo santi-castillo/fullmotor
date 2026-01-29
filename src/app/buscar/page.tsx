@@ -1,40 +1,49 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
-import { CATEGORIES, Vehicle } from "@/types/vehicle";
+import { useState, useMemo } from "react";
+import { CATEGORIES, Category } from "@/types/vehicle";
+import vehiclesData from "../../../data/vehicles.json";
+
+interface Vehicle {
+  id: string;
+  slug: string;
+  brand: string;
+  model: string;
+  year: number;
+  version?: string;
+  category: string;
+  priceUSD?: number;
+  engineHp?: number;
+  description?: string;
+}
+
+const vehicles = vehiclesData as Vehicle[];
 
 export default function SearchPage() {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("");
-  const [results, setResults] = useState<Vehicle[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [total, setTotal] = useState(0);
 
-  useEffect(() => {
-    const search = async () => {
-      setLoading(true);
-      const params = new URLSearchParams();
-      if (query) params.set("search", query);
-      if (category) params.set("category", category);
-      
-      try {
-        const res = await fetch(`/api/vehicles?${params}`);
-        const data = await res.json();
-        setResults(data.data || []);
-        setTotal(data.total || 0);
-      } catch (err) {
-        console.error(err);
-        setResults([]);
-      }
-      setLoading(false);
-    };
+  const results = useMemo(() => {
+    let filtered = vehicles;
 
-    const timer = setTimeout(search, 300);
-    return () => clearTimeout(timer);
+    if (category) {
+      filtered = filtered.filter(v => v.category === category);
+    }
+
+    if (query) {
+      const q = query.toLowerCase();
+      filtered = filtered.filter(v =>
+        v.brand.toLowerCase().includes(q) ||
+        v.model.toLowerCase().includes(q) ||
+        (v.description?.toLowerCase().includes(q))
+      );
+    }
+
+    return filtered;
   }, [query, category]);
 
-  const categoryInfo = (cat: string) => 
+  const categoryInfo = (cat: string) =>
     CATEGORIES.find(c => c.id === cat) || { icon: '🚗', name: cat };
 
   return (
@@ -42,8 +51,8 @@ export default function SearchPage() {
       {/* Search Header */}
       <div className="bg-[var(--muted)] py-12">
         <div className="max-w-3xl mx-auto px-4">
-          <h1 className="text-3xl font-bold mb-6 text-center">Buscar Vehículos</h1>
-          
+          <h1 className="text-3xl font-bold mb-6 text-center">Buscar Vehiculos</h1>
+
           <div className="relative mb-4">
             <input
               type="text"
@@ -82,17 +91,17 @@ export default function SearchPage() {
       <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="flex items-center justify-between mb-8">
           <p className="text-[var(--secondary)]">
-            {loading ? "Buscando..." : `${total} resultados`}
+            {results.length} resultados
           </p>
         </div>
 
-        {results.length === 0 && !loading ? (
+        {results.length === 0 ? (
           <div className="text-center py-20">
             <span className="text-6xl mb-4 block opacity-30">🔍</span>
             <p className="text-[var(--secondary)]">
-              {query || category 
-                ? "No se encontraron vehículos con esos criterios" 
-                : "Escribe para buscar o selecciona una categoría"}
+              {query || category
+                ? "No se encontraron vehiculos con esos criterios"
+                : "Escribe para buscar o selecciona una categoria"}
             </p>
           </div>
         ) : (
@@ -115,18 +124,18 @@ export default function SearchPage() {
                       </div>
                       <span className="category-badge">{vehicle.year}</span>
                     </div>
-                    
+
                     {vehicle.version && (
                       <p className="text-sm text-[var(--secondary)] mb-3">{vehicle.version}</p>
                     )}
-                    
+
                     <div className="flex items-center justify-between pt-3 border-t border-[var(--border)]">
                       {vehicle.priceUSD ? (
                         <p className="price-tag">USD {vehicle.priceUSD.toLocaleString()}</p>
                       ) : (
                         <p className="text-[var(--secondary)]">Consultar precio</p>
                       )}
-                      
+
                       <div className="flex items-center gap-2 text-sm text-[var(--secondary)]">
                         {vehicle.engineHp && <span>{vehicle.engineHp} HP</span>}
                       </div>

@@ -1,61 +1,53 @@
 import Link from "next/link";
-import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
-import { CATEGORIES } from "@/types/vehicle";
+import { CATEGORIES, Category } from "@/types/vehicle";
+import { getVehiclesByCategory } from "@/lib/data";
 
 type Params = Promise<{ category: string }>
 
 const categoryMeta: Record<string, { title: string; description: string }> = {
   autos: {
     title: "Autos en Uruguay",
-    description: "Fichas técnicas de autos sedán, hatchback y coupé disponibles en Uruguay"
+    description: "Fichas tecnicas de autos sedan, hatchback y coupe disponibles en Uruguay"
   },
   suvs: {
-    title: "SUVs en Uruguay", 
-    description: "Fichas técnicas de SUVs y crossovers disponibles en Uruguay"
+    title: "SUVs en Uruguay",
+    description: "Fichas tecnicas de SUVs y crossovers disponibles en Uruguay"
   },
   camionetas: {
     title: "Camionetas en Uruguay",
-    description: "Fichas técnicas de pickups y camionetas disponibles en Uruguay"
+    description: "Fichas tecnicas de pickups y camionetas disponibles en Uruguay"
   },
   motos: {
     title: "Motos en Uruguay",
-    description: "Fichas técnicas de motos nakeds, deportivas y adventure en Uruguay"
+    description: "Fichas tecnicas de motos nakeds, deportivas y adventure en Uruguay"
   }
 };
 
 export async function generateMetadata({ params }: { params: Params }) {
   const { category } = await params;
   const meta = categoryMeta[category];
-  if (!meta) return { title: 'Categoría no encontrada' };
-  
+  if (!meta) return { title: 'Categoria no encontrada' };
+
   return {
     title: `${meta.title} | FullMotor`,
     description: meta.description
   };
 }
 
-async function getVehiclesByCategory(category: string) {
-  const vehicles = await prisma.vehicle.findMany({
-    where: { category },
-    orderBy: { brand: 'asc' }
-  });
-  
-  return vehicles.map(v => ({
-    ...v,
-    images: v.images ? JSON.parse(v.images) : []
-  }));
+export function generateStaticParams() {
+  return CATEGORIES.map(cat => ({ category: cat.id }));
 }
 
 export default async function CategoryPage({ params }: { params: Params }) {
   const { category } = await params;
-  
+
   const categoryInfo = CATEGORIES.find(c => c.id === category);
   if (!categoryInfo) {
     notFound();
   }
-  
-  const vehicles = await getVehiclesByCategory(category);
+
+  const vehicles = getVehiclesByCategory(category as Category);
   const meta = categoryMeta[category];
 
   // Group by brand
@@ -75,12 +67,12 @@ export default async function CategoryPage({ params }: { params: Params }) {
             <span>/</span>
             <span className="text-white">{categoryInfo.name}</span>
           </nav>
-          
+
           <div className="flex items-center gap-4">
             <span className="text-5xl">{categoryInfo.icon}</span>
             <div>
               <h1 className="text-3xl md:text-4xl font-bold">{meta.title}</h1>
-              <p className="text-slate-300 mt-1">{vehicles.length} vehículos disponibles</p>
+              <p className="text-slate-300 mt-1">{vehicles.length} vehiculos disponibles</p>
             </div>
           </div>
         </div>
@@ -91,7 +83,7 @@ export default async function CategoryPage({ params }: { params: Params }) {
         {Object.keys(byBrand).length === 0 ? (
           <div className="text-center py-20">
             <span className="text-6xl mb-4 block opacity-30">{categoryInfo.icon}</span>
-            <p className="text-[var(--secondary)]">No hay vehículos en esta categoría aún</p>
+            <p className="text-[var(--secondary)]">No hay vehiculos en esta categoria aun</p>
           </div>
         ) : (
           Object.entries(byBrand).map(([brand, brandVehicles]) => (
@@ -102,7 +94,7 @@ export default async function CategoryPage({ params }: { params: Params }) {
                   ({brandVehicles.length})
                 </span>
               </h2>
-              
+
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {brandVehicles.map((vehicle) => (
                   <Link key={vehicle.id} href={`/vehiculo/${vehicle.slug}`}>
@@ -120,18 +112,18 @@ export default async function CategoryPage({ params }: { params: Params }) {
                           </div>
                           <span className="category-badge">{vehicle.year}</span>
                         </div>
-                        
+
                         {vehicle.version && (
                           <p className="text-sm text-[var(--secondary)] mb-3">{vehicle.version}</p>
                         )}
-                        
+
                         <div className="flex items-center justify-between pt-3 border-t border-[var(--border)]">
                           {vehicle.priceUSD ? (
                             <p className="price-tag">USD {vehicle.priceUSD.toLocaleString()}</p>
                           ) : (
                             <p className="text-[var(--secondary)]">Consultar precio</p>
                           )}
-                          
+
                           <div className="flex items-center gap-2 text-sm text-[var(--secondary)]">
                             {vehicle.engineHp && <span>{vehicle.engineHp} HP</span>}
                           </div>

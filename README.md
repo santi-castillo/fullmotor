@@ -1,36 +1,116 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FullMotor
 
-## Getting Started
+Plataforma de fichas tecnicas de vehiculos en Uruguay. 100% estatica, sin base de datos.
 
-First, run the development server:
+## Inicio rapido
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abrir [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Estructura
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+fullmotor/
+├── data/
+│   └── vehicles.json      # Base de datos de vehiculos
+├── src/
+│   ├── app/               # Paginas Next.js
+│   ├── lib/
+│   │   └── data.ts        # Funciones para leer vehicles.json
+│   └── types/
+│       └── vehicle.ts     # Tipos TypeScript
+└── public/                # Assets estaticos
+```
 
-## Learn More
+## Agregar vehiculos
 
-To learn more about Next.js, take a look at the following resources:
+Editar `data/vehicles.json` y agregar un nuevo objeto al array:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```json
+{
+  "id": "marca-modelo-año-version",
+  "slug": "marca-modelo-año-version",
+  "brand": "Marca",
+  "model": "Modelo",
+  "year": 2026,
+  "version": "Version (opcional)",
+  "category": "autos|suvs|camionetas|motos",
+  "subcategory": "sedan|suv|pickup|naked|etc (opcional)",
+  "priceUSD": 30000,
+  "priceUYU": 1260000,
+  "engineCc": 2000,
+  "engineHp": 150,
+  "engineTorque": 200,
+  "fuelType": "nafta|diesel|electrico|hibrido",
+  "transmission": "manual|automatica|cvt",
+  "gears": 6,
+  "length": 4500,
+  "width": 1800,
+  "height": 1400,
+  "wheelbase": 2700,
+  "trunkCapacity": 450,
+  "fuelTank": 50,
+  "weight": 1400,
+  "safetyFeatures": ["ABS", "Airbags", "ESP"],
+  "equipment": ["Pantalla tactil", "Apple CarPlay"],
+  "images": [],
+  "description": "Descripcion del vehiculo."
+}
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Campos requeridos
 
-## Deploy on Vercel
+- `id`: Identificador unico
+- `slug`: URL amigable (igual que id)
+- `brand`: Marca del vehiculo
+- `model`: Modelo
+- `year`: Año
+- `category`: Una de: `autos`, `suvs`, `camionetas`, `motos`
+- `safetyFeatures`: Array de caracteristicas de seguridad (puede estar vacio)
+- `equipment`: Array de equipamiento (puede estar vacio)
+- `images`: Array de URLs de imagenes (puede estar vacio)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Campos opcionales
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Todos los demas campos son opcionales. Si no aplican (ej: `trunkCapacity` en motos), usar `null`.
+
+## Categorias disponibles
+
+| ID | Nombre | Descripcion |
+|---|---|---|
+| `autos` | Autos | Sedans, hatchbacks, coupes |
+| `suvs` | SUVs | SUVs y crossovers |
+| `camionetas` | Camionetas | Pickups |
+| `motos` | Motos | Todas las motocicletas |
+
+## Build para produccion
+
+```bash
+npm run build
+npm run start
+```
+
+## Deploy
+
+Al ser 100% estatico, se puede deployar en:
+
+- Vercel (recomendado)
+- Netlify
+- GitHub Pages
+- Cualquier hosting estatico
+
+```bash
+npm run build
+# Los archivos quedan en .next/
+```
+
+## Tecnologias
+
+- Next.js 16
+- React 19
+- TypeScript
+- Tailwind CSS 4

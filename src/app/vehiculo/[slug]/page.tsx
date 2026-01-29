@@ -1,39 +1,28 @@
 import Link from "next/link";
-import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
+import { getVehicleBySlug, getAllVehicles } from "@/lib/data";
 
 type Params = Promise<{ slug: string }>
 
-async function getVehicle(slug: string) {
-  const vehicle = await prisma.vehicle.findUnique({
-    where: { slug }
-  });
-  
-  if (!vehicle) return null;
-  
+export async function generateMetadata({ params }: { params: Params }) {
+  const { slug } = await params;
+  const vehicle = getVehicleBySlug(slug);
+  if (!vehicle) return { title: 'Vehiculo no encontrado' };
+
   return {
-    ...vehicle,
-    safetyFeatures: vehicle.safetyFeatures ? JSON.parse(vehicle.safetyFeatures) : [],
-    equipment: vehicle.equipment ? JSON.parse(vehicle.equipment) : [],
-    images: vehicle.images ? JSON.parse(vehicle.images) : []
+    title: `${vehicle.brand} ${vehicle.model} ${vehicle.year} | FullMotor`,
+    description: vehicle.description || `Ficha tecnica del ${vehicle.brand} ${vehicle.model} ${vehicle.year}. Especificaciones, precios y equipamiento.`
   };
 }
 
-export async function generateMetadata({ params }: { params: Params }) {
-  const { slug } = await params;
-  const vehicle = await getVehicle(slug);
-  if (!vehicle) return { title: 'Vehículo no encontrado' };
-  
-  return {
-    title: `${vehicle.brand} ${vehicle.model} ${vehicle.year} | FullMotor`,
-    description: vehicle.description || `Ficha técnica del ${vehicle.brand} ${vehicle.model} ${vehicle.year}. Especificaciones, precios y equipamiento.`
-  };
+export function generateStaticParams() {
+  return getAllVehicles().map(v => ({ slug: v.slug }));
 }
 
 export default async function VehiclePage({ params }: { params: Params }) {
   const { slug } = await params;
-  const vehicle = await getVehicle(slug);
-  
+  const vehicle = getVehicleBySlug(slug);
+
   if (!vehicle) {
     notFound();
   }
@@ -47,14 +36,14 @@ export default async function VehiclePage({ params }: { params: Params }) {
 
   const fuelNames: Record<string, string> = {
     nafta: 'Nafta',
-    diesel: 'Diésel',
-    electrico: 'Eléctrico',
-    hibrido: 'Híbrido'
+    diesel: 'Diesel',
+    electrico: 'Electrico',
+    hibrido: 'Hibrido'
   };
 
   const transmissionNames: Record<string, string> = {
     manual: 'Manual',
-    automatica: 'Automática',
+    automatica: 'Automatica',
     cvt: 'CVT'
   };
 
@@ -81,7 +70,7 @@ export default async function VehiclePage({ params }: { params: Params }) {
           <div>
             <div className="aspect-[16/10] bg-[var(--muted)] rounded-xl flex items-center justify-center">
               <span className="text-[120px] opacity-30">
-                {vehicle.category === 'motos' ? '🏍️' : 
+                {vehicle.category === 'motos' ? '🏍️' :
                  vehicle.category === 'camionetas' ? '🛻' :
                  vehicle.category === 'suvs' ? '🚙' : '🚗'}
               </span>
@@ -136,7 +125,7 @@ export default async function VehiclePage({ params }: { params: Params }) {
               )}
               {vehicle.transmission && (
                 <div className="spec-item">
-                  <p className="spec-label">Transmisión</p>
+                  <p className="spec-label">Transmision</p>
                   <p className="spec-value">{transmissionNames[vehicle.transmission] || vehicle.transmission}</p>
                 </div>
               )}
@@ -158,8 +147,8 @@ export default async function VehiclePage({ params }: { params: Params }) {
 
         {/* Detailed Specs */}
         <section className="mt-16">
-          <h2 className="text-2xl font-bold mb-8">Especificaciones Técnicas</h2>
-          
+          <h2 className="text-2xl font-bold mb-8">Especificaciones Tecnicas</h2>
+
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Motor */}
             <div className="card p-6">
@@ -197,7 +186,7 @@ export default async function VehiclePage({ params }: { params: Params }) {
             {/* Transmission */}
             <div className="card p-6">
               <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-                <span>⚙️</span> Transmisión
+                <span>⚙️</span> Transmision
               </h3>
               <dl className="space-y-3">
                 {vehicle.transmission && (
@@ -256,7 +245,7 @@ export default async function VehiclePage({ params }: { params: Params }) {
               <dl className="space-y-3">
                 {vehicle.trunkCapacity !== null && vehicle.trunkCapacity !== undefined && vehicle.trunkCapacity > 0 && (
                   <div className="flex justify-between">
-                    <dt className="text-[var(--secondary)]">Baúl</dt>
+                    <dt className="text-[var(--secondary)]">Baul</dt>
                     <dd className="font-medium">{vehicle.trunkCapacity} L</dd>
                   </div>
                 )}
