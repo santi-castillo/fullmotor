@@ -26,6 +26,47 @@ fullmotor/
 └── public/                # Assets estaticos
 ```
 
+## Vercel Blob - Almacenamiento de Imágenes
+
+Este proyecto usa Vercel Blob para almacenar las imágenes de los vehículos.
+
+### Configuración
+
+1. Crear un Blob Store en Vercel:
+   - Ve a tu dashboard de Vercel → Storage → Create Database
+   - Selecciona "Blob" y crea tu store
+   - Copia el token `BLOB_READ_WRITE_TOKEN`
+
+2. Agregar el token a las variables de entorno:
+   ```bash
+   # .env.local (desarrollo)
+   BLOB_READ_WRITE_TOKEN=vercel_blob_rw_XXXXXXXXXXXXXXXX
+   ```
+
+3. En producción, Vercel lo configura automáticamente cuando conectas el Blob Store a tu proyecto.
+
+### Subir Imágenes
+
+1. Accede a `/admin` en tu sitio
+2. Selecciona un vehículo del dropdown
+3. Elige una imagen (JPG, PNG, WEBP recomendado)
+4. Click en "Subir Imagen"
+5. Copia la URL generada y agrégala al JSON del vehículo:
+   ```json
+   {
+     "id": "...",
+     "image": "https://xxxxx.public.blob.vercel-storage.com/...",
+     ...
+   }
+   ```
+
+### Recomendaciones para Imágenes
+
+- **Formato:** WEBP o JPG
+- **Tamaño:** 1200x750px (ratio 16:10)
+- **Peso:** < 200KB optimizado
+- **Contenido:** Foto del vehículo en ángulo 3/4 frontal
+
 ## Agregar vehiculos
 
 Editar `data/vehicles.json` y agregar un nuevo objeto al array:

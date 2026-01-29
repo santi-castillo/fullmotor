@@ -59,12 +59,20 @@ export default function Home() {
           {latestVehicles.map((vehicle) => (
             <Link key={vehicle.id} href={`/vehiculo/${vehicle.slug}`}>
               <article className="card group">
-                <div className="aspect-[16/10] bg-[var(--muted)] flex items-center justify-center">
-                  <span className="text-6xl opacity-30">
-                    {vehicle.category === 'motos' ? '🏍️' :
-                     vehicle.category === 'camionetas' ? '🛻' :
-                     vehicle.category === 'suvs' ? '🚙' : '🚗'}
-                  </span>
+                <div className="aspect-[16/10] bg-[var(--muted)] flex items-center justify-center overflow-hidden">
+                  {vehicle.image ? (
+                    <img 
+                      src={vehicle.image} 
+                      alt={`${vehicle.brand} ${vehicle.model}`}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  ) : (
+                    <span className="text-6xl opacity-30">
+                      {vehicle.category === 'motos' ? '🏍️' :
+                       vehicle.category === 'camionetas' ? '🛻' :
+                       vehicle.category === 'suvs' ? '🚙' : '🚗'}
+                    </span>
+                  )}
                 </div>
                 <div className="p-5">
                   <div className="flex items-start justify-between mb-2">

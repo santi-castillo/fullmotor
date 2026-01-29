@@ -68,12 +68,20 @@ export default async function VehiclePage({ params }: { params: Params }) {
         <div className="grid lg:grid-cols-2 gap-12">
           {/* Image */}
           <div>
-            <div className="aspect-[16/10] bg-[var(--muted)] rounded-xl flex items-center justify-center">
-              <span className="text-[120px] opacity-30">
-                {vehicle.category === 'motos' ? '🏍️' :
-                 vehicle.category === 'camionetas' ? '🛻' :
-                 vehicle.category === 'suvs' ? '🚙' : '🚗'}
-              </span>
+            <div className="aspect-[16/10] bg-[var(--muted)] rounded-xl flex items-center justify-center overflow-hidden">
+              {vehicle.image ? (
+                <img 
+                  src={vehicle.image} 
+                  alt={`${vehicle.brand} ${vehicle.model} ${vehicle.year}`}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span className="text-[120px] opacity-30">
+                  {vehicle.category === 'motos' ? '🏍️' :
+                   vehicle.category === 'camionetas' ? '🛻' :
+                   vehicle.category === 'suvs' ? '🚙' : '🚗'}
+                </span>
+              )}
             </div>
           </div>
 

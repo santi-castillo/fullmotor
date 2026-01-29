@@ -24,10 +24,11 @@ export interface Vehicle {
   weight?: number
   safetyFeatures: string[]
   equipment: string[]
+  image?: string
   images: string[]
   description?: string
-  createdAt: string
-  updatedAt: string
+  createdAt?: string
+  updatedAt?: string
 }
 
 export type Category = 'autos' | 'suvs' | 'camionetas' | 'motos'

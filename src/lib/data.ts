@@ -1,5 +1,5 @@
 import { Vehicle, Category, CATEGORIES } from '@/types/vehicle'
-import vehiclesData from '../../../data/vehicles.json'
+import vehiclesData from '../../data/vehicles.json'
 
 const vehicles: Vehicle[] = vehiclesData as Vehicle[]
 
