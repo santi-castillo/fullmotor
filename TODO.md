@@ -45,23 +45,31 @@ node ~/clawd/skills/vercel-image-upload/scripts/upload-image.js <imagen-url-o-pa
 
 ---
 
-## 🔄 EN PROGRESO
+## ✅ COMPLETADO (continuación)
 
-### Sistema de Scraping - Fase 2: Scrapers
+### Sistema de Scraping - Fase 2: Scrapers ✅
 **Ubicación:** `~/clawd/scripts/vehicle-scraper/`
 
-**Estado:** Implementando directamente (Claude Code falló 2x con signal 9)
+**Estado:** COMPLETADO - 2026-01-29 17:20 UTC
 
-**Iniciado:** 2026-01-29 17:06 UTC
+**Scripts implementados:**
+1. ✅ `scrape-autoblog.js` - Playwright scraper de autoblog.uy
+2. ✅ `scrape-instagram.js` - Scraper de @ondrive.uy  
+3. ✅ `fetch-brand-images.js` - Búsqueda de imágenes oficiales
+4. ✅ `add-vehicles.js` - Integración completa con fullmotor
+   - Detecta duplicados (marca+modelo+año)
+   - Valida según types
+   - Sube imágenes a Vercel Blob
+   - Git commit/push automático
+5. ✅ `run-daily.sh` - Pipeline completo con logs y manejo de errores
 
-**Implementando ahora:**
-1. ✅ scrape-autoblog.js - Playwright scraper de autoblog.uy
-2. ✅ scrape-instagram.js - Scraper de @ondrive.uy
-3. ✅ fetch-brand-images.js - Búsqueda de imágenes oficiales
-4. ✅ add-vehicles.js - Integración con fullmotor (detecta duplicados, valida, sube imágenes, commit)
-5. ✅ run-daily.sh - Pipeline completo con manejo de errores
+**Dependencias:** Instaladas (playwright + dotenv)
 
-**Método:** Implementación directa paso a paso con testing
+**Uso:**
+```bash
+cd ~/clawd/scripts/vehicle-scraper
+./run-daily.sh  # Ejecuta pipeline completo
+```
 
 **Archivos existentes:**
 - ✅ `README.md` - Documentación del sistema
@@ -82,50 +90,21 @@ node ~/clawd/skills/vercel-image-upload/scripts/upload-image.js <imagen-url-o-pa
 
 ## 📋 PENDIENTE
 
-### Prioridad 1: Implementar Scrapers (Fase 2)
-1. **scrape-autoblog.js**
-   - Playwright para scraping de autoblog.uy
-   - Extrae: marca, modelo, año, precio, specs técnicas
-   
-2. **scrape-instagram.js**
-   - Scraper de @ondrive.uy (Instagram)
-   - Alternativa liviana (puppeteer u otro, NO instaloader)
-   
-3. **fetch-brand-images.js**
-   - Búsqueda de imágenes oficiales de marcas
-   - Google Images API o scraping de sitios oficiales
-   - Prioriza calidad alta, vista frontal/lateral
+### Prioridad 1: Testing y Validación
+- ✅ Upload skill testeado (funcional)
+- ⏳ Test scrapers individualmente
+  - `npm run scrape:autoblog`
+  - `npm run scrape:instagram`
+  - `npm run add:vehicles`
+- ⏳ Test pipeline completo (`./run-daily.sh`)
+- ⏳ Verificar deploy automático en Vercel tras commit
 
-4. **add-vehicles.js** - Integración con fullmotor
-   - Lee data scraped de otros scripts
-   - Lee `~/clawd/fullmotor/data/vehicles.json`
-   - Detecta duplicados (marca+modelo+año)
-   - Valida según `~/clawd/fullmotor/src/types/vehicle.ts`
-   - Genera slug único
-   - Usa skill vercel-image-upload para subir imágenes
-   - Agrega a vehicles.json
-   - Commit y push automático
-
-5. **run-daily.sh** - Pipeline completo
-   - Ejecuta todos los scripts en orden
-   - Manejo de errores
-   - Log de resultados
-
-### Prioridad 2: Testing (Fase 2)
-- ✅ Probar upload skill (listo)
-- ❌ Probar cada scraper individualmente
-- ❌ Probar pipeline completo
-- ❌ Verificar deploy automático en Vercel
-
-### Prioridad 3: Automatización (Fase 4)
+### Prioridad 2: Automatización (Fase 4)
 - ✅ Cron de resumen (7 AM Uruguay) - Job ID: 698c8385-9a1b-49b1-89c7-aeb18bd461f9
-- ❌ Cron job para ejecutar pipeline diario (9 AM Uruguay)
-- ❌ Notificaciones con resultados
-- ❌ Manejo de errores y reintentos
-
-### Otros
-- Verificar build después del commit pendiente
-- Deploy a producción
+- ⏳ Cron job para ejecutar pipeline diario (9 AM Uruguay)
+  - Ejecuta `~/clawd/scripts/vehicle-scraper/run-daily.sh`
+  - Notifica resultados a Santiago
+  - Manejo de errores incluido en script
 
 ---
 
