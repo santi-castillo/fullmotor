@@ -50,9 +50,16 @@ node ~/clawd/skills/vercel-image-upload/scripts/upload-image.js <imagen-url-o-pa
 ### Sistema de Scraping - Fase 2: Scrapers
 **Ubicación:** `~/clawd/scripts/vehicle-scraper/`
 
-**Estado:** Claude Code trabajando (session: oceanic-ocean, lanzado: 2026-01-29 13:10 UTC)
+**Estado:** Relanzando Claude Code (session anterior oceanic-ocean falló - signal 9)
+
+**Lanzado:** 2026-01-29 15:01 UTC
 
 **Objetivo:** Implementar 5 scripts completos
+1. scrape-autoblog.js - Playwright scraper de autoblog.uy
+2. scrape-instagram.js - Scraper de @ondrive.uy
+3. fetch-brand-images.js - Búsqueda de imágenes oficiales
+4. add-vehicles.js - Integración con fullmotor (detecta duplicados, valida, sube imágenes, commit)
+5. run-daily.sh - Pipeline completo con manejo de errores
 
 **Archivos existentes:**
 - ✅ `README.md` - Documentación del sistema
