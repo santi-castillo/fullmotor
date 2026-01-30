@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Lightning Bolt F - solid color -->
+  <path d="M38 4 L14 36 L30 36 L8 60 L48 28 L32 28 L54 4 Z" fill="#8b5cf6"/>
+  <!-- Top horizontal line of F -->
+  <rect x="38" y="4" width="22" height="8" rx="2" fill="#8b5cf6"/>
+  <!-- Middle horizontal line of F -->
+  <rect x="30" y="16" width="20" height="6" rx="2" fill="#8b5cf6"/>
+</svg>

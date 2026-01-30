@@ -23,8 +23,20 @@
     "trunkCapacity": 470,
     "fuelTank": 50,
     "weight": 1340,
-    "safetyFeatures": ["7 Airbags", "ABS", "Control de estabilidad", "Camara trasera", "Sensores de estacionamiento"],
-    "equipment": ["Pantalla tactil 9\"", "Apple CarPlay", "Android Auto", "Climatizador automatico", "Llantas 17\""],
+    "safetyFeatures": [
+      "7 Airbags",
+      "ABS",
+      "Control de estabilidad",
+      "Camara trasera",
+      "Sensores de estacionamiento"
+    ],
+    "equipment": [
+      "Pantalla tactil 9\"",
+      "Apple CarPlay",
+      "Android Auto",
+      "Climatizador automatico",
+      "Llantas 17\""
+    ],
     "images": [],
     "description": "El Toyota Corolla 2026 combina eficiencia, confort y la reconocida confiabilidad Toyota."
   },
@@ -52,8 +64,19 @@
     "trunkCapacity": 445,
     "fuelTank": 52,
     "weight": 1395,
-    "safetyFeatures": ["6 Airbags", "ABS", "ESP", "Alerta de colision frontal", "Alerta de cambio de carril"],
-    "equipment": ["MyLink 8\"", "Cargador inalambrico", "Asientos de cuero", "Techo solar"],
+    "safetyFeatures": [
+      "6 Airbags",
+      "ABS",
+      "ESP",
+      "Alerta de colision frontal",
+      "Alerta de cambio de carril"
+    ],
+    "equipment": [
+      "MyLink 8\"",
+      "Cargador inalambrico",
+      "Asientos de cuero",
+      "Techo solar"
+    ],
     "images": [],
     "description": "El Chevrolet Cruze 2026 ofrece tecnologia de punta y un motor turbo eficiente."
   },
@@ -81,8 +104,20 @@
     "trunkCapacity": 498,
     "fuelTank": 50,
     "weight": 1380,
-    "safetyFeatures": ["6 Airbags", "ABS", "ESC", "Control de traccion", "Frenos de emergencia autonomo"],
-    "equipment": ["VW Play 10\"", "Digital Cockpit", "Climatizador bi-zona", "Llantas 18\"", "LED Matrix"],
+    "safetyFeatures": [
+      "6 Airbags",
+      "ABS",
+      "ESC",
+      "Control de traccion",
+      "Frenos de emergencia autonomo"
+    ],
+    "equipment": [
+      "VW Play 10\"",
+      "Digital Cockpit",
+      "Climatizador bi-zona",
+      "Llantas 18\"",
+      "LED Matrix"
+    ],
     "images": [],
     "description": "La Volkswagen Taos redefine el segmento SUV compacto con tecnologia alemana."
   },
@@ -110,8 +145,19 @@
     "trunkCapacity": 438,
     "fuelTank": 60,
     "weight": 1650,
-    "safetyFeatures": ["6 Airbags", "ABS", "ESP", "Hill Holder", "Camara 360"],
-    "equipment": ["Uconnect 10.1\"", "Traccion 4x4", "Modo Off-Road", "Asientos calefaccionados"],
+    "safetyFeatures": [
+      "6 Airbags",
+      "ABS",
+      "ESP",
+      "Hill Holder",
+      "Camara 360"
+    ],
+    "equipment": [
+      "Uconnect 10.1\"",
+      "Traccion 4x4",
+      "Modo Off-Road",
+      "Asientos calefaccionados"
+    ],
     "images": [],
     "description": "El Jeep Compass 2026 con motor diesel y traccion 4x4 para cualquier aventura."
   },
@@ -139,8 +185,19 @@
     "trunkCapacity": null,
     "fuelTank": 80,
     "weight": 2100,
-    "safetyFeatures": ["7 Airbags", "ABS", "VSC", "Control de descenso", "Bloqueo de diferencial trasero"],
-    "equipment": ["Pantalla 8\"", "Toyota Safety Sense", "Camara trasera", "Sensores delanteros y traseros"],
+    "safetyFeatures": [
+      "7 Airbags",
+      "ABS",
+      "VSC",
+      "Control de descenso",
+      "Bloqueo de diferencial trasero"
+    ],
+    "equipment": [
+      "Pantalla 8\"",
+      "Toyota Safety Sense",
+      "Camara trasera",
+      "Sensores delanteros y traseros"
+    ],
     "images": [],
     "description": "La Toyota Hilux 2026, lider indiscutida del segmento pickup en Uruguay."
   },
@@ -168,8 +225,19 @@
     "trunkCapacity": null,
     "fuelTank": 80,
     "weight": 2200,
-    "safetyFeatures": ["8 Airbags", "ABS", "ESP", "Pre-colision con frenado", "Monitoreo de angulo muerto"],
-    "equipment": ["SYNC 4 12\"", "Camara 360", "Asientos de cuero", "Suspension adaptativa"],
+    "safetyFeatures": [
+      "8 Airbags",
+      "ABS",
+      "ESP",
+      "Pre-colision con frenado",
+      "Monitoreo de angulo muerto"
+    ],
+    "equipment": [
+      "SYNC 4 12\"",
+      "Camara 360",
+      "Asientos de cuero",
+      "Suspension adaptativa"
+    ],
     "images": [],
     "description": "La nueva Ford Ranger 2026 con motor V6 diesel de 250 CV."
   },
@@ -197,8 +265,15 @@
     "trunkCapacity": null,
     "fuelTank": 14,
     "weight": 184,
-    "safetyFeatures": ["ABS", "Control de traccion"],
-    "equipment": ["Display LCD", "LED Full", "Asistente de arranque en pendiente"],
+    "safetyFeatures": [
+      "ABS",
+      "Control de traccion"
+    ],
+    "equipment": [
+      "Display LCD",
+      "LED Full",
+      "Asistente de arranque en pendiente"
+    ],
     "images": [],
     "description": "La Yamaha MT-07 2026, la naked mas versatil del mercado."
   },
@@ -226,9 +301,100 @@
     "trunkCapacity": null,
     "fuelTank": 17,
     "weight": 199,
-    "safetyFeatures": ["ABS", "Control de par deslizante"],
-    "equipment": ["Panel digital LCD", "Iluminacion full LED", "Parabrisas ajustable"],
+    "safetyFeatures": [
+      "ABS",
+      "Control de par deslizante"
+    ],
+    "equipment": [
+      "Panel digital LCD",
+      "Iluminacion full LED",
+      "Parabrisas ajustable"
+    ],
     "images": [],
     "description": "La Honda CB 500X 2026, ideal para ciudad y rutas."
+  },
+  {
+    "id": "byd-yuan-pro-2026",
+    "slug": "byd-yuan-pro-2026",
+    "brand": "BYD",
+    "model": "Yuan Pro",
+    "year": 2026,
+    "version": "EV",
+    "category": "suvs",
+    "subcategory": "crossover",
+    "priceUSD": 29900,
+    "priceUYU": 1256000,
+    "engineCc": null,
+    "engineHp": 136,
+    "engineTorque": 210,
+    "fuelType": "eléctrico",
+    "transmission": "automatica",
+    "gears": 1,
+    "length": 4310,
+    "width": 1785,
+    "height": 1680,
+    "wheelbase": 2620,
+    "trunkCapacity": 340,
+    "fuelTank": null,
+    "weight": 1555,
+    "autonomyKm": 401,
+    "batteryKwh": 50.1,
+    "safetyFeatures": [
+      "6 Airbags",
+      "ABS",
+      "ESC",
+      "Camara 360",
+      "Sensores de estacionamiento"
+    ],
+    "equipment": [
+      "Pantalla 12.8\" rotativa",
+      "Cargador AC 7kW",
+      "Carga rapida DC",
+      "Climatizador",
+      "Llantas 17\""
+    ],
+    "images": [],
+    "description": "El BYD Yuan Pro 100% electrico ofrece hasta 401 km de autonomia y tecnologia de punta."
+  },
+  {
+    "id": "toyota-corolla-cross-2026-hybrid",
+    "slug": "toyota-corolla-cross-2026-hybrid",
+    "brand": "Toyota",
+    "model": "Corolla Cross",
+    "year": 2026,
+    "version": "Hybrid XEi",
+    "category": "suvs",
+    "subcategory": "crossover",
+    "priceUSD": 42500,
+    "priceUYU": 1785000,
+    "engineCc": 1798,
+    "engineHp": 122,
+    "engineTorque": 142,
+    "fuelType": "híbrido",
+    "transmission": "cvt",
+    "gears": null,
+    "length": 4460,
+    "width": 1825,
+    "height": 1620,
+    "wheelbase": 2640,
+    "trunkCapacity": 440,
+    "fuelTank": 43,
+    "weight": 1420,
+    "safetyFeatures": [
+      "7 Airbags",
+      "ABS",
+      "TSS 2.0",
+      "Frenado autonomo",
+      "Alerta de punto ciego"
+    ],
+    "equipment": [
+      "Toyota Safety Sense",
+      "Pantalla 9\"",
+      "Apple CarPlay",
+      "Android Auto",
+      "JBL Premium Audio"
+    ],
+    "images": [],
+    "description": "El Toyota Corolla Cross Hybrid combina eficiencia excepcional con versatilidad SUV."
   }
 ]
