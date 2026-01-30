@@ -86,12 +86,9 @@ export default function LatestCarousel({ vehicles }: LatestCarouselProps) {
                                     {vehicle.model}
                                 </h3>
                                 <div className="flex items-center justify-between mt-2">
-                                    <span className="category-badge text-xs py-1 px-2">{vehicle.year}</span>
-                                    {vehicle.priceUSD && (
-                                        <span className="text-sm font-bold text-[var(--accent-secondary)]">
-                                            USD {vehicle.priceUSD.toLocaleString()}
-                                        </span>
-                                    )}
+                                    <span className="category-badge text-xs py-1 px-2">
+                                        {new Date().toLocaleDateString('es-UY')}
+                                    </span>
                                 </div>
                             </div>
                         </article>

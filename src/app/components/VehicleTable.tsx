@@ -92,14 +92,30 @@ export default function VehicleTable({ vehicles }: VehicleTableProps) {
 
     const getFuelBadge = (fuelType: string | undefined) => {
         const fuel = fuelType?.toLowerCase() || '';
+
+        // Helper component for consistent badge style
+        const BadgeIcon = ({ icon, letter, color, title }: { icon: string, letter: string, color: string, title: string }) => (
+            <div className="relative inline-block" title={title}>
+                <span className="text-xl">{icon}</span>
+                <span className={`absolute -bottom-1 -right-1 text-[10px] font-bold px-1 rounded ${color} leading-3`}>
+                    {letter}
+                </span>
+            </div>
+        );
+
         if (fuel === 'electrico' || fuel === 'eléctrico') {
-            return <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-400 border border-green-500/30">⚡ Eléctrico</span>;
+            return <BadgeIcon icon="⚡" letter="E" color="bg-green-600 text-white" title="Eléctrico" />;
         }
         if (fuel === 'hibrido' || fuel === 'híbrido') {
-            return <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-400 border border-blue-500/30">🔋 Híbrido</span>;
+            return <BadgeIcon icon="🔋" letter="H" color="bg-blue-600 text-white" title="Híbrido" />;
         }
-        const fuelLabel = fuel === 'diesel' ? 'Diesel' : fuel === 'nafta' ? 'Nafta' : 'Combustión';
-        return <span className="px-2 py-1 rounded-full text-xs font-medium bg-orange-500/20 text-orange-400 border border-orange-500/30">⛽ {fuelLabel}</span>;
+
+        const isDiesel = fuel === 'diesel';
+        const fuelLabel = isDiesel ? 'Diesel' : fuel === 'nafta' ? 'Nafta' : 'Combustión';
+        const badgeColor = isDiesel ? 'bg-gray-600 text-white' : 'bg-orange-500 text-white';
+        const badgeLetter = isDiesel ? 'D' : 'N';
+
+        return <BadgeIcon icon="⛽" letter={badgeLetter} color={badgeColor} title={fuelLabel} />;
     };
 
     const isElectric = (fuelType: string | undefined) => {
@@ -175,10 +191,7 @@ export default function VehicleTable({ vehicles }: VehicleTableProps) {
                         <thead>
                             <tr className="border-b border-[var(--border)] bg-[var(--glass-bg)]">
                                 <th className="text-left px-4 py-4 text-sm font-semibold text-[var(--foreground-muted)]">Vehículo</th>
-                                <th className="text-left px-4 py-4 text-sm font-semibold text-[var(--foreground-muted)]">Tipo</th>
-                                <th className="text-center px-4 py-4 text-sm font-semibold text-[var(--foreground-muted)]">Potencia</th>
-                                <th className="text-center px-4 py-4 text-sm font-semibold text-[var(--foreground-muted)]">Motor</th>
-                                <th className="text-center px-4 py-4 text-sm font-semibold text-[var(--foreground-muted)]">Autonomía</th>
+                                <th className="text-right px-4 py-4 text-sm font-semibold text-[var(--foreground-muted)]">Motor</th>
                                 <th className="text-right px-4 py-4 text-sm font-semibold text-[var(--foreground-muted)]">Precio USD</th>
                             </tr>
                         </thead>
@@ -199,7 +212,7 @@ export default function VehicleTable({ vehicles }: VehicleTableProps) {
                                         <td className="px-4 py-4 relative">
                                             <Link href={`/vehiculo/${vehicle.slug}`} className="absolute inset-0 z-10" aria-label={`Ver ${vehicle.brand} ${vehicle.model}`}></Link>
                                             <div className="flex items-center gap-3">
-                                                <div className="w-12 h-12 rounded-lg bg-[var(--glass-bg)] border border-[var(--border)] flex items-center justify-center text-2xl flex-shrink-0">
+                                                <div title={vehicle.category} className="w-12 h-12 rounded-lg bg-[var(--glass-bg)] border border-[var(--border)] flex items-center justify-center text-2xl flex-shrink-0">
                                                     {vehicle.image ? (
                                                         <img src={vehicle.image} alt="" className="w-full h-full object-cover rounded-lg" />
                                                     ) : (
@@ -217,44 +230,29 @@ export default function VehicleTable({ vehicles }: VehicleTableProps) {
                                             </div>
                                         </td>
 
-                                        {/* Category */}
-                                        <td className="px-4 py-4">
-                                            <span className="inline-flex items-center gap-1 text-sm">
-                                                <span>{getCategoryIcon(vehicle.category)}</span>
-                                                <span className="text-[var(--foreground-muted)]">{getCategoryName(vehicle.category)}</span>
-                                            </span>
-                                        </td>
+                                        {/* Motor (Fuel Type) */}
+                                        {/* Motor / Power Combined */}
+                                        <td className="px-4 py-4 text-right">
+                                            <div className="flex flex-col items-center gap-1 w-fit ml-auto">
+                                                <div className="mb-1">{getFuelBadge(vehicle.fuelType)}</div>
 
-                                        {/* HP */}
-                                        <td className="px-4 py-4 text-center">
-                                            {vehicle.engineHp ? (
-                                                <span className="font-bold text-sm">{vehicle.engineHp} <span className="text-xs text-[var(--foreground-muted)]">HP</span></span>
-                                            ) : (
-                                                <span className="text-[var(--foreground-muted)] text-sm">-</span>
-                                            )}
-                                        </td>
+                                                {vehicle.engineHp ? (
+                                                    <span className="font-bold text-sm">{vehicle.engineHp} <span className="text-xs text-[var(--foreground-muted)]">HP</span></span>
+                                                ) : (
+                                                    <span className="text-[var(--foreground-muted)] text-sm">-</span>
+                                                )}
 
-                                        {/* Fuel Type */}
-                                        <td className="px-4 py-4 text-center">
-                                            {getFuelBadge(vehicle.fuelType)}
-                                        </td>
-
-                                        {/* Autonomy (only for electric) */}
-                                        <td className="px-4 py-4 text-center">
-                                            {isElectric(vehicle.fuelType) && (vehicle as any).autonomyKm ? (
-                                                <span className="font-medium text-sm text-green-400">{(vehicle as any).autonomyKm} km</span>
-                                            ) : isElectric(vehicle.fuelType) ? (
-                                                <span className="text-[var(--foreground-muted)] text-sm">-</span>
-                                            ) : (
-                                                <span className="text-[var(--foreground-muted)] text-xs">N/A</span>
-                                            )}
+                                                {isElectric(vehicle.fuelType) && (vehicle as any).autonomyKm && (
+                                                    <span className="font-medium text-xs text-green-400">{(vehicle as any).autonomyKm} km</span>
+                                                )}
+                                            </div>
                                         </td>
 
                                         {/* Price */}
                                         <td className="px-4 py-4 text-right">
                                             {vehicle.priceUSD ? (
-                                                <span className="price-tag text-sm font-bold">
-                                                    USD {vehicle.priceUSD.toLocaleString()}
+                                                <span className="text-sm font-bold text-[var(--primary)]">
+                                                    {vehicle.priceUSD.toLocaleString('es-UY')}
                                                 </span>
                                             ) : (
                                                 <span className="text-[var(--foreground-muted)] text-sm">Consultar</span>
