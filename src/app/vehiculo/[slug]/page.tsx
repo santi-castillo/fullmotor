@@ -6,7 +6,7 @@ type Params = Promise<{ slug: string }>
 
 export async function generateMetadata({ params }: { params: Params }) {
   const { slug } = await params;
-  const vehicle = getVehicleBySlug(slug);
+  const vehicle = await getVehicleBySlug(slug);
   if (!vehicle) return { title: 'Vehiculo no encontrado' };
 
   return {
@@ -15,13 +15,14 @@ export async function generateMetadata({ params }: { params: Params }) {
   };
 }
 
-export function generateStaticParams() {
-  return getAllVehicles().map(v => ({ slug: v.slug }));
+export async function generateStaticParams() {
+  const vehicles = await getAllVehicles();
+  return vehicles.map(v => ({ slug: v.slug }));
 }
 
 export default async function VehiclePage({ params }: { params: Params }) {
   const { slug } = await params;
-  const vehicle = getVehicleBySlug(slug);
+  const vehicle = await getVehicleBySlug(slug);
 
   if (!vehicle) {
     notFound();
@@ -70,16 +71,16 @@ export default async function VehiclePage({ params }: { params: Params }) {
           <div>
             <div className="aspect-[16/10] bg-[var(--muted)] rounded-xl flex items-center justify-center overflow-hidden">
               {vehicle.image ? (
-                <img 
-                  src={vehicle.image} 
+                <img
+                  src={vehicle.image}
                   alt={`${vehicle.brand} ${vehicle.model} ${vehicle.year}`}
                   className="w-full h-full object-cover"
                 />
               ) : (
                 <span className="text-[120px] opacity-30">
                   {vehicle.category === 'motos' ? '🏍️' :
-                   vehicle.category === 'camionetas' ? '🛻' :
-                   vehicle.category === 'suvs' ? '🚙' : '🚗'}
+                    vehicle.category === 'camionetas' ? '🛻' :
+                      vehicle.category === 'suvs' ? '🚙' : '🚗'}
                 </span>
               )}
             </div>

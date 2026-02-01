@@ -47,7 +47,7 @@ export default async function CategoryPage({ params }: { params: Params }) {
     notFound();
   }
 
-  const vehicles = getVehiclesByCategory(category as Category);
+  const vehicles = await getVehiclesByCategory(category as Category);
   const meta = categoryMeta[category];
 
   // Group by brand

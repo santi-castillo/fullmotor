@@ -1,52 +1,51 @@
 import { Vehicle, Category, CATEGORIES } from '@/types/vehicle'
-import vehiclesData from '../../data/vehicles.json'
+import { fetchVehicles, fetchVehicleBySlug as apiFetchVehicleBySlug } from './api'
 
-const vehicles: Vehicle[] = vehiclesData as Vehicle[]
+// Re-export CATEGORIES for components that need it
+export { CATEGORIES }
 
-export function getAllVehicles(): Vehicle[] {
+export async function getAllVehicles(): Promise<Vehicle[]> {
+  const { vehicles } = await fetchVehicles({ limit: 100 })
   return vehicles
 }
 
-export function getVehicleBySlug(slug: string): Vehicle | undefined {
-  return vehicles.find(v => v.slug === slug)
+export async function getVehicleBySlug(slug: string): Promise<Vehicle | undefined> {
+  const vehicle = await apiFetchVehicleBySlug(slug)
+  return vehicle || undefined
 }
 
-export function getVehiclesByCategory(category: Category): Vehicle[] {
+export async function getVehiclesByCategory(category: Category): Promise<Vehicle[]> {
+  const { vehicles } = await fetchVehicles({ category, limit: 100 })
+  return vehicles.sort((a, b) => a.brand.localeCompare(b.brand))
+}
+
+export async function getLatestVehicles(limit: number = 6): Promise<Vehicle[]> {
+  const { vehicles } = await fetchVehicles({ limit, sort: 'newest' })
   return vehicles
-    .filter(v => v.category === category)
-    .sort((a, b) => a.brand.localeCompare(b.brand))
 }
 
-export function getLatestVehicles(limit: number = 6): Vehicle[] {
-  return vehicles.slice(0, limit)
-}
-
-export function getCountByCategory(): { id: Category; name: string; icon: string; count: number }[] {
+export async function getCountByCategory(): Promise<{ id: Category; name: string; icon: string; count: number }[]> {
+  const { vehicles } = await fetchVehicles({ limit: 1000 })
   return CATEGORIES.map(cat => ({
     ...cat,
     count: vehicles.filter(v => v.category === cat.id).length
   }))
 }
 
-export function searchVehicles(query: string, category?: Category): Vehicle[] {
-  let results = vehicles
+export async function searchVehiclesLocal(query: string, category?: Category): Promise<Vehicle[]> {
+  const { vehicles } = await fetchVehicles({ category, limit: 100 })
 
-  if (category) {
-    results = results.filter(v => v.category === category)
-  }
+  if (!query) return vehicles
 
-  if (query) {
-    const q = query.toLowerCase()
-    results = results.filter(v =>
-      v.brand.toLowerCase().includes(q) ||
-      v.model.toLowerCase().includes(q) ||
-      (v.description?.toLowerCase().includes(q))
-    )
-  }
-
-  return results
+  const q = query.toLowerCase()
+  return vehicles.filter(v =>
+    v.brand.toLowerCase().includes(q) ||
+    v.model.toLowerCase().includes(q) ||
+    (v.description?.toLowerCase().includes(q))
+  )
 }
 
-export function getVehiclesBrands(): string[] {
+export async function getVehiclesBrands(): Promise<string[]> {
+  const { vehicles } = await fetchVehicles({ limit: 1000 })
   return [...new Set(vehicles.map(v => v.brand))].sort()
 }

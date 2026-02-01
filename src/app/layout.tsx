@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
+import SearchBar from "./components/SearchBar";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -28,14 +29,15 @@ export default function RootLayout({
     <html lang="es">
       <body className={`${inter.variable} antialiased`}>
         <header className="sticky top-0 z-50 bg-[var(--background)]/80 backdrop-blur-xl border-b border-[var(--border)]">
-          <nav className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-3 group">
+          <nav className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
+            <Link href="/" className="flex items-center gap-3 group flex-shrink-0">
               <img src="/logo.svg" alt="FullMotor" className="w-8 h-8 group-hover:scale-110 transition-transform duration-300" />
               <div className="flex items-baseline gap-2">
                 <span className="text-xl font-bold gradient-text">FullMotor</span>
-                <span className="text-sm text-[var(--foreground-muted)]">Uruguay</span>
+                <span className="text-sm text-[var(--foreground-muted)] hidden sm:inline">Uruguay</span>
               </div>
             </Link>
+            <SearchBar />
           </nav>
         </header>
 
