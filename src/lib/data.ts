@@ -5,8 +5,13 @@ import { fetchVehicles, fetchVehicleBySlug as apiFetchVehicleBySlug } from './ap
 export { CATEGORIES }
 
 export async function getAllVehicles(): Promise<Vehicle[]> {
-  const { vehicles } = await fetchVehicles({ limit: 100 })
-  return vehicles
+  try {
+    const { vehicles } = await fetchVehicles({ limit: 100 })
+    return vehicles
+  } catch (error) {
+    console.warn("Failed to fetch vehicles (likely empty DB during build). Returning empty list.", error)
+    return []
+  }
 }
 
 export async function getVehicleBySlug(slug: string): Promise<Vehicle | undefined> {
