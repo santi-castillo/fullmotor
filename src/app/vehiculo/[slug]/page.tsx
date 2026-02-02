@@ -56,7 +56,7 @@ export default async function VehiclePage({ params }: { params: Params }) {
           <nav className="flex items-center gap-2 text-sm text-[var(--secondary)]">
             <Link href="/" className="hover:text-[var(--foreground)]">Inicio</Link>
             <span>/</span>
-            <Link href={`/${vehicle.category}`} className="hover:text-[var(--foreground)]">
+            <Link href={`/?category=${vehicle.category}`} className="hover:text-[var(--foreground)]">
               {categoryNames[vehicle.category]}
             </Link>
             <span>/</span>
@@ -99,24 +99,27 @@ export default async function VehiclePage({ params }: { params: Params }) {
               {vehicle.version && (
                 <p className="text-xl text-[var(--secondary)]">{vehicle.version}</p>
               )}
+
+              <div className="mt-4">
+                <Link href={`/compare?vehicle1=${vehicle.slug}`} className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-violet-600 hover:bg-violet-700 rounded-lg transition-colors">
+                  Comparar
+                </Link>
+              </div>
             </div>
 
             {/* Pricing */}
             <div className="bg-[var(--muted)] rounded-xl p-6 mb-6">
-              {vehicle.priceUSD && (
+              {vehicle.price && (
                 <div className="mb-2">
-                  <p className="price-tag text-3xl">USD {vehicle.priceUSD.toLocaleString()}</p>
+                  <p className="price-tag text-3xl">{vehicle.currency} {vehicle.price.toLocaleString()}</p>
                 </div>
-              )}
-              {vehicle.priceUYU && (
-                <p className="text-[var(--secondary)]">
-                  ${vehicle.priceUYU.toLocaleString()} UYU
-                </p>
               )}
               <p className="text-xs text-[var(--secondary)] mt-2">
                 * Precio de referencia. Consultar con concesionario.
               </p>
             </div>
+
+
 
             {/* Quick Specs */}
             <div className="grid grid-cols-2 gap-4 mb-6">
@@ -144,6 +147,18 @@ export default async function VehiclePage({ params }: { params: Params }) {
                   <p className="spec-value">{fuelNames[vehicle.fuelType] || vehicle.fuelType}</p>
                 </div>
               )}
+              {vehicle.batteryKwh && (
+                <div className="spec-item">
+                  <p className="spec-label">Batería</p>
+                  <p className="spec-value">{vehicle.batteryKwh} kWh</p>
+                </div>
+              )}
+              {vehicle.autonomyKm && (
+                <div className="spec-item">
+                  <p className="spec-label">Autonomía</p>
+                  <p className="spec-value">{vehicle.autonomyKm} km</p>
+                </div>
+              )}
             </div>
 
             {vehicle.description && (
@@ -151,6 +166,17 @@ export default async function VehiclePage({ params }: { params: Params }) {
                 {vehicle.description}
               </p>
             )}
+
+            {/* Report Button */}
+            <div className="mt-8 border-t border-[var(--border)] pt-6">
+              <a
+                href={`mailto:contacto@todomotor.uy?subject=Warning en publicacion: ${vehicle.brand} ${vehicle.model} (${vehicle.slug})`}
+                className="flex items-center gap-2 text-sm text-[var(--secondary)] hover:text-red-500 transition-colors w-fit"
+              >
+                <span className="text-lg">⚠️</span>
+                Reportar error en la publicación
+              </a>
+            </div>
           </div>
         </div>
 
@@ -187,6 +213,18 @@ export default async function VehiclePage({ params }: { params: Params }) {
                   <div className="flex justify-between">
                     <dt className="text-[var(--secondary)]">Combustible</dt>
                     <dd className="font-medium">{fuelNames[vehicle.fuelType] || vehicle.fuelType}</dd>
+                  </div>
+                )}
+                {vehicle.batteryKwh && (
+                  <div className="flex justify-between">
+                    <dt className="text-[var(--secondary)]">Capacidad Batería</dt>
+                    <dd className="font-medium">{vehicle.batteryKwh} kWh</dd>
+                  </div>
+                )}
+                {vehicle.autonomyKm && (
+                  <div className="flex justify-between">
+                    <dt className="text-[var(--secondary)]">Autonomía (WLTP)</dt>
+                    <dd className="font-medium">{vehicle.autonomyKm} km</dd>
                   </div>
                 )}
               </dl>

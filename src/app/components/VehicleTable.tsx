@@ -47,13 +47,13 @@ export default function VehicleTable({ vehicles }: VehicleTableProps) {
         }
 
         // Price filter
-        if (priceMin && vehicle.priceUSD) {
-            if (vehicle.priceUSD < parseInt(priceMin)) {
+        if (priceMin && vehicle.price) {
+            if (vehicle.price < parseInt(priceMin)) {
                 return false;
             }
         }
-        if (priceMax && vehicle.priceUSD) {
-            if (vehicle.priceUSD > parseInt(priceMax)) {
+        if (priceMax && vehicle.price) {
+            if (vehicle.price > parseInt(priceMax)) {
                 return false;
             }
         }
@@ -168,7 +168,7 @@ export default function VehicleTable({ vehicles }: VehicleTableProps) {
                 <div className="flex items-center gap-2">
                     <input
                         type="number"
-                        placeholder="USD Min"
+                        placeholder="Precio Min"
                         value={priceMin}
                         onChange={(e) => setPriceMin(e.target.value)}
                         className="w-32 px-3 py-2 rounded-lg bg-[var(--glass-bg)] border border-[var(--border)] text-sm focus:border-[var(--primary)] focus:outline-none"
@@ -176,7 +176,7 @@ export default function VehicleTable({ vehicles }: VehicleTableProps) {
                     <span className="text-[var(--foreground-muted)]">-</span>
                     <input
                         type="number"
-                        placeholder="USD Max"
+                        placeholder="Precio Max"
                         value={priceMax}
                         onChange={(e) => setPriceMax(e.target.value)}
                         className="w-32 px-3 py-2 rounded-lg bg-[var(--glass-bg)] border border-[var(--border)] text-sm focus:border-[var(--primary)] focus:outline-none"
@@ -192,7 +192,7 @@ export default function VehicleTable({ vehicles }: VehicleTableProps) {
                             <tr className="border-b border-[var(--border)] bg-[var(--glass-bg)]">
                                 <th className="text-left px-4 py-4 text-sm font-semibold text-[var(--foreground-muted)]">Vehículo</th>
                                 <th className="text-right px-4 py-4 text-sm font-semibold text-[var(--foreground-muted)]">Motor</th>
-                                <th className="text-right px-4 py-4 text-sm font-semibold text-[var(--foreground-muted)]">Precio USD</th>
+                                <th className="text-right px-4 py-4 text-sm font-semibold text-[var(--foreground-muted)]">Precio</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -250,9 +250,9 @@ export default function VehicleTable({ vehicles }: VehicleTableProps) {
 
                                         {/* Price */}
                                         <td className="px-4 py-4 text-right">
-                                            {vehicle.priceUSD ? (
+                                            {vehicle.price ? (
                                                 <span className="text-sm font-bold text-[var(--primary)]">
-                                                    {vehicle.priceUSD.toLocaleString('es-UY')}
+                                                    {vehicle.currency} {vehicle.price.toLocaleString('es-UY')}
                                                 </span>
                                             ) : (
                                                 <span className="text-[var(--foreground-muted)] text-sm">Consultar</span>

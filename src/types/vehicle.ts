@@ -1,14 +1,17 @@
 export interface Vehicle {
   id: string
   slug: string
+  countryCode: string
+  vehicleType: string
+  vehicleSubtype: string
   brand: string
   model: string
   year: number
   version?: string
   category: 'autos' | 'suvs' | 'camionetas' | 'motos'
-  subcategory?: string
-  priceUYU?: number
-  priceUSD?: number
+  subcategory?: string // Keeping this as optional if it was used for something else, or maybe it is redundant with vehicleSubtype
+  currency: string
+  price: number
   engineCc?: number
   engineHp?: number
   engineTorque?: number
@@ -22,6 +25,8 @@ export interface Vehicle {
   trunkCapacity?: number
   fuelTank?: number
   weight?: number
+  autonomyKm?: number
+  batteryKwh?: number
   safetyFeatures: string[]
   equipment: string[]
   image?: string

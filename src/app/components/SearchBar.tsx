@@ -122,9 +122,9 @@ export default function SearchBar() {
                                     {vehicle.year} {vehicle.version && `· ${vehicle.version}`}
                                 </p>
                             </div>
-                            {vehicle.priceUSD && (
+                            {vehicle.price && (
                                 <span className="text-sm font-bold text-[var(--primary)]">
-                                    ${vehicle.priceUSD.toLocaleString()}
+                                    {vehicle.currency} {vehicle.price.toLocaleString()}
                                 </span>
                             )}
                         </Link>

@@ -88,7 +88,7 @@ export default function VehicleFilters({ brands }: VehicleFiltersProps) {
             <div className="flex items-center gap-2">
                 <input
                     type="number"
-                    placeholder="USD Min"
+                    placeholder="Precio Min"
                     value={currentMinPrice}
                     onChange={(e) => handleFilterChange('min_price', e.target.value)}
                     className="w-28 px-3 py-2 rounded-lg bg-[var(--glass-bg)] border border-[var(--border)] text-sm focus:border-[var(--primary)] focus:outline-none"
@@ -96,7 +96,7 @@ export default function VehicleFilters({ brands }: VehicleFiltersProps) {
                 <span className="text-[var(--foreground-muted)]">-</span>
                 <input
                     type="number"
-                    placeholder="USD Max"
+                    placeholder="Precio Max"
                     value={currentMaxPrice}
                     onChange={(e) => handleFilterChange('max_price', e.target.value)}
                     className="w-28 px-3 py-2 rounded-lg bg-[var(--glass-bg)] border border-[var(--border)] text-sm focus:border-[var(--primary)] focus:outline-none"

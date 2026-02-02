@@ -1,6 +1,12 @@
 import { Vehicle, Category } from '@/types/vehicle'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'
+const COUNTRY = process.env.NEXT_PUBLIC_COUNTRY || 'uy'
+
+const getHeaders = (vehicleType: string = 'automotive') => ({
+    'X-Country': COUNTRY,
+    'X-Vehicle-Type': vehicleType,
+})
 
 // ============================================
 // Category & Fuel Type Mapping (Backend ↔ Frontend)
@@ -38,10 +44,15 @@ interface ApiVehicle {
     model: string
     year: number
     version?: string
-    category: string
+    category?: string // Removed from API but maybe keeping for safety or if mapped differently? User said removed.
+    countryCode: string
+    vehicleType: string
+    vehicleSubtype: string
     subcategory?: string
-    priceUYU?: number
-    priceUSD?: number
+    currency: string
+    price: number
+    // priceUYU?: number // Removed
+    // priceUSD?: number // Removed
     engineCc?: number
     engineHp?: number
     engineTorque?: number
@@ -76,8 +87,9 @@ interface VehiclesResponse {
 
 interface FiltersResponse {
     brands: { name: string; count: number }[]
-    categories: string[]
+    subtypes: string[]
     priceRange: { min: number; max: number }
+    currency: string
 }
 
 interface CarouselItem {
@@ -103,14 +115,19 @@ function transformVehicle(apiVehicle: ApiVehicle): Vehicle {
     return {
         id: apiVehicle.id,
         slug: apiVehicle.slug,
+        countryCode: apiVehicle.countryCode,
+        vehicleType: apiVehicle.vehicleType,
+        vehicleSubtype: apiVehicle.vehicleSubtype,
         brand: apiVehicle.brand,
         model: apiVehicle.model,
         year: apiVehicle.year,
         version: apiVehicle.version,
-        category: categoryToFrontend[apiVehicle.category] || 'autos',
+        category: categoryToFrontend[apiVehicle.vehicleSubtype] || 'autos', // Map subtype to frontend category
         subcategory: apiVehicle.subcategory,
-        priceUYU: apiVehicle.priceUYU,
-        priceUSD: apiVehicle.priceUSD,
+        currency: apiVehicle.currency,
+        price: apiVehicle.price,
+        // priceUYU: apiVehicle.priceUYU,
+        // priceUSD: apiVehicle.priceUSD,
         engineCc: apiVehicle.engineCc,
         engineHp: apiVehicle.engineHp,
         engineTorque: apiVehicle.engineTorque,
@@ -124,6 +141,8 @@ function transformVehicle(apiVehicle: ApiVehicle): Vehicle {
         trunkCapacity: apiVehicle.trunkCapacity,
         fuelTank: apiVehicle.fuelTank,
         weight: apiVehicle.weight,
+        autonomyKm: apiVehicle.autonomyKm,
+        batteryKwh: apiVehicle.batteryKwh,
         safetyFeatures: apiVehicle.safetyFeatures || [],
         equipment: apiVehicle.equipment || [],
         image: apiVehicle.images?.[0],
@@ -147,6 +166,7 @@ interface FetchVehiclesParams {
     minPrice?: number
     maxPrice?: number
     sort?: 'price_asc' | 'price_desc' | 'newest'
+    vehicleType?: string
 }
 
 export async function fetchVehicles(params: FetchVehiclesParams = {}): Promise<{ vehicles: Vehicle[]; meta: VehiclesResponse['meta'] }> {
@@ -155,7 +175,7 @@ export async function fetchVehicles(params: FetchVehiclesParams = {}): Promise<{
     if (params.page) searchParams.set('page', params.page.toString())
     if (params.limit) searchParams.set('limit', params.limit.toString())
     if (params.brand) searchParams.set('brand', params.brand)
-    if (params.category) searchParams.set('category', categoryToBackend[params.category])
+    if (params.category) searchParams.set('subtype', categoryToBackend[params.category])
     if (params.fuelType) searchParams.set('fuel_type', params.fuelType)
     if (params.minPrice) searchParams.set('min_price', params.minPrice.toString())
     if (params.maxPrice) searchParams.set('max_price', params.maxPrice.toString())
@@ -163,7 +183,10 @@ export async function fetchVehicles(params: FetchVehiclesParams = {}): Promise<{
 
     const url = `${API_URL}/api/vehicles${searchParams.toString() ? `?${searchParams}` : ''}`
 
-    const response = await fetch(url, { next: { revalidate: 60 } })
+    const response = await fetch(url, {
+        next: { revalidate: 60 },
+        headers: getHeaders(params.vehicleType)
+    })
 
     if (!response.ok) {
         throw new Error(`Failed to fetch vehicles: ${response.statusText}`)
@@ -177,10 +200,13 @@ export async function fetchVehicles(params: FetchVehiclesParams = {}): Promise<{
     }
 }
 
-export async function fetchVehicleBySlug(slug: string): Promise<Vehicle | null> {
+export async function fetchVehicleBySlug(slug: string, vehicleType?: string): Promise<Vehicle | null> {
     const url = `${API_URL}/api/vehicles/${slug}`
 
-    const response = await fetch(url, { next: { revalidate: 60 } })
+    const response = await fetch(url, {
+        next: { revalidate: 60 },
+        headers: getHeaders(vehicleType)
+    })
 
     if (response.status === 404) {
         return null
@@ -194,10 +220,13 @@ export async function fetchVehicleBySlug(slug: string): Promise<Vehicle | null> 
     return transformVehicle(apiVehicle)
 }
 
-export async function fetchCarouselItems(): Promise<CarouselItem[]> {
+export async function fetchCarouselItems(vehicleType?: string): Promise<CarouselItem[]> {
     const url = `${API_URL}/api/carousel`
 
-    const response = await fetch(url, { next: { revalidate: 60 } })
+    const response = await fetch(url, {
+        next: { revalidate: 60 },
+        headers: getHeaders(vehicleType)
+    })
 
     if (!response.ok) {
         throw new Error(`Failed to fetch carousel: ${response.statusText}`)
@@ -207,10 +236,13 @@ export async function fetchCarouselItems(): Promise<CarouselItem[]> {
     return data.data || []
 }
 
-export async function fetchFilters(): Promise<FiltersResponse> {
+export async function fetchFilters(vehicleType?: string): Promise<FiltersResponse> {
     const url = `${API_URL}/api/filters`
 
-    const response = await fetch(url, { next: { revalidate: 300 } })
+    const response = await fetch(url, {
+        next: { revalidate: 300 },
+        headers: getHeaders(vehicleType)
+    })
 
     if (!response.ok) {
         throw new Error(`Failed to fetch filters: ${response.statusText}`)
@@ -219,11 +251,13 @@ export async function fetchFilters(): Promise<FiltersResponse> {
     return response.json()
 }
 
-export async function searchVehicles(query: string, type: 'text' | 'semantic' = 'text'): Promise<Vehicle[]> {
+export async function searchVehicles(query: string, type: 'text' | 'semantic' = 'text', vehicleType?: string): Promise<Vehicle[]> {
     const searchParams = new URLSearchParams({ q: query, type })
     const url = `${API_URL}/api/search?${searchParams}`
 
-    const response = await fetch(url)
+    const response = await fetch(url, {
+        headers: getHeaders(vehicleType)
+    })
 
     if (!response.ok) {
         throw new Error(`Search failed: ${response.statusText}`)

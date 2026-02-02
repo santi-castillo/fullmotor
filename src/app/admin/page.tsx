@@ -12,7 +12,7 @@ export default function AdminPage() {
   const [message, setMessage] = useState('')
 
   useEffect(() => {
-    setVehicles(getAllVehicles())
+    getAllVehicles().then(setVehicles)
   }, [])
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -23,7 +23,7 @@ export default function AdminPage() {
 
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!file || !selectedVehicle) {
       setMessage('Selecciona un vehículo y una imagen')
       return
@@ -34,7 +34,7 @@ export default function AdminPage() {
 
     try {
       const filename = `vehicles/${selectedVehicle}-${Date.now()}.${file.name.split('.').pop()}`
-      
+
       const response = await fetch(
         `/api/upload?filename=${encodeURIComponent(filename)}`,
         {
@@ -48,15 +48,15 @@ export default function AdminPage() {
       }
 
       const blob = await response.json()
-      
+
       setMessage(`Imagen subida exitosamente: ${blob.url}`)
       console.log('Blob URL:', blob.url)
       console.log(`Actualiza el vehículo ${selectedVehicle} con: "image": "${blob.url}"`)
-      
+
       setFile(null)
       const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement
       if (fileInput) fileInput.value = ''
-      
+
     } catch (error) {
       console.error('Error uploading:', error)
       setMessage('Error al subir la imagen')
@@ -69,7 +69,7 @@ export default function AdminPage() {
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-8">Admin - Subir Imágenes</h1>
-        
+
         <form onSubmit={handleUpload} className="bg-white p-6 rounded-lg shadow-md space-y-4">
           <div>
             <label className="block text-sm font-medium mb-2">

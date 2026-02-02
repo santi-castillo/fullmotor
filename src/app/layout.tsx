@@ -56,6 +56,13 @@ export default function RootLayout({
               <p className="text-[var(--foreground-muted)] text-sm">
                 © {new Date().getFullYear()} FullMotor Uruguay. Información de referencia.
               </p>
+              <a
+                href="mailto:contacto@todomotor.uy"
+                className="hidden md:flex items-center gap-2 px-4 py-2 rounded-full border border-[var(--border)] bg-[var(--background)] hover:bg-[var(--muted)] transition-colors text-sm font-medium"
+              >
+                <span>✉️</span>
+                Contáctanos
+              </a>
             </div>
           </div>
         </footer>

@@ -55,7 +55,7 @@ export default function VehicleList({ vehicles }: VehicleListProps) {
                         <tr className="border-b border-[var(--border)] bg-[var(--glass-bg)]">
                             <th className="text-left px-4 py-4 text-sm font-semibold text-[var(--foreground-muted)]">Vehículo</th>
                             <th className="text-right px-4 py-4 text-sm font-semibold text-[var(--foreground-muted)]">Motor</th>
-                            <th className="text-right px-4 py-4 text-sm font-semibold text-[var(--foreground-muted)]">Precio USD</th>
+                            <th className="text-right px-4 py-4 text-sm font-semibold text-[var(--foreground-muted)]">Precio</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -112,9 +112,9 @@ export default function VehicleList({ vehicles }: VehicleListProps) {
 
                                     {/* Price */}
                                     <td className="px-4 py-4 text-right">
-                                        {vehicle.priceUSD ? (
+                                        {vehicle.price ? (
                                             <span className="text-sm font-bold text-[var(--primary)]">
-                                                {vehicle.priceUSD.toLocaleString('es-UY')}
+                                                {vehicle.currency} {vehicle.price.toLocaleString('es-UY')}
                                             </span>
                                         ) : (
                                             <span className="text-[var(--foreground-muted)] text-sm">Consultar</span>
