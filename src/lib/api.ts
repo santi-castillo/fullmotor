@@ -7,6 +7,7 @@ const getHeaders = (vehicleType: string = 'automotive') => ({
     'X-Country': COUNTRY || 'uy',
     'X-Vehicle-Type': vehicleType || 'automotive',
     'User-Agent': 'Mozilla/5.0 (compatible; FullMotor-WebApp/1.0; +https://todomotor.uy)',
+    'X-Api-Secret': process.env.API_SECRET_KEY || '',
 })
 
 // ============================================
