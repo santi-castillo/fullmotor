@@ -59,7 +59,7 @@ export default function LatestCarousel({ vehicles }: LatestCarouselProps) {
                 ref={scrollRef}
                 className="flex gap-4 overflow-x-auto pb-4 px-12 snap-x snap-mandatory scrollbar-hide"
             >
-                {vehicles.map((vehicle) => (
+                {(vehicles || []).map((vehicle) => (
                     <Link
                         key={vehicle.id}
                         href={`/vehiculo/${vehicle.slug}`}

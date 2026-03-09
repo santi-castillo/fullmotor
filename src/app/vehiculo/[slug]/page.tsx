@@ -312,7 +312,7 @@ export default async function VehiclePage({ params }: { params: Params }) {
             </div>
 
             {/* Safety */}
-            {vehicle.safetyFeatures.length > 0 && (
+            {vehicle.safetyFeatures && vehicle.safetyFeatures.length > 0 && (
               <div className="card p-6">
                 <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
                   <span>🛡️</span> Seguridad
@@ -329,7 +329,7 @@ export default async function VehiclePage({ params }: { params: Params }) {
             )}
 
             {/* Equipment */}
-            {vehicle.equipment.length > 0 && (
+            {vehicle.equipment && vehicle.equipment.length > 0 && (
               <div className="card p-6">
                 <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
                   <span>✨</span> Equipamiento

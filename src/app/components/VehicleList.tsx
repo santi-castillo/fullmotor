@@ -59,7 +59,7 @@ export default function VehicleList({ vehicles }: VehicleListProps) {
                         </tr>
                     </thead>
                     <tbody>
-                        {vehicles.length === 0 ? (
+                        {!vehicles || vehicles.length === 0 ? (
                             <tr>
                                 <td colSpan={3} className="px-4 py-12 text-center text-[var(--foreground-muted)]">
                                     No se encontraron vehículos con los filtros seleccionados
