@@ -34,7 +34,12 @@ export default function SearchBar() {
 
         setIsLoading(true);
         try {
-            const response = await fetch(`${API_URL}/api/search?q=${encodeURIComponent(searchQuery)}&type=semantic`);
+            const response = await fetch(`${API_URL}/api/search?q=${encodeURIComponent(searchQuery)}&type=semantic`, {
+                headers: {
+                    'X-Country': 'uy',
+                    'X-Vehicle-Type': 'automotive'
+                }
+            });
             if (response.ok) {
                 const data = await response.json();
                 setResults(data.data || []);
