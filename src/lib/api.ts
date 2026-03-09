@@ -4,8 +4,8 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'
 const COUNTRY = process.env.NEXT_PUBLIC_COUNTRY || 'uy'
 
 const getHeaders = (vehicleType: string = 'automotive') => ({
-    'X-Country': COUNTRY,
-    'X-Vehicle-Type': vehicleType,
+    'X-Country': COUNTRY || 'uy',
+    'X-Vehicle-Type': vehicleType || 'automotive',
 })
 
 // ============================================
