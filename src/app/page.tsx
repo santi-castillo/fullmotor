@@ -39,7 +39,7 @@ export default async function Home({ searchParams }: PageProps) {
 
   // Fetch filter metadata (brands list)
   const filters = await fetchFilters();
-  const brands = filters.brands.map(b => b.name);
+  const brands = (filters.brands || []).map(b => b.name);
 
   return (
     <div className="fade-in">
