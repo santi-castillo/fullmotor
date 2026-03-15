@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getVehicleBySlug, getAllVehicles } from "@/lib/data";
+import ImageCarousel from "@/app/components/ImageCarousel";
 
 type Params = Promise<{ slug: string }>
 
@@ -10,7 +11,7 @@ export async function generateMetadata({ params }: { params: Params }) {
   if (!vehicle) return { title: 'Vehiculo no encontrado' };
 
   return {
-    title: `${vehicle.brand} ${vehicle.model} ${vehicle.year} | FullMotor`,
+    title: `${vehicle.brand} ${vehicle.model} ${vehicle.year} | TodoMotor`,
     description: vehicle.description || `Ficha tecnica del ${vehicle.brand} ${vehicle.model} ${vehicle.year}. Especificaciones, precios y equipamiento.`
   };
 }
@@ -48,6 +49,10 @@ export default async function VehiclePage({ params }: { params: Params }) {
     cvt: 'CVT'
   };
 
+  const allImages = vehicle.images?.length > 0 
+    ? [vehicle.image, ...vehicle.images].filter((v, i, a) => v && a.indexOf(v) === i) as string[]
+    : vehicle.image ? [vehicle.image] : [];
+
   return (
     <div className="fade-in">
       {/* Breadcrumb */}
@@ -69,21 +74,20 @@ export default async function VehiclePage({ params }: { params: Params }) {
         <div className="grid lg:grid-cols-2 gap-12">
           {/* Image */}
           <div>
-            <div className="aspect-[16/10] bg-[var(--muted)] rounded-xl flex items-center justify-center overflow-hidden">
-              {vehicle.image ? (
-                <img
-                  src={vehicle.image}
-                  alt={`${vehicle.brand} ${vehicle.model} ${vehicle.year}`}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <span className="text-[120px] opacity-30">
-                  {vehicle.category === 'motos' ? '🏍️' :
-                    vehicle.category === 'camionetas' ? '🛻' :
-                      vehicle.category === 'suvs' ? '🚙' : '🚗'}
-                </span>
-              )}
-            </div>
+            <ImageCarousel 
+              images={allImages} 
+              altPrefix={`${vehicle.brand} ${vehicle.model} ${vehicle.year}`} 
+              category={vehicle.category} 
+            />
+
+            {/* Description (Moved here) */}
+            {vehicle.description && (
+              <div className="mt-8">
+                <p className="text-[var(--secondary)] leading-relaxed text-lg">
+                  {vehicle.description}
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Info */}
@@ -118,8 +122,6 @@ export default async function VehiclePage({ params }: { params: Params }) {
                 * Precio de referencia. Consultar con concesionario.
               </p>
             </div>
-
-
 
             {/* Quick Specs */}
             <div className="grid grid-cols-2 gap-4 mb-6">
@@ -161,10 +163,19 @@ export default async function VehiclePage({ params }: { params: Params }) {
               )}
             </div>
 
-            {vehicle.description && (
-              <p className="text-[var(--secondary)] leading-relaxed">
-                {vehicle.description}
-              </p>
+            {/* Related Versions (Moved here) */}
+            {vehicle.relatedVersions && vehicle.relatedVersions.length > 0 && (
+              <div className="mb-6">
+                <h3 className="text-lg font-bold mb-3">Otras versiones disponibles</h3>
+                <div className="flex flex-col gap-2">
+                  {vehicle.relatedVersions.map((v) => (
+                    <Link key={v.slug} href={`/vehiculo/${v.slug}`} className="flex justify-between items-center p-3 rounded-lg border border-[var(--border)] hover:border-violet-500 hover:bg-[var(--muted)] transition-all">
+                      <span className="font-medium">{v.version || vehicle.model}</span>
+                      <span className="text-[var(--secondary)] font-semibold">{v.currency} {v.price?.toLocaleString()}</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
             )}
 
             {/* Report Button */}

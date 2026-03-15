@@ -3,10 +3,10 @@ import { Vehicle, Category } from '@/types/vehicle'
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'
 const COUNTRY = process.env.NEXT_PUBLIC_COUNTRY || 'uy'
 
-const getHeaders = (vehicleType: string = 'automotive') => ({
+const getHeaders = (vehicleType: string = 'all') => ({
     'X-Country': COUNTRY || 'uy',
-    'X-Vehicle-Type': vehicleType || 'automotive',
-    'User-Agent': 'Mozilla/5.0 (compatible; FullMotor-WebApp/1.0; +https://todomotor.uy)',
+    'X-Vehicle-Type': vehicleType || 'all',
+    'User-Agent': 'Mozilla/5.0 (compatible; TodoMotor-WebApp/1.0; +https://todomotor.uy)',
     'X-Api-Secret': process.env.API_SECRET_KEY || '',
 })
 
@@ -14,17 +14,22 @@ const getHeaders = (vehicleType: string = 'automotive') => ({
 // Category & Fuel Type Mapping (Backend ↔ Frontend)
 // ============================================
 
-const categoryToBackend: Record<Category, string> = {
+// Maps frontend category to the ?subtype= query param.
+// NOTE: 'motos' is NOT here — it only changes the X-Vehicle-Type header,
+// not the subtype filter (motorcycle subtypes in DB are 'sport', 'atvs', etc.)
+const categoryToSubtype: Partial<Record<Category, string>> = {
     'autos': 'cars',
     'suvs': 'suvs',
     'camionetas': 'trucks',
-    'motos': 'motorcycles',
 }
 
 const categoryToFrontend: Record<string, Category> = {
     'cars': 'autos',
     'suvs': 'suvs',
     'trucks': 'camionetas',
+    'sport': 'motos',
+    'atvs': 'motos',
+    'scooters': 'motos',
     'motorcycles': 'motos',
 }
 
@@ -46,6 +51,7 @@ interface ApiVehicle {
     model: string
     year: number
     version?: string
+    modelFamilyId?: string
     category?: string // Removed from API but maybe keeping for safety or if mapped differently? User said removed.
     countryCode: string
     vehicleType: string
@@ -74,6 +80,7 @@ interface ApiVehicle {
     equipment?: string[]
     images?: string[]
     description?: string
+    relatedVersions?: { slug: string; version: string; price: number; currency: string }[]
     createdAt?: string
     updatedAt?: string
 }
@@ -124,6 +131,8 @@ function transformVehicle(apiVehicle: ApiVehicle): Vehicle {
         model: apiVehicle.model,
         year: apiVehicle.year,
         version: apiVehicle.version,
+        modelFamilyId: apiVehicle.modelFamilyId,
+        relatedVersions: apiVehicle.relatedVersions,
         category: categoryToFrontend[apiVehicle.vehicleSubtype] || 'autos', // Map subtype to frontend category
         subcategory: apiVehicle.subcategory,
         currency: apiVehicle.currency,
@@ -177,7 +186,10 @@ export async function fetchVehicles(params: FetchVehiclesParams = {}): Promise<{
     if (params.page) searchParams.set('page', params.page.toString())
     if (params.limit) searchParams.set('limit', params.limit.toString())
     if (params.brand) searchParams.set('brand', params.brand)
-    if (params.category) searchParams.set('subtype', categoryToBackend[params.category])
+    if (params.category) {
+        const subtype = categoryToSubtype[params.category]
+        if (subtype) searchParams.set('subtype', subtype)
+    }
     if (params.fuelType) searchParams.set('fuel_type', params.fuelType)
     if (params.minPrice) searchParams.set('min_price', params.minPrice.toString())
     if (params.maxPrice) searchParams.set('max_price', params.maxPrice.toString())
@@ -185,9 +197,22 @@ export async function fetchVehicles(params: FetchVehiclesParams = {}): Promise<{
 
     const url = `${API_URL}/api/vehicles${searchParams.toString() ? `?${searchParams}` : ''}`
 
+    // Map frontend categories to main vehicle types for the header
+    const categoryToVehicleType: Record<string, string> = {
+        'autos': 'automotive',
+        'suvs': 'automotive',
+        'camionetas': 'automotive',
+        'motos': 'motorcycles',
+    };
+
+    let reqVehicleType = params.vehicleType;
+    if (!reqVehicleType && params.category) {
+        reqVehicleType = categoryToVehicleType[params.category] || 'all';
+    }
+
     const response = await fetch(url, {
         next: { revalidate: 60 },
-        headers: getHeaders(params.vehicleType)
+        headers: getHeaders(reqVehicleType)
     })
 
     if (!response.ok) {
@@ -270,4 +295,4 @@ export async function searchVehicles(query: string, type: 'text' | 'semantic' = 
 }
 
 // Export mappers for use in other modules
-export { categoryToBackend, categoryToFrontend }
+export { categoryToSubtype, categoryToFrontend }

@@ -8,6 +8,13 @@ export interface Vehicle {
   model: string
   year: number
   version?: string
+  modelFamilyId?: string
+  relatedVersions?: {
+    slug: string
+    version: string
+    price: number
+    currency: string
+  }[]
   category: 'autos' | 'suvs' | 'camionetas' | 'motos'
   subcategory?: string // Keeping this as optional if it was used for something else, or maybe it is redundant with vehicleSubtype
   currency: string

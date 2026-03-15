@@ -10,11 +10,11 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "FullMotor Uruguay | Fichas Técnicas de Vehículos",
+  title: "TodoMotor Uruguay | Fichas Técnicas de Vehículos",
   description: "Encuentra las fichas técnicas completas de autos, SUVs, camionetas y motos disponibles en Uruguay. Especificaciones, precios y equipamiento.",
   keywords: "autos uruguay, motos uruguay, fichas técnicas, precios autos, suvs, camionetas",
   openGraph: {
-    title: "FullMotor Uruguay",
+    title: "TodoMotor Uruguay",
     description: "Fichas técnicas de vehículos en Uruguay",
     type: "website",
   }
@@ -30,11 +30,10 @@ export default function RootLayout({
       <body className={`${inter.variable} antialiased`}>
         <header className="sticky top-0 z-50 bg-[var(--background)]/80 backdrop-blur-xl border-b border-[var(--border)]">
           <nav className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
-            <Link href="/" className="flex items-center gap-3 group flex-shrink-0">
-              <img src="/logo.svg" alt="FullMotor" className="w-8 h-8 group-hover:scale-110 transition-transform duration-300" />
+            <Link href="/" className="flex items-center gap-2 group flex-shrink-0">
               <div className="flex items-baseline gap-2">
-                <span className="text-xl font-bold gradient-text">FullMotor</span>
-                <span className="text-sm text-[var(--foreground-muted)] hidden sm:inline">Uruguay</span>
+                <span className="text-xl font-bold gradient-text">Todo Motor</span>
+                <span className="text-sm font-medium text-[var(--foreground-muted)] hidden sm:inline">Uruguay</span>
               </div>
             </Link>
             <SearchBar />
@@ -48,13 +47,12 @@ export default function RootLayout({
         <footer className="bg-[var(--background-secondary)] border-t border-[var(--border)] py-10 mt-20">
           <div className="max-w-7xl mx-auto px-4">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <img src="/logo.svg" alt="FullMotor" className="w-6 h-6" />
-                <span className="gradient-text font-bold">FullMotor</span>
-                <span className="text-[var(--foreground-muted)] text-sm">Uruguay</span>
+              <div className="flex items-center gap-2">
+                <span className="text-xl font-bold gradient-text">Todo Motor</span>
+                <span className="text-[var(--foreground-muted)] text-sm font-medium">Uruguay</span>
               </div>
               <p className="text-[var(--foreground-muted)] text-sm">
-                © {new Date().getFullYear()} FullMotor Uruguay. Información de referencia.
+                © {new Date().getFullYear()} Todo Motor Uruguay. Información de referencia.
               </p>
               <a
                 href="mailto:contacto@todomotor.uy"

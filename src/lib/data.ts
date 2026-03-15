@@ -36,7 +36,7 @@ export async function getVehiclesByCategory(category: Category): Promise<Vehicle
 
 export async function getLatestVehicles(limit: number = 6): Promise<Vehicle[]> {
   try {
-    const { vehicles } = await fetchVehicles({ limit, sort: 'newest' })
+    const { vehicles } = await fetchVehicles({ limit, sort: 'newest', vehicleType: 'all' })
     return vehicles
   } catch (error) {
     console.warn("getLatestVehicles failed:", error)
@@ -46,7 +46,8 @@ export async function getLatestVehicles(limit: number = 6): Promise<Vehicle[]> {
 
 export async function getCountByCategory(): Promise<{ id: Category; name: string; icon: string; count: number }[]> {
   try {
-    const { vehicles } = await fetchVehicles({ limit: 1000 })
+    const { vehicles } = await fetchVehicles({ limit: 1000, vehicleType: 'all' })
+    
     return CATEGORIES.map(cat => ({
       ...cat,
       count: vehicles.filter(v => v.category === cat.id).length
