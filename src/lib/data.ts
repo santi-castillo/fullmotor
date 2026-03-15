@@ -1,5 +1,5 @@
 import { Vehicle, Category, CATEGORIES } from '@/types/vehicle'
-import { fetchVehicles, fetchVehicleBySlug as apiFetchVehicleBySlug } from './api'
+import { fetchVehicles, fetchVehicleBySlug as apiFetchVehicleBySlug, fetchCarouselItems } from './api'
 
 // Re-export CATEGORIES for components that need it
 export { CATEGORIES }
@@ -36,8 +36,8 @@ export async function getVehiclesByCategory(category: Category): Promise<Vehicle
 
 export async function getLatestVehicles(limit: number = 6): Promise<Vehicle[]> {
   try {
-    const { vehicles } = await fetchVehicles({ limit, sort: 'newest', vehicleType: 'all' })
-    return vehicles
+    const vehicles = await fetchCarouselItems('all')
+    return vehicles.slice(0, limit)
   } catch (error) {
     console.warn("getLatestVehicles failed:", error)
     return []

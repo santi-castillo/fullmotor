@@ -104,12 +104,14 @@ interface FiltersResponse {
 interface CarouselItem {
     id: string
     title: string
-    description: string
     imageUrl: string
     linkUrl: string
-    order: number
-    validFrom: string
-    validUntil: string
+    price: number
+    currency: string
+    year: number
+    vehicleType: string
+    countryCode: string
+    createdAt?: string
 }
 
 interface CarouselResponse {
@@ -247,7 +249,7 @@ export async function fetchVehicleBySlug(slug: string, vehicleType?: string): Pr
     return transformVehicle(apiVehicle)
 }
 
-export async function fetchCarouselItems(vehicleType?: string): Promise<CarouselItem[]> {
+export async function fetchCarouselItems(vehicleType?: string): Promise<Vehicle[]> {
     const url = `${API_URL}/api/carousel`
 
     const response = await fetch(url, {
@@ -260,7 +262,29 @@ export async function fetchCarouselItems(vehicleType?: string): Promise<Carousel
     }
 
     const data: CarouselResponse = await response.json()
-    return data.data || []
+    return (data.data || []).map((item): Vehicle => {
+        // linkUrl is e.g. "/vehicles/uy-kawasaki-ninja-500-2026-se-abs"
+        const slug = item.linkUrl.split('/').pop() || item.id
+        const [brand = '', ...modelParts] = item.title.split(' ')
+        return {
+            id: item.id,
+            slug,
+            countryCode: item.countryCode,
+            vehicleType: item.vehicleType,
+            vehicleSubtype: item.vehicleType === 'motorcycles' ? 'sport' : 'cars',
+            brand,
+            model: modelParts.join(' '),
+            year: item.year,
+            category: item.vehicleType === 'motorcycles' ? 'motos' : 'autos',
+            currency: item.currency,
+            price: item.price,
+            image: item.imageUrl,
+            images: [item.imageUrl],
+            safetyFeatures: [],
+            equipment: [],
+            createdAt: item.createdAt,
+        }
+    })
 }
 
 export async function fetchFilters(vehicleType?: string): Promise<FiltersResponse> {
