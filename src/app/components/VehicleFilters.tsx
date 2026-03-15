@@ -67,7 +67,7 @@ export default function VehicleFilters({ brands }: VehicleFiltersProps) {
                 <option value="all">Todos los tipos</option>
                 <option value="autos">🚗 Autos</option>
                 <option value="suvs">🚙 SUVs</option>
-                <option value="camionetas">🛻 Camionetas</option>
+                <option value="pickups">🛻 Camionetas</option>
                 <option value="motos">🏍️ Motos</option>
             </select>
 

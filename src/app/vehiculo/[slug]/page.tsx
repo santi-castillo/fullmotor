@@ -32,7 +32,7 @@ export default async function VehiclePage({ params }: { params: Params }) {
   const categoryNames: Record<string, string> = {
     autos: 'Autos',
     suvs: 'SUVs',
-    camionetas: 'Camionetas',
+    pickups: 'Camionetas',
     motos: 'Motos'
   };
 

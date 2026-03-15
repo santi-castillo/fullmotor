@@ -22,7 +22,7 @@ export default function ImageCarousel({ images, altPrefix, category }: ImageCaro
       <div className="aspect-[16/10] bg-[var(--muted)] rounded-xl flex items-center justify-center overflow-hidden">
         <span className="text-[120px] opacity-30">
           {category === 'motos' ? '🏍️' :
-            category === 'camionetas' ? '🛻' :
+            category === 'pickups' ? '🛻' :
               category === 'suvs' ? '🚙' : '🚗'}
         </span>
       </div>

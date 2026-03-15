@@ -75,7 +75,7 @@ export default function VehicleTable({ vehicles }: VehicleTableProps) {
     const getCategoryIcon = (category: string) => {
         switch (category) {
             case 'motos': return '🏍️';
-            case 'camionetas': return '🛻';
+            case 'pickups': return '🛻';
             case 'suvs': return '🚙';
             default: return '🚗';
         }
@@ -84,7 +84,7 @@ export default function VehicleTable({ vehicles }: VehicleTableProps) {
     const getCategoryName = (category: string) => {
         switch (category) {
             case 'motos': return 'Moto';
-            case 'camionetas': return 'Camioneta';
+            case 'pickups': return 'Camioneta';
             case 'suvs': return 'SUV';
             default: return 'Auto';
         }
@@ -148,7 +148,7 @@ export default function VehicleTable({ vehicles }: VehicleTableProps) {
                     <option value="all">Todos los tipos</option>
                     <option value="autos">🚗 Autos</option>
                     <option value="suvs">🚙 SUVs</option>
-                    <option value="camionetas">🛻 Camionetas</option>
+                    <option value="pickups">🛻 Camionetas</option>
                     <option value="motos">🏍️ Motos</option>
                 </select>
 

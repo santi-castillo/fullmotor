@@ -56,7 +56,7 @@ export default function LatestCarousel({ vehicles }: LatestCarouselProps) {
     const getCategoryIcon = (category: string) => {
         switch (category) {
             case 'motos': return '🏍️';
-            case 'camionetas': return '🛻';
+            case 'pickups': return '🛻';
             case 'suvs': return '🚙';
             default: return '🚗';
         }

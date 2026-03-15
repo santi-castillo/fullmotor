@@ -20,13 +20,14 @@ const getHeaders = (vehicleType: string = 'all') => ({
 const categoryToSubtype: Partial<Record<Category, string>> = {
     'autos': 'cars',
     'suvs': 'suvs',
-    'camionetas': 'trucks',
+    'pickups': 'pickups', // 1:1 with API subtype — but must be explicit so the param is sent
 }
 
 const categoryToFrontend: Record<string, Category> = {
     'cars': 'autos',
     'suvs': 'suvs',
-    'trucks': 'camionetas',
+    'pickups': 'pickups',
+    'trucks': 'pickups',     // fallback alias
     'sport': 'motos',
     'atvs': 'motos',
     'scooters': 'motos',
@@ -203,7 +204,7 @@ export async function fetchVehicles(params: FetchVehiclesParams = {}): Promise<{
     const categoryToVehicleType: Record<string, string> = {
         'autos': 'automotive',
         'suvs': 'automotive',
-        'camionetas': 'automotive',
+        'pickups': 'automotive',
         'motos': 'motorcycles',
     };
 

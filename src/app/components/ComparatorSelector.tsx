@@ -75,7 +75,7 @@ export default function ComparatorSelector({ slot, currentSlug }: ComparatorSele
                     >
                         <div className="text-xl">
                             {v.category === 'motos' ? '🏍️' :
-                                v.category === 'camionetas' ? '🛻' :
+                                v.category === 'pickups' ? '🛻' :
                                     v.category === 'suvs' ? '🚙' : '🚗'}
                         </div>
                         <div>

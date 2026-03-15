@@ -75,7 +75,7 @@ export default function SearchBar() {
     const getCategoryIcon = (category: string) => {
         switch (category) {
             case 'motos': case 'motorcycles': return '🏍️';
-            case 'camionetas': case 'trucks': return '🛻';
+            case 'pickups': case 'trucks': return '🛻';
             case 'suvs': return '🚙';
             default: return '🚗';
         }
