@@ -20,7 +20,7 @@ interface PageProps {
 
 export default async function Home({ searchParams }: PageProps) {
   const params = await searchParams;
-  const latestVehicles = await getLatestVehicles(8);
+  const latestVehicles = await getLatestVehicles(8, params.category as Category | undefined);
 
   // Parse search params
   const page = parseInt(params.page || '1', 10);

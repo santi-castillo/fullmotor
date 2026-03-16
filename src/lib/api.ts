@@ -21,6 +21,7 @@ const categoryToSubtype: Partial<Record<Category, string>> = {
     'autos': 'cars',
     'suvs': 'suvs',
     'pickups': 'pickups', // 1:1 with API subtype — but must be explicit so the param is sent
+    'motos': 'motorcycles',
 }
 
 const categoryToFrontend: Record<string, Category> = {
@@ -200,22 +201,9 @@ export async function fetchVehicles(params: FetchVehiclesParams = {}): Promise<{
 
     const url = `${API_URL}/api/vehicles${searchParams.toString() ? `?${searchParams}` : ''}`
 
-    // Map frontend categories to main vehicle types for the header
-    const categoryToVehicleType: Record<string, string> = {
-        'autos': 'automotive',
-        'suvs': 'automotive',
-        'pickups': 'automotive',
-        'motos': 'motorcycles',
-    };
-
-    let reqVehicleType = params.vehicleType;
-    if (!reqVehicleType && params.category) {
-        reqVehicleType = categoryToVehicleType[params.category] || 'all';
-    }
-
     const response = await fetch(url, {
         next: { revalidate: 60 },
-        headers: getHeaders(reqVehicleType)
+        headers: getHeaders(params.vehicleType || 'all')
     })
 
     if (!response.ok) {
@@ -250,12 +238,19 @@ export async function fetchVehicleBySlug(slug: string, vehicleType?: string): Pr
     return transformVehicle(apiVehicle)
 }
 
-export async function fetchCarouselItems(vehicleType?: string): Promise<Vehicle[]> {
-    const url = `${API_URL}/api/carousel`
+export async function fetchCarouselItems(category?: Category): Promise<Vehicle[]> {
+    const searchParams = new URLSearchParams()
+
+    if (category) {
+        const subtype = categoryToSubtype[category]
+        if (subtype) searchParams.set('category', subtype)
+    }
+
+    const url = `${API_URL}/api/carousel${searchParams.toString() ? `?${searchParams}` : ''}`
 
     const response = await fetch(url, {
         next: { revalidate: 60 },
-        headers: getHeaders(vehicleType)
+        headers: getHeaders('all')
     })
 
     if (!response.ok) {

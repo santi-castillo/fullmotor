@@ -34,9 +34,9 @@ export async function getVehiclesByCategory(category: Category): Promise<Vehicle
   }
 }
 
-export async function getLatestVehicles(limit: number = 6): Promise<Vehicle[]> {
+export async function getLatestVehicles(limit: number = 6, category?: Category): Promise<Vehicle[]> {
   try {
-    const vehicles = await fetchCarouselItems('all')
+    const vehicles = await fetchCarouselItems(category)
     return vehicles.slice(0, limit)
   } catch (error) {
     console.warn("getLatestVehicles failed:", error)
