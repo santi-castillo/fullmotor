@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Vehicle } from '@/types/vehicle';
-// Import the server action
-import { searchVehiclesAction } from '@/app/actions/search';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
 interface ComparatorSelectorProps {
     vehicles?: Vehicle[]; // Make optional or deprecated
@@ -29,10 +29,19 @@ export default function ComparatorSelector({ slot, currentSlug }: ComparatorSele
 
             setLoading(true);
             try {
-                const data = await searchVehiclesAction(searchTerm);
-                setResults(data);
+                const response = await fetch(`${API_URL}/api/search?q=${encodeURIComponent(searchTerm)}&type=semantic`, {
+                    headers: {
+                        'X-Country': 'uy',
+                        'X-Vehicle-Type': 'all'
+                    }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    setResults(data.data || []);
+                }
             } catch (error) {
                 console.error("Error searching:", error);
+                setResults([]);
             } finally {
                 setLoading(false);
             }

@@ -298,7 +298,7 @@ export async function fetchFilters(vehicleType?: string): Promise<FiltersRespons
     return response.json()
 }
 
-export async function searchVehicles(query: string, type: 'text' | 'semantic' = 'text', vehicleType?: string): Promise<Vehicle[]> {
+export async function searchVehicles(query: string, type: 'text' | 'semantic' = 'semantic', vehicleType?: string): Promise<Vehicle[]> {
     const searchParams = new URLSearchParams({ q: query, type })
     const url = `${API_URL}/api/search?${searchParams}`
 
