@@ -3,7 +3,7 @@ export interface Vehicle {
   slug: string
   countryCode: string
   vehicleType: string
-  vehicleSubtype: string
+  vehicleSubtype: string[] | null
   brand: string
   model: string
   year: number

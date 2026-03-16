@@ -14,25 +14,20 @@ const getHeaders = (vehicleType: string = 'all') => ({
 // Category & Fuel Type Mapping (Backend ↔ Frontend)
 // ============================================
 
-// Maps frontend category to the ?subtype= query param.
-// NOTE: 'motos' is NOT here — it only changes the X-Vehicle-Type header,
-// not the subtype filter (motorcycle subtypes in DB are 'sport', 'atvs', etc.)
-const categoryToSubtype: Partial<Record<Category, string>> = {
-    'autos': 'cars',
-    'suvs': 'suvs',
-    'pickups': 'pickups', // 1:1 with API subtype — but must be explicit so the param is sent
-    'motos': 'motorcycles',
-}
-
-const categoryToFrontend: Record<string, Category> = {
+// Maps backend vehicleType to frontend category
+const vehicleTypeToCategory: Record<string, Category> = {
     'cars': 'autos',
     'suvs': 'suvs',
     'pickups': 'pickups',
-    'trucks': 'pickups',     // fallback alias
-    'sport': 'motos',
-    'atvs': 'motos',
-    'scooters': 'motos',
     'motorcycles': 'motos',
+}
+
+// Maps frontend category to backend vehicleType (for headers and filters)
+const categoryToVehicleType: Partial<Record<Category, string>> = {
+    'autos': 'cars',
+    'suvs': 'suvs',
+    'pickups': 'pickups',
+    'motos': 'motorcycles',
 }
 
 const fuelTypeToFrontend: Record<string, string> = {
@@ -54,10 +49,9 @@ interface ApiVehicle {
     year: number
     version?: string
     modelFamilyId?: string
-    category?: string // Removed from API but maybe keeping for safety or if mapped differently? User said removed.
     countryCode: string
     vehicleType: string
-    vehicleSubtype: string
+    vehicleSubtype: string[] | null
     subcategory?: string
     currency: string
     price: number
@@ -98,7 +92,17 @@ interface VehiclesResponse {
 
 interface FiltersResponse {
     brands: { name: string; count: number }[]
-    subtypes: string[]
+    subtypes: Array<{
+        id: string
+        vehicleType: string
+        name: string
+        slug: string
+        icon?: string
+        orderPosition?: number
+        active?: boolean
+        createdAt?: string
+        updatedAt?: string
+    }>
     priceRange: { min: number; max: number }
     currency: string
 }
@@ -137,12 +141,10 @@ function transformVehicle(apiVehicle: ApiVehicle): Vehicle {
         version: apiVehicle.version,
         modelFamilyId: apiVehicle.modelFamilyId,
         relatedVersions: apiVehicle.relatedVersions,
-        category: categoryToFrontend[apiVehicle.vehicleSubtype] || 'autos', // Map subtype to frontend category
+        category: vehicleTypeToCategory[apiVehicle.vehicleType] || 'autos', // Direct mapping: vehicleType → category
         subcategory: apiVehicle.subcategory,
         currency: apiVehicle.currency,
         price: apiVehicle.price,
-        // priceUYU: apiVehicle.priceUYU,
-        // priceUSD: apiVehicle.priceUSD,
         engineCc: apiVehicle.engineCc,
         engineHp: apiVehicle.engineHp,
         engineTorque: apiVehicle.engineTorque,
@@ -190,10 +192,6 @@ export async function fetchVehicles(params: FetchVehiclesParams = {}): Promise<{
     if (params.page) searchParams.set('page', params.page.toString())
     if (params.limit) searchParams.set('limit', params.limit.toString())
     if (params.brand) searchParams.set('brand', params.brand)
-    if (params.category) {
-        const subtype = categoryToSubtype[params.category]
-        if (subtype) searchParams.set('subtype', subtype)
-    }
     if (params.fuelType) searchParams.set('fuel_type', params.fuelType)
     if (params.minPrice) searchParams.set('min_price', params.minPrice.toString())
     if (params.maxPrice) searchParams.set('max_price', params.maxPrice.toString())
@@ -201,9 +199,12 @@ export async function fetchVehicles(params: FetchVehiclesParams = {}): Promise<{
 
     const url = `${API_URL}/api/vehicles${searchParams.toString() ? `?${searchParams}` : ''}`
 
+    // Use category to set the X-Vehicle-Type header (backend uses vehicleType for filtering)
+    const vehicleTypeHeader = params.category ? categoryToVehicleType[params.category] : params.vehicleType || 'all'
+
     const response = await fetch(url, {
         next: { revalidate: 60 },
-        headers: getHeaders(params.vehicleType || 'all')
+        headers: getHeaders(vehicleTypeHeader)
     })
 
     if (!response.ok) {
@@ -242,8 +243,8 @@ export async function fetchCarouselItems(category?: Category): Promise<Vehicle[]
     const searchParams = new URLSearchParams()
 
     if (category) {
-        const subtype = categoryToSubtype[category]
-        if (subtype) searchParams.set('category', subtype)
+        const vehicleType = categoryToVehicleType[category]
+        if (vehicleType) searchParams.set('category', vehicleType)
     }
 
     const url = `${API_URL}/api/carousel${searchParams.toString() ? `?${searchParams}` : ''}`
@@ -267,11 +268,11 @@ export async function fetchCarouselItems(category?: Category): Promise<Vehicle[]
             slug,
             countryCode: item.countryCode,
             vehicleType: item.vehicleType,
-            vehicleSubtype: item.vehicleType === 'motorcycles' ? 'sport' : 'cars',
+            vehicleSubtype: null,
             brand,
             model: modelParts.join(' '),
             year: item.year,
-            category: item.vehicleType === 'motorcycles' ? 'motos' : 'autos',
+            category: vehicleTypeToCategory[item.vehicleType] || 'autos', // Use simple mapping
             currency: item.currency,
             price: item.price,
             image: item.imageUrl,
@@ -314,5 +315,5 @@ export async function searchVehicles(query: string, type: 'text' | 'semantic' = 
     return (data.data || []).map(transformVehicle)
 }
 
-// Export mappers for use in other modules
-export { categoryToSubtype, categoryToFrontend }
+// Export mappers for use in other modules (if needed elsewhere)
+export { categoryToVehicleType, vehicleTypeToCategory }
