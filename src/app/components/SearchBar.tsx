@@ -37,7 +37,7 @@ export default function SearchBar() {
             const response = await fetch(`${API_URL}/api/search?q=${encodeURIComponent(searchQuery)}&type=semantic`, {
                 headers: {
                     'X-Country': 'uy',
-                    'X-Vehicle-Type': 'automotive'
+                    'X-Vehicle-Type': 'all'
                 }
             });
             if (response.ok) {
