@@ -69,6 +69,7 @@ export default function VehicleFilters({ brands }: VehicleFiltersProps) {
                 <option value="suvs">🚙 SUVs</option>
                 <option value="pickups">🛻 Camionetas</option>
                 <option value="motos">🏍️ Motos</option>
+                <option value="utilitarios">🚐 Utilitarios</option>
             </select>
 
             {/* Fuel Filter */}

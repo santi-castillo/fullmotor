@@ -33,7 +33,8 @@ export default async function VehiclePage({ params }: { params: Params }) {
     autos: 'Autos',
     suvs: 'SUVs',
     pickups: 'Camionetas',
-    motos: 'Motos'
+    motos: 'Motos',
+    utilitarios: 'Utilitarios'
   };
 
   const fuelNames: Record<string, string> = {
@@ -149,15 +150,15 @@ export default async function VehiclePage({ params }: { params: Params }) {
                   <p className="spec-value">{fuelNames[vehicle.fuelType] || vehicle.fuelType}</p>
                 </div>
               )}
-              {vehicle.batteryKwh && (
+              {vehicle.batteryKwh != null && vehicle.batteryKwh > 0 && (
                 <div className="spec-item">
                   <p className="spec-label">Batería</p>
                   <p className="spec-value">{vehicle.batteryKwh} kWh</p>
                 </div>
               )}
-              {vehicle.autonomyKm && (
+              {vehicle.autonomyKm != null && vehicle.autonomyKm > 0 && (
                 <div className="spec-item">
-                  <p className="spec-label">Autonomía</p>
+                  <p className="spec-label">Autonomía eléctrica</p>
                   <p className="spec-value">{vehicle.autonomyKm} km</p>
                 </div>
               )}
@@ -226,15 +227,15 @@ export default async function VehiclePage({ params }: { params: Params }) {
                     <dd className="font-medium">{fuelNames[vehicle.fuelType] || vehicle.fuelType}</dd>
                   </div>
                 )}
-                {vehicle.batteryKwh && (
+                {vehicle.batteryKwh != null && vehicle.batteryKwh > 0 && (
                   <div className="flex justify-between">
                     <dt className="text-[var(--secondary)]">Capacidad Batería</dt>
                     <dd className="font-medium">{vehicle.batteryKwh} kWh</dd>
                   </div>
                 )}
-                {vehicle.autonomyKm && (
+                {vehicle.autonomyKm != null && vehicle.autonomyKm > 0 && (
                   <div className="flex justify-between">
-                    <dt className="text-[var(--secondary)]">Autonomía (WLTP)</dt>
+                    <dt className="text-[var(--secondary)]">Autonomía eléctrica</dt>
                     <dd className="font-medium">{vehicle.autonomyKm} km</dd>
                   </div>
                 )}

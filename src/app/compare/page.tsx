@@ -41,7 +41,7 @@ export default async function ComparatorPage({
         { label: "Potencia", render: (v: Vehicle) => v.engineHp ? `${v.engineHp} HP` : '-' },
         { label: "Torque", render: (v: Vehicle) => v.engineTorque ? `${v.engineTorque} Nm` : '-' },
         { label: "Batería", render: (v: Vehicle) => v.batteryKwh ? `${v.batteryKwh} kWh` : '-' },
-        { label: "Autonomía", render: (v: Vehicle) => v.autonomyKm ? `${v.autonomyKm} km` : '-' },
+        { label: "Autonomía eléctrica", render: (v: Vehicle) => v.autonomyKm ? `${v.autonomyKm} km` : '-' },
         { section: "Dimensiones y Capacidades" },
         { label: "Largo", render: (v: Vehicle) => v.length ? `${v.length} mm` : '-' },
         { label: "Ancho", render: (v: Vehicle) => v.width ? `${v.width} mm` : '-' },

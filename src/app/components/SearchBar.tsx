@@ -77,6 +77,7 @@ export default function SearchBar() {
             case 'motos': case 'motorcycles': return '🏍️';
             case 'pickups': case 'trucks': return '🛻';
             case 'suvs': return '🚙';
+            case 'utilitarios': return '🚐';
             default: return '🚗';
         }
     };

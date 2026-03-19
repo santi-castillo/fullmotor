@@ -77,6 +77,7 @@ export default function VehicleTable({ vehicles }: VehicleTableProps) {
             case 'motos': return '🏍️';
             case 'pickups': return '🛻';
             case 'suvs': return '🚙';
+            case 'utilitarios': return '🚐';
             default: return '🚗';
         }
     };
@@ -86,6 +87,7 @@ export default function VehicleTable({ vehicles }: VehicleTableProps) {
             case 'motos': return 'Moto';
             case 'pickups': return 'Camioneta';
             case 'suvs': return 'SUV';
+            case 'utilitarios': return 'Utilitario';
             default: return 'Auto';
         }
     };

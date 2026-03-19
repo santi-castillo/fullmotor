@@ -58,6 +58,7 @@ export default function LatestCarousel({ vehicles }: LatestCarouselProps) {
             case 'motos': return '🏍️';
             case 'pickups': return '🛻';
             case 'suvs': return '🚙';
+            case 'utilitarios': return '🚐';
             default: return '🚗';
         }
     };

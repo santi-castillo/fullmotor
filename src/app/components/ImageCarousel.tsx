@@ -23,7 +23,8 @@ export default function ImageCarousel({ images, altPrefix, category }: ImageCaro
         <span className="text-[120px] opacity-30">
           {category === 'motos' ? '🏍️' :
             category === 'pickups' ? '🛻' :
-              category === 'suvs' ? '🚙' : '🚗'}
+              category === 'suvs' ? '🚙' :
+                category === 'utilitarios' ? '🚐' : '🚗'}
         </span>
       </div>
     );

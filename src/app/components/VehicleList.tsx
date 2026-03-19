@@ -11,6 +11,7 @@ export default function VehicleList({ vehicles }: VehicleListProps) {
             case 'motos': return '🏍️';
             case 'pickups': return '🛻';
             case 'suvs': return '🚙';
+            case 'utilitarios': return '🚐';
             default: return '🚗';
         }
     };

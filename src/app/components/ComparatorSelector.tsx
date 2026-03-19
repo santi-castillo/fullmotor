@@ -85,7 +85,8 @@ export default function ComparatorSelector({ slot, currentSlug }: ComparatorSele
                         <div className="text-xl">
                             {v.category === 'motos' ? '🏍️' :
                                 v.category === 'pickups' ? '🛻' :
-                                    v.category === 'suvs' ? '🚙' : '🚗'}
+                                    v.category === 'suvs' ? '🚙' :
+                                        v.category === 'utilitarios' ? '🚐' : '🚗'}
                         </div>
                         <div>
                             <div className="font-bold group-hover:text-[var(--primary)] transition-colors">{v.brand} {v.model}</div>
