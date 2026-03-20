@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
@@ -45,7 +46,9 @@ export default function RootLayout({
             </Link>
 
             <div className="ml-auto max-w-md w-full hidden md:block">
-              <HeaderSearch />
+              <Suspense fallback={null}>
+                <HeaderSearch />
+              </Suspense>
             </div>
 
             <div className="flex items-center gap-2">
