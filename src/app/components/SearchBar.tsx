@@ -111,13 +111,13 @@ export default function SearchBar() {
 
             {/* Results Dropdown */}
             {isOpen && results.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-[var(--background)] border border-[var(--border)] rounded-lg shadow-xl overflow-hidden z-50 max-h-80 overflow-y-auto">
-                    {results.slice(0, 6).map((vehicle) => (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-[var(--card)] border border-[var(--glass-border)] rounded-xl shadow-2xl overflow-hidden z-50">
+                    {results.map((vehicle) => (
                         <Link
                             key={vehicle.id}
                             href={`/vehiculo/${vehicle.slug}`}
                             onClick={handleResultClick}
-                            className="flex items-center gap-3 px-4 py-3 hover:bg-[var(--glass-bg)] transition-colors border-b border-[var(--border)] last:border-b-0"
+                            className="flex items-center gap-3 px-4 py-3 hover:bg-[var(--surface-high)] transition-colors border-b border-[var(--border)] last:border-b-0"
                         >
                             <span className="text-xl">{getCategoryIcon(vehicle.category)}</span>
                             <div className="flex-1 min-w-0">
@@ -135,11 +135,6 @@ export default function SearchBar() {
                             )}
                         </Link>
                     ))}
-                    {results.length > 6 && (
-                        <div className="px-4 py-2 text-center text-xs text-[var(--foreground-muted)] bg-[var(--muted)]">
-                            +{results.length - 6} resultados más
-                        </div>
-                    )}
                 </div>
             )}
 

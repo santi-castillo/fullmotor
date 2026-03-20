@@ -5,128 +5,111 @@ interface VehicleListProps {
     vehicles: Vehicle[];
 }
 
+function getFuelLabel(fuelType: string | undefined): string {
+    const fuel = fuelType?.toLowerCase() || '';
+    if (fuel === 'electrico' || fuel === 'eléctrico') return 'Eléctrico';
+    if (fuel === 'hibrido' || fuel === 'híbrido') return 'Híbrido';
+    if (fuel === 'diesel') return 'Diesel';
+    if (fuel === 'nafta') return 'Nafta';
+    return 'Combustión';
+}
+
 export default function VehicleList({ vehicles }: VehicleListProps) {
-    const getCategoryIcon = (category: string) => {
-        switch (category) {
-            case 'motos': return '🏍️';
-            case 'pickups': return '🛻';
-            case 'suvs': return '🚙';
-            case 'utilitarios': return '🚐';
-            default: return '🚗';
-        }
-    };
-
-    const getFuelBadge = (fuelType: string | undefined) => {
-        const fuel = fuelType?.toLowerCase() || '';
-
-        const BadgeIcon = ({ icon, letter, color, title }: { icon: string, letter: string, color: string, title: string }) => (
-            <div className="relative inline-block" title={title}>
-                <span className="text-xl">{icon}</span>
-                <span className={`absolute -bottom-1 -right-1 text-[10px] font-bold px-1 rounded ${color} leading-3`}>
-                    {letter}
-                </span>
+    if (!vehicles || vehicles.length === 0) {
+        return (
+            <div className="py-20 text-center">
+                <span className="material-symbols-outlined text-5xl text-[var(--foreground-muted)] opacity-30 mb-4 block">search_off</span>
+                <p className="text-[var(--foreground-muted)] text-lg">
+                    No se encontraron veh&iacute;culos con los filtros seleccionados
+                </p>
             </div>
         );
-
-        if (fuel === 'electrico' || fuel === 'eléctrico') {
-            return <BadgeIcon icon="⚡" letter="E" color="bg-green-600 text-white" title="Eléctrico" />;
-        }
-        if (fuel === 'hibrido' || fuel === 'híbrido') {
-            return <BadgeIcon icon="🔋" letter="H" color="bg-blue-600 text-white" title="Híbrido" />;
-        }
-
-        const isDiesel = fuel === 'diesel';
-        const fuelLabel = isDiesel ? 'Diesel' : fuel === 'nafta' ? 'Nafta' : 'Combustión';
-        const badgeColor = isDiesel ? 'bg-gray-600 text-white' : 'bg-orange-500 text-white';
-        const badgeLetter = isDiesel ? 'D' : 'N';
-
-        return <BadgeIcon icon="⛽" letter={badgeLetter} color={badgeColor} title={fuelLabel} />;
-    };
-
-    const isElectric = (fuelType: string | undefined) => {
-        const fuel = fuelType?.toLowerCase() || '';
-        return fuel === 'electrico' || fuel === 'eléctrico';
-    };
+    }
 
     return (
-        <div className="card overflow-hidden">
-            <div className="overflow-x-auto">
-                <table className="w-full">
-                    <thead>
-                        <tr className="border-b border-[var(--border)] bg-[var(--glass-bg)]">
-                            <th className="text-left px-4 py-4 text-sm font-semibold text-[var(--foreground-muted)]">Vehículo</th>
-                            <th className="text-right px-4 py-4 text-sm font-semibold text-[var(--foreground-muted)]">Motor</th>
-                            <th className="text-right px-4 py-4 text-sm font-semibold text-[var(--foreground-muted)]">Precio</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {!vehicles || vehicles.length === 0 ? (
-                            <tr>
-                                <td colSpan={3} className="px-4 py-12 text-center text-[var(--foreground-muted)]">
-                                    No se encontraron vehículos con los filtros seleccionados
-                                </td>
-                            </tr>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+            {vehicles.map((vehicle) => (
+                <Link
+                    key={vehicle.id}
+                    href={`/vehiculo/${vehicle.slug}`}
+                    className="group card overflow-hidden"
+                >
+                    {/* Image */}
+                    <div className="relative h-48 md:h-56 overflow-hidden bg-[var(--surface-mid)]">
+                        {vehicle.image ? (
+                            <img
+                                src={vehicle.image}
+                                alt={`${vehicle.brand} ${vehicle.model}`}
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            />
                         ) : (
-                            vehicles.map((vehicle, index) => (
-                                <tr
-                                    key={vehicle.id}
-                                    className={`border-b border-[var(--border)] hover:bg-[var(--glass-bg)] transition-colors group ${index % 2 === 0 ? '' : 'bg-[var(--muted)]'}`}
-                                >
-                                    {/* Vehicle Name */}
-                                    <td className="px-4 py-4 relative">
-                                        <Link href={`/vehiculo/${vehicle.slug}`} className="absolute inset-0 z-10" aria-label={`Ver ${vehicle.brand} ${vehicle.model}`}></Link>
-                                        <div className="flex items-center gap-3">
-                                            <div title={vehicle.category} className="w-12 h-12 rounded-lg bg-[var(--glass-bg)] border border-[var(--border)] flex items-center justify-center text-2xl flex-shrink-0">
-                                                {vehicle.image ? (
-                                                    <img src={vehicle.image} alt="" className="w-full h-full object-cover rounded-lg" />
-                                                ) : (
-                                                    getCategoryIcon(vehicle.category)
-                                                )}
-                                            </div>
-                                            <div>
-                                                <p className="font-semibold text-sm group-hover:text-[var(--primary-light)] transition-colors">
-                                                    {vehicle.brand} {vehicle.model}
-                                                </p>
-                                                <p className="text-xs text-[var(--foreground-muted)]">
-                                                    {vehicle.version && `${vehicle.version} · `}{vehicle.year}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </td>
-
-                                    {/* Motor / Power */}
-                                    <td className="px-4 py-4 text-right">
-                                        <div className="flex flex-col items-center gap-1 w-fit ml-auto">
-                                            <div className="mb-1">{getFuelBadge(vehicle.fuelType)}</div>
-
-                                            {vehicle.engineHp ? (
-                                                <span className="font-bold text-sm">{vehicle.engineHp} <span className="text-xs text-[var(--foreground-muted)]">HP</span></span>
-                                            ) : (
-                                                <span className="text-[var(--foreground-muted)] text-sm">-</span>
-                                            )}
-
-                                            {isElectric(vehicle.fuelType) && (vehicle as any).autonomyKm && (
-                                                <span className="font-medium text-xs text-green-400">{(vehicle as any).autonomyKm} km</span>
-                                            )}
-                                        </div>
-                                    </td>
-
-                                    {/* Price */}
-                                    <td className="px-4 py-4 text-right">
-                                        {vehicle.price ? (
-                                            <span className="text-sm font-bold text-[var(--primary)]">
-                                                {vehicle.currency} {vehicle.price.toLocaleString('es-UY')}
-                                            </span>
-                                        ) : (
-                                            <span className="text-[var(--foreground-muted)] text-sm">Consultar</span>
-                                        )}
-                                    </td>
-                                </tr>
-                            ))
+                            <div className="w-full h-full flex items-center justify-center">
+                                <span className="material-symbols-outlined text-6xl text-[var(--foreground-muted)] opacity-20">
+                                    directions_car
+                                </span>
+                            </div>
                         )}
-                    </tbody>
-                </table>
-            </div>
+                        {/* Gradient overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-[var(--card)] via-transparent to-transparent" />
+
+                        {/* Category glass badge */}
+                        <div className="absolute top-3 left-3">
+                            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider glass-panel text-[var(--accent)]">
+                                {vehicle.category === 'pickups' ? 'Camioneta' : vehicle.category === 'motos' ? 'Moto' : vehicle.category === 'utilitarios' ? 'Utilitario' : vehicle.category === 'suvs' ? 'SUV' : 'Auto'}
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* Content */}
+                    <div className="p-5">
+                        <p className="text-xs text-[var(--foreground-muted)] mb-1">{vehicle.brand} &middot; {vehicle.year}</p>
+                        <h3 className="text-xl font-black italic uppercase tracking-tighter text-[var(--accent)] group-hover:text-[var(--primary-light)] transition-colors line-clamp-1">
+                            {vehicle.model}
+                        </h3>
+                        {vehicle.version && (
+                            <p className="text-xs text-[var(--foreground-muted)] mt-0.5 line-clamp-1">{vehicle.version}</p>
+                        )}
+
+                        {/* Price */}
+                        <div className="mt-3">
+                            {vehicle.price ? (
+                                <span className="text-2xl font-black text-[var(--primary)]">
+                                    {vehicle.currency} {vehicle.price.toLocaleString('es-UY')}
+                                </span>
+                            ) : (
+                                <span className="text-sm text-[var(--foreground-muted)]">Consultar precio</span>
+                            )}
+                        </div>
+
+                        {/* Specs grid */}
+                        <div className="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-[var(--border)]">
+                            <div className="text-center">
+                                <p className="text-[10px] uppercase tracking-wider text-[var(--foreground-muted)]">A&ntilde;o</p>
+                                <p className="text-sm font-bold text-[var(--accent)]">{vehicle.year}</p>
+                            </div>
+                            <div className="text-center">
+                                <p className="text-[10px] uppercase tracking-wider text-[var(--foreground-muted)]">
+                                    {vehicle.engineHp ? 'Potencia' : vehicle.engineCc ? 'Cilindrada' : 'Motor'}
+                                </p>
+                                <p className="text-sm font-bold text-[var(--accent)]">
+                                    {vehicle.engineHp ? `${vehicle.engineHp} HP` : vehicle.engineCc ? `${vehicle.engineCc} CC` : '-'}
+                                </p>
+                            </div>
+                            <div className="text-center">
+                                <p className="text-[10px] uppercase tracking-wider text-[var(--foreground-muted)]">Tipo</p>
+                                <p className="text-sm font-bold text-[var(--accent)]">{getFuelLabel(vehicle.fuelType)}</p>
+                            </div>
+                        </div>
+
+                        {/* CTA */}
+                        <div className="mt-4">
+                            <span className="block w-full text-center py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider bg-[var(--surface-highest)] text-[var(--foreground)] group-hover:bg-[var(--primary)] group-hover:text-[#0b1326] transition-all">
+                                Ver Detalles
+                            </span>
+                        </div>
+                    </div>
+                </Link>
+            ))}
         </div>
     );
 }

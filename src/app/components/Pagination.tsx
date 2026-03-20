@@ -25,23 +25,28 @@ export default function Pagination({ currentPage, totalPages, total }: Paginatio
     if (totalPages <= 1) return null;
 
     return (
-        <div className="flex items-center justify-between mt-4 px-2">
+        <div className="flex items-center justify-center gap-6 mt-8 py-4">
+            {/* Previous */}
             <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="px-4 py-2 rounded-lg bg-[var(--glass-bg)] border border-[var(--border)] text-sm hover:border-[var(--primary)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="w-11 h-11 rounded-full flex items-center justify-center bg-[var(--surface-high)] border border-[var(--glass-border)] hover:border-[var(--primary)] hover:bg-[var(--primary)] hover:text-[#0b1326] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
             >
-                ← Anterior
+                <span className="material-symbols-outlined text-xl">chevron_left</span>
             </button>
-            <span className="text-sm text-[var(--foreground-muted)]">
-                Página {currentPage} de {totalPages} ({total} vehículos)
+
+            {/* Page info */}
+            <span className="text-xs font-black tracking-[0.15em] uppercase text-[var(--foreground-muted)]">
+                P&aacute;gina {currentPage} de {totalPages}
             </span>
+
+            {/* Next */}
             <button
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className="px-4 py-2 rounded-lg bg-[var(--glass-bg)] border border-[var(--border)] text-sm hover:border-[var(--primary)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="w-11 h-11 rounded-full flex items-center justify-center bg-[var(--surface-high)] border border-[var(--glass-border)] hover:border-[var(--primary)] hover:bg-[var(--primary)] hover:text-[#0b1326] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
             >
-                Siguiente →
+                <span className="material-symbols-outlined text-xl">chevron_right</span>
             </button>
         </div>
     );

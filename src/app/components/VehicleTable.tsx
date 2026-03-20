@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Vehicle } from "@/types/vehicle";
+import Badge from "./Badge";
 
 interface VehicleTableProps {
     vehicles: Vehicle[];
@@ -94,30 +95,16 @@ export default function VehicleTable({ vehicles }: VehicleTableProps) {
 
     const getFuelBadge = (fuelType: string | undefined) => {
         const fuel = fuelType?.toLowerCase() || '';
-
-        // Helper component for consistent badge style
-        const BadgeIcon = ({ icon, letter, color, title }: { icon: string, letter: string, color: string, title: string }) => (
-            <div className="relative inline-block" title={title}>
-                <span className="text-xl">{icon}</span>
-                <span className={`absolute -bottom-1 -right-1 text-[10px] font-bold px-1 rounded ${color} leading-3`}>
-                    {letter}
-                </span>
-            </div>
-        );
-
         if (fuel === 'electrico' || fuel === 'eléctrico') {
-            return <BadgeIcon icon="⚡" letter="E" color="bg-green-600 text-white" title="Eléctrico" />;
+            return <Badge icon="⚡" letter="E" title="Eléctrico" />;
         }
         if (fuel === 'hibrido' || fuel === 'híbrido') {
-            return <BadgeIcon icon="🔋" letter="H" color="bg-blue-600 text-white" title="Híbrido" />;
+            return <Badge icon="🔋" letter="H" title="Híbrido" />;
         }
-
         const isDiesel = fuel === 'diesel';
         const fuelLabel = isDiesel ? 'Diesel' : fuel === 'nafta' ? 'Nafta' : 'Combustión';
-        const badgeColor = isDiesel ? 'bg-gray-600 text-white' : 'bg-orange-500 text-white';
         const badgeLetter = isDiesel ? 'D' : 'N';
-
-        return <BadgeIcon icon="⛽" letter={badgeLetter} color={badgeColor} title={fuelLabel} />;
+        return <Badge icon="⛽" letter={badgeLetter} title={fuelLabel} />;
     };
 
     const isElectric = (fuelType: string | undefined) => {

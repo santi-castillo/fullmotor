@@ -120,6 +120,7 @@ interface CarouselItem {
     vehicleType: string
     countryCode: string
     createdAt?: string
+    engineHp?: number
 }
 
 interface CarouselResponse {
@@ -282,6 +283,7 @@ export async function fetchCarouselItems(category?: Category): Promise<Vehicle[]
             safetyFeatures: [],
             equipment: [],
             createdAt: item.createdAt,
+            engineHp: item.engineHp,
         }
     })
 }

@@ -1,34 +1,38 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0a0a0f;
-  --background-secondary: #12121a;
-  --foreground: #f0f0f5;
-  --foreground-muted: #a0a0b0;
+  --background: #0b1326;
+  --background-secondary: #060e20;
+  --foreground: #dae2fd;
+  --foreground-muted: #b9caca;
 
-  /* Premium violet palette */
-  --primary: #8b5cf6;
-  --primary-light: #a78bfa;
-  --primary-dark: #7c3aed;
-  --secondary: #c084fc;
-  --accent: #f472b6;
-  --accent-secondary: #22d3ee;
+  /* Electric cyan palette */
+  --primary: #00dce5;
+  --primary-light: #00f5ff;
+  --primary-dark: #00696e;
+  --accent: #e9feff;
   --success: #34d399;
   --warning: #fbbf24;
 
+  /* Surfaces */
+  --card: #131b2e;
+  --surface-mid: #171f33;
+  --surface-high: #222a3d;
+  --surface-highest: #2d3449;
+
   /* Glass effects */
-  --glass-bg: rgba(255, 255, 255, 0.05);
-  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-bg: rgba(45, 52, 73, 0.4);
+  --glass-border: rgba(58, 73, 74, 0.3);
   --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 
   /* Gradients */
-  --gradient-primary: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #c084fc 100%);
-  --gradient-hero: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16162a 100%);
-  --gradient-card: linear-gradient(145deg, rgba(139, 92, 246, 0.1) 0%, rgba(168, 85, 247, 0.05) 100%);
-  --gradient-glow: radial-gradient(ellipse at center, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
+  --gradient-primary: linear-gradient(135deg, #00dce5 0%, #00f5ff 100%);
+  --gradient-electric: linear-gradient(135deg, #e9feff 0%, #00dce5 100%);
+  --gradient-hero: linear-gradient(135deg, #0b1326 0%, #131b2e 50%, #0b1326 100%);
+  --gradient-card: linear-gradient(145deg, rgba(0, 220, 229, 0.08) 0%, rgba(0, 245, 255, 0.03) 100%);
+  --gradient-glow: radial-gradient(ellipse at center, rgba(0, 220, 229, 0.12) 0%, transparent 70%);
 
-  --border: rgba(255, 255, 255, 0.08);
-  --card: rgba(20, 20, 30, 0.8);
+  --border: rgba(58, 73, 74, 0.15);
   --muted: rgba(255, 255, 255, 0.03);
 }
 
@@ -60,12 +64,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--primary);
+  background: var(--primary-dark);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--primary-light);
+  background: var(--primary);
 }
 
 /* Hide scrollbar for carousel */
@@ -81,36 +85,41 @@ body {
 /* Glass Card styles */
 .card {
   background: var(--card);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
   border-radius: 16px;
   border: 1px solid var(--glass-border);
   overflow: hidden;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
 }
 
-.card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: var(--gradient-card);
-  opacity: 0;
-  transition: opacity 0.4s ease;
-  pointer-events: none;
-}
-
 .card:hover {
-  box-shadow: 0 20px 60px rgba(139, 92, 246, 0.2), 0 0 40px rgba(168, 85, 247, 0.1);
+  box-shadow: 0 20px 60px rgba(0, 220, 229, 0.15), 0 0 40px rgba(0, 245, 255, 0.08);
   transform: translateY(-4px);
-  border-color: rgba(139, 92, 246, 0.3);
+  border-color: rgba(0, 220, 229, 0.3);
 }
 
-.card:hover::before {
-  opacity: 1;
+/* Glass panel utility */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+}
+
+/* Electric gradient utility */
+.electric-gradient {
+  background: var(--gradient-electric);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Kinetic text: font-black italic uppercase tracking-tighter */
+.kinetic-text {
+  font-weight: 900;
+  font-style: italic;
+  text-transform: uppercase;
+  letter-spacing: -0.05em;
 }
 
 /* Button styles */
@@ -146,24 +155,25 @@ body {
 
 .btn-primary {
   background: var(--gradient-primary);
-  color: white;
-  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
+  color: #0b1326;
+  font-weight: 700;
+  box-shadow: 0 4px 20px rgba(0, 220, 229, 0.3);
 }
 
 .btn-primary:hover {
-  box-shadow: 0 6px 30px rgba(139, 92, 246, 0.6);
+  box-shadow: 0 6px 30px rgba(0, 220, 229, 0.5);
   transform: translateY(-2px);
 }
 
 .btn-secondary {
-  background: var(--glass-bg);
+  background: var(--surface-highest);
   color: var(--foreground);
   border: 1px solid var(--glass-border);
-  backdrop-filter: blur(10px);
 }
 
 .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--primary);
+  color: #0b1326;
   border-color: var(--primary);
 }
 
@@ -177,8 +187,8 @@ body {
   font-size: 0.8rem;
   font-weight: 600;
   background: var(--gradient-primary);
-  color: white;
-  box-shadow: 0 2px 10px rgba(139, 92, 246, 0.3);
+  color: #0b1326;
+  box-shadow: 0 2px 10px rgba(0, 220, 229, 0.3);
 }
 
 /* Spec grid */
@@ -199,7 +209,7 @@ body {
 
 .spec-item:hover {
   border-color: var(--primary);
-  background: rgba(139, 92, 246, 0.05);
+  background: rgba(0, 220, 229, 0.05);
 }
 
 .spec-label {
@@ -281,14 +291,14 @@ body {
 .search-input:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 30px rgba(139, 92, 246, 0.3), 0 0 60px rgba(168, 85, 247, 0.1);
+  box-shadow: 0 0 30px rgba(0, 220, 229, 0.2), 0 0 60px rgba(0, 245, 255, 0.08);
 }
 
 /* Price tag */
 .price-tag {
   font-size: 1.4rem;
   font-weight: 800;
-  background: linear-gradient(135deg, #22d3ee 0%, #34d399 100%);
+  background: linear-gradient(135deg, #00dce5 0%, #00f5ff 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -373,12 +383,12 @@ body {
 
 /* Glow text */
 .glow-text {
-  text-shadow: 0 0 40px rgba(139, 92, 246, 0.5), 0 0 80px rgba(168, 85, 247, 0.3);
+  text-shadow: 0 0 40px rgba(0, 220, 229, 0.5), 0 0 80px rgba(0, 245, 255, 0.3);
 }
 
 /* Gradient text */
 .gradient-text {
-  background: var(--gradient-primary);
+  background: var(--gradient-electric);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -398,7 +408,7 @@ body {
 .feature-card:hover {
   border-color: var(--primary);
   transform: translateY(-8px);
-  box-shadow: 0 20px 40px rgba(139, 92, 246, 0.15);
+  box-shadow: 0 20px 40px rgba(0, 220, 229, 0.12);
 }
 
 .feature-icon {
@@ -425,6 +435,6 @@ body {
   left: 0;
   right: 0;
   height: 60%;
-  background: linear-gradient(to top, rgba(10, 10, 15, 0.9), transparent);
+  background: linear-gradient(to top, rgba(11, 19, 38, 0.9), transparent);
   pointer-events: none;
 }

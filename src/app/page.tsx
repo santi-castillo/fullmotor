@@ -1,8 +1,10 @@
 import { Suspense } from "react";
 import { fetchVehicles, fetchFilters } from "@/lib/api";
-import { getLatestVehicles } from "@/lib/data";
+import { getLatestVehicles, getCountByCategory } from "@/lib/data";
 import { Category } from "@/types/vehicle";
-import LatestCarousel from "./components/LatestCarousel";
+import HeroSection from "./components/HeroSection";
+import CategoryGrid from "./components/CategoryGrid";
+import PremiumListings from "./components/PremiumListings";
 import VehicleList from "./components/VehicleList";
 import VehicleFilters from "./components/VehicleFilters";
 import Pagination from "./components/Pagination";
@@ -19,59 +21,84 @@ interface PageProps {
   }>;
 }
 
+const CATEGORY_NAMES: Record<string, string> = {
+  autos: 'Autos',
+  suvs: 'SUVs',
+  pickups: 'Camionetas',
+  motos: 'Motos',
+  utilitarios: 'Utilitarios',
+};
+
 export default async function Home({ searchParams }: PageProps) {
   const params = await searchParams;
-  const latestVehicles = await getLatestVehicles(8, params.category as Category | undefined);
 
-  // Parse search params
+  const hasFilters = params.category || params.brand || params.fuel || params.min_price || params.max_price || params.page;
+  const isShowingInventory = hasFilters && params.category !== undefined;
+
+  // Always fetch vehicles for inventory view
   const page = parseInt(params.page || '1', 10);
-  const limit = 8;
+  const limit = 9;
 
-  // Fetch vehicles with server-side filtering
   const { vehicles, meta } = await fetchVehicles({
     page,
     limit,
     brand: params.brand || undefined,
-    category: params.category as Category | undefined,
+    category: (params.category && params.category !== 'all') ? params.category as Category : undefined,
     fuelType: params.fuel || undefined,
     minPrice: params.min_price ? parseInt(params.min_price) : undefined,
     maxPrice: params.max_price ? parseInt(params.max_price) : undefined,
     sort: params.sort as any || undefined,
   });
 
-  // Fetch filter metadata (brands list)
   const filters = await fetchFilters();
   const brands = (filters.brands || []).map(b => b.name);
 
+  // For the home page (no filters), also fetch hero data
+  if (!isShowingInventory) {
+    const [latestVehicles, categoryCounts] = await Promise.all([
+      getLatestVehicles(6),
+      getCountByCategory(),
+    ]);
+
+    return (
+      <div className="fade-in">
+        <HeroSection />
+        <PremiumListings vehicles={latestVehicles} />
+        <CategoryGrid categories={categoryCounts} totalCount={meta.total} />
+      </div>
+    );
+  }
+
+  // Inventory view (when category or filters are selected)
+  const categoryName = params.category && params.category !== 'all'
+    ? CATEGORY_NAMES[params.category] || params.category
+    : null;
+
   return (
     <div className="fade-in">
-      {/* Featured Carousel */}
-      <section className="pt-8 overflow-hidden">
-        <div className="max-w-7xl mx-auto">
-          <LatestCarousel vehicles={latestVehicles} />
-        </div>
+      {/* Inventory header */}
+      <section className="max-w-7xl mx-auto px-4 pt-10 pb-2">
+        <span className="text-xs font-bold tracking-[0.2em] uppercase text-[var(--primary)]">
+          Cat&aacute;logo
+        </span>
+        <h1 className="text-3xl md:text-5xl font-black italic uppercase tracking-tighter text-[var(--accent)] mt-1">
+          {categoryName ? `Inventario de ${categoryName}` : 'Inventario'}
+        </h1>
+        <p className="text-[var(--foreground-muted)] text-sm mt-2">
+          {meta.total} veh&iacute;culos encontrados
+        </p>
       </section>
 
-      {/* All Vehicles with Filters */}
-      <section className="max-w-7xl mx-auto px-4 pt-8">
-        <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-2xl font-bold">
-            Todos los <span className="gradient-text">Vehiculos</span>
-          </h2>
-          <span className="text-sm text-[var(--foreground-muted)]">
-            Mostrando {vehicles.length} de {meta.total} vehículos
-          </span>
-        </div>
-
-        {/* Filters - Client Component */}
+      {/* Filters */}
+      <section className="max-w-7xl mx-auto px-4 pt-6">
         <Suspense fallback={<div className="h-12 bg-[var(--muted)] rounded-lg animate-pulse" />}>
           <VehicleFilters brands={brands} />
         </Suspense>
 
-        {/* Vehicle List - Server Rendered */}
+        {/* Vehicle grid */}
         <VehicleList vehicles={vehicles} />
 
-        {/* Pagination - Client Component */}
+        {/* Pagination */}
         <Suspense fallback={null}>
           <Pagination
             currentPage={meta.page}
