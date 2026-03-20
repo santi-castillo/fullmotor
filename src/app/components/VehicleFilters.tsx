@@ -112,12 +112,12 @@ export default function VehicleFilters({ brands }: VehicleFiltersProps) {
                     Filtros{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
                 </button>
 
-                <div className="flex items-center gap-2">
-                    <span className="material-symbols-outlined text-[var(--foreground-muted)] text-lg">sort</span>
+                <div className="flex items-center gap-2 min-w-0">
+                    <span className="material-symbols-outlined text-[var(--foreground-muted)] text-lg flex-shrink-0">sort</span>
                     <select
                         value={currentSort}
                         onChange={(e) => handleFilterChange('sort', e.target.value)}
-                        className={selectClass}
+                        className={`${selectClass} min-w-0 truncate`}
                     >
                         <option value="newest">M&aacute;s recientes</option>
                         <option value="oldest">M&aacute;s antiguos</option>
@@ -125,8 +125,8 @@ export default function VehicleFilters({ brands }: VehicleFiltersProps) {
                         <option value="price_desc">Mayor precio</option>
                         <option value="power_asc">Menor potencia</option>
                         <option value="power_desc">Mayor potencia</option>
-                        <option value="value_asc">Mejor relaci&oacute;n precio/potencia</option>
-                        <option value="value_desc">Peor relaci&oacute;n precio/potencia</option>
+                        <option value="value_asc">Mejor precio/HP</option>
+                        <option value="value_desc">Peor precio/HP</option>
                     </select>
                 </div>
             </div>
