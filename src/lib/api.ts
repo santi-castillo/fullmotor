@@ -184,7 +184,7 @@ interface FetchVehiclesParams {
     fuelType?: string
     minPrice?: number
     maxPrice?: number
-    sort?: 'price_asc' | 'price_desc' | 'newest'
+    sort?: 'newest' | 'oldest' | 'price_asc' | 'price_desc' | 'power_asc' | 'power_desc' | 'value_asc' | 'value_desc'
     vehicleType?: string
 }
 

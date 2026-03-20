@@ -15,6 +15,7 @@ interface PageProps {
     fuel?: string;
     min_price?: string;
     max_price?: string;
+    sort?: string;
   }>;
 }
 
@@ -35,6 +36,7 @@ export default async function Home({ searchParams }: PageProps) {
     fuelType: params.fuel || undefined,
     minPrice: params.min_price ? parseInt(params.min_price) : undefined,
     maxPrice: params.max_price ? parseInt(params.max_price) : undefined,
+    sort: params.sort as any || undefined,
   });
 
   // Fetch filter metadata (brands list)
