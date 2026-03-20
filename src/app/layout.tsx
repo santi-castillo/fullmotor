@@ -34,7 +34,7 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
         />
       </head>
-      <body className={`${inter.variable} antialiased pb-16 md:pb-0`}>
+      <body className={`${inter.variable} antialiased pb-0`}>
         {/* Header */}
         <header className="sticky top-0 z-50 bg-[var(--background)]/80 backdrop-blur-xl border-b border-[var(--border)]">
           <nav className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
@@ -87,27 +87,19 @@ export default function RootLayout({
           </div>
         </footer>
 
-        {/* Mobile Bottom Nav */}
-        <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-[var(--background-secondary)]/95 backdrop-blur-xl border-t border-[var(--border)]">
-          <div className="flex items-center justify-around py-2">
-            <Link href="/" className="flex flex-col items-center gap-0.5 px-3 py-1 text-[var(--primary)]">
-              <span className="material-symbols-outlined text-xl">home</span>
-              <span className="text-[10px] font-bold uppercase tracking-wider">Inicio</span>
-            </Link>
-            <Link href="/?category=all" className="flex flex-col items-center gap-0.5 px-3 py-1 text-[var(--foreground-muted)] hover:text-[var(--primary)] transition-colors">
-              <span className="material-symbols-outlined text-xl">search</span>
-              <span className="text-[10px] font-bold uppercase tracking-wider">Buscar</span>
-            </Link>
-            <Link href="/?category=all" className="flex flex-col items-center gap-0.5 px-3 py-1 text-[var(--foreground-muted)] hover:text-[var(--primary)] transition-colors">
-              <span className="material-symbols-outlined text-xl">sell</span>
-              <span className="text-[10px] font-bold uppercase tracking-wider">Vender</span>
-            </Link>
-            <button className="flex flex-col items-center gap-0.5 px-3 py-1 text-[var(--foreground-muted)] hover:text-[var(--primary)] transition-colors">
-              <span className="material-symbols-outlined text-xl">person</span>
-              <span className="text-[10px] font-bold uppercase tracking-wider">Perfil</span>
-            </button>
+        {/* Mobile Footer */}
+        <footer className="md:hidden bg-[var(--background-secondary)] border-t border-[var(--border)] py-6 mt-10">
+          <div className="px-4 flex flex-col items-center gap-3">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-[var(--primary)]">electric_bolt</span>
+              <span className="text-lg font-black italic uppercase tracking-tighter text-[var(--accent)]">Todo Motor</span>
+              <span className="text-[var(--foreground-muted)] text-sm font-medium">Uruguay</span>
+            </div>
+            <p className="text-[var(--foreground-muted)] text-xs">
+              &copy; {new Date().getFullYear()} Todo Motor Uruguay. Informaci&oacute;n de referencia.
+            </p>
           </div>
-        </nav>
+        </footer>
       </body>
     </html>
   );
