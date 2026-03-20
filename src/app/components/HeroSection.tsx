@@ -80,7 +80,7 @@ export default function HeroSection() {
             <div className="relative z-10 max-w-7xl mx-auto">
                 <div className="max-w-3xl">
                     {/* Headline */}
-                    <h1 className="text-5xl md:text-7xl lg:text-8xl font-black italic uppercase tracking-tighter leading-[0.9] mb-6">
+                    <h1 className="text-5xl md:text-7xl lg:text-8xl font-black italic uppercase tracking-normal leading-[1.05] mb-6">
                         <span className="electric-gradient">Encontr&aacute;</span>
                         <br />
                         <span className="text-[var(--accent)]">Tu Pr&oacute;ximo</span>
