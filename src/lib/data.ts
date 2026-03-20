@@ -46,11 +46,15 @@ export async function getLatestVehicles(limit: number = 6, category?: Category):
 
 export async function getCountByCategory(): Promise<{ id: Category; name: string; icon: string; count: number }[]> {
   try {
-    const { vehicles } = await fetchVehicles({ limit: 1000, vehicleType: 'all' })
-    
-    return CATEGORIES.map(cat => ({
+    // Fetch each category separately because X-Vehicle-Type: 'all' doesn't include motorcycles/utilitarios
+    // Use Promise.allSettled so one failing category doesn't break the rest
+    const results = await Promise.allSettled(
+      CATEGORIES.map(cat => fetchVehicles({ category: cat.id, limit: 1 }))
+    )
+
+    return CATEGORIES.map((cat, i) => ({
       ...cat,
-      count: vehicles.filter(v => v.category === cat.id).length
+      count: results[i].status === 'fulfilled' ? results[i].value.meta.total : 0
     }))
   } catch (error) {
     console.warn("getCountByCategory failed:", error)

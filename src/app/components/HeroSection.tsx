@@ -71,7 +71,7 @@ export default function HeroSection() {
     };
 
     return (
-        <section className="relative py-20 md:py-32 px-4">
+        <section className="relative py-12 md:py-20 px-4">
             {/* Background glow effects */}
             <div className="absolute inset-0 bg-gradient-to-br from-[#0b1326] via-[#131b2e] to-[#0b1326]" />
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(0,220,229,0.08)_0%,transparent_70%)]" />

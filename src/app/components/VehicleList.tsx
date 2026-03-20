@@ -35,12 +35,12 @@ export default function VehicleList({ vehicles }: VehicleListProps) {
                     className="group card overflow-hidden"
                 >
                     {/* Image */}
-                    <div className="relative h-48 md:h-56 overflow-hidden bg-[var(--surface-mid)]">
+                    <div className="relative h-48 md:h-56 overflow-hidden bg-[var(--card)]" style={{ boxShadow: 'inset 0 -40px 30px -20px var(--card)' }}>
                         {vehicle.image ? (
                             <img
                                 src={vehicle.image}
                                 alt={`${vehicle.brand} ${vehicle.model}`}
-                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                             />
                         ) : (
                             <div className="w-full h-full flex items-center justify-center">
@@ -49,8 +49,6 @@ export default function VehicleList({ vehicles }: VehicleListProps) {
                                 </span>
                             </div>
                         )}
-                        {/* Gradient overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-[var(--card)] via-transparent to-transparent" />
 
                         {/* Category glass badge */}
                         <div className="absolute top-3 left-3">
