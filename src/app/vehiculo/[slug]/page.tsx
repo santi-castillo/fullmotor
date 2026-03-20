@@ -106,7 +106,8 @@ export default async function VehiclePage({ params }: { params: Params }) {
               )}
 
               <div className="mt-4">
-                <Link href={`/compare?vehicle1=${vehicle.slug}`} className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-violet-600 hover:bg-violet-700 rounded-lg transition-colors">
+                <Link href={`/compare?vehicle1=${vehicle.slug}`} className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium glass-panel hover:border-[var(--primary)] transition-colors text-[var(--primary)]">
+                  <span className="material-symbols-outlined text-base">compare_arrows</span>
                   Comparar
                 </Link>
               </div>
@@ -170,7 +171,7 @@ export default async function VehiclePage({ params }: { params: Params }) {
                 <h3 className="text-lg font-bold mb-3">Otras versiones disponibles</h3>
                 <div className="flex flex-col gap-2">
                   {vehicle.relatedVersions.map((v) => (
-                    <Link key={v.slug} href={`/vehiculo/${v.slug}`} className="flex justify-between items-center p-3 rounded-lg border border-[var(--border)] hover:border-violet-500 hover:bg-[var(--muted)] transition-all">
+                    <Link key={v.slug} href={`/vehiculo/${v.slug}`} className="flex justify-between items-center p-3 rounded-lg border border-[var(--border)] hover:border-[var(--primary)] hover:bg-[var(--muted)] transition-all">
                       <span className="font-medium">{v.version || vehicle.model}</span>
                       <span className="text-[var(--secondary)] font-semibold">{v.currency} {v.price?.toLocaleString()}</span>
                     </Link>
@@ -179,15 +180,11 @@ export default async function VehiclePage({ params }: { params: Params }) {
               </div>
             )}
 
-            {/* Report Button */}
+            {/* Report */}
             <div className="mt-8 border-t border-[var(--border)] pt-6">
-              <a
-                href={`mailto:contacto@todomotor.uy?subject=Warning en publicacion: ${vehicle.brand} ${vehicle.model} (${vehicle.slug})`}
-                className="flex items-center gap-2 text-sm text-[var(--secondary)] hover:text-red-500 transition-colors w-fit"
-              >
-                <span className="text-lg">⚠️</span>
-                Reportar error en la publicación
-              </a>
+              <p className="text-xs text-[var(--foreground-muted)]">
+                ¿Encontraste un error? Escribinos a <span className="text-[var(--secondary)]">contacto@todomotor.uy</span>
+              </p>
             </div>
           </div>
         </div>
@@ -200,7 +197,7 @@ export default async function VehiclePage({ params }: { params: Params }) {
             {/* Motor */}
             <div className="card p-6">
               <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-                <span>⚡</span> Motor
+                <span className="material-symbols-outlined text-[var(--primary)] text-xl">bolt</span> Motor
               </h3>
               <dl className="space-y-3">
                 {vehicle.engineCc && (
@@ -245,7 +242,7 @@ export default async function VehiclePage({ params }: { params: Params }) {
             {/* Transmission */}
             <div className="card p-6">
               <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-                <span>⚙️</span> Transmision
+                <span className="material-symbols-outlined text-[var(--primary)] text-xl">settings</span> Transmision
               </h3>
               <dl className="space-y-3">
                 {vehicle.transmission && (
@@ -266,7 +263,7 @@ export default async function VehiclePage({ params }: { params: Params }) {
             {/* Dimensions */}
             <div className="card p-6">
               <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-                <span>📐</span> Dimensiones
+                <span className="material-symbols-outlined text-[var(--primary)] text-xl">straighten</span> Dimensiones
               </h3>
               <dl className="space-y-3">
                 {vehicle.length && (
@@ -299,7 +296,7 @@ export default async function VehiclePage({ params }: { params: Params }) {
             {/* Capacities */}
             <div className="card p-6">
               <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-                <span>📦</span> Capacidades
+                <span className="material-symbols-outlined text-[var(--primary)] text-xl">inventory_2</span> Capacidades
               </h3>
               <dl className="space-y-3">
                 {vehicle.trunkCapacity !== null && vehicle.trunkCapacity !== undefined && vehicle.trunkCapacity > 0 && (
@@ -327,12 +324,12 @@ export default async function VehiclePage({ params }: { params: Params }) {
             {vehicle.safetyFeatures && vehicle.safetyFeatures.length > 0 && (
               <div className="card p-6">
                 <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-                  <span>🛡️</span> Seguridad
+                  <span className="material-symbols-outlined text-[var(--primary)] text-xl">shield</span> Seguridad
                 </h3>
                 <ul className="space-y-2">
                   {vehicle.safetyFeatures.map((feature: string, i: number) => (
                     <li key={i} className="flex items-center gap-2 text-sm">
-                      <span className="text-green-500">✓</span>
+                      <span className="material-symbols-outlined text-sm text-[var(--primary)]">check</span>
                       {feature}
                     </li>
                   ))}
@@ -344,12 +341,12 @@ export default async function VehiclePage({ params }: { params: Params }) {
             {vehicle.equipment && vehicle.equipment.length > 0 && (
               <div className="card p-6">
                 <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-                  <span>✨</span> Equipamiento
+                  <span className="material-symbols-outlined text-[var(--primary)] text-xl">star</span> Equipamiento
                 </h3>
                 <ul className="space-y-2">
                   {vehicle.equipment.map((item: string, i: number) => (
                     <li key={i} className="flex items-center gap-2 text-sm">
-                      <span className="text-blue-500">•</span>
+                      <span className="material-symbols-outlined text-sm text-[var(--primary)]">check</span>
                       {item}
                     </li>
                   ))}

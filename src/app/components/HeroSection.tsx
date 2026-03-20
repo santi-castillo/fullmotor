@@ -71,7 +71,7 @@ export default function HeroSection() {
     };
 
     return (
-        <section className="relative py-12 md:py-20 px-4">
+        <section className="relative py-8 md:py-14 px-4">
             {/* Background glow effects */}
             <div className="absolute inset-0 bg-gradient-to-br from-[#0b1326] via-[#131b2e] to-[#0b1326]" />
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(0,220,229,0.08)_0%,transparent_70%)]" />
@@ -79,14 +79,6 @@ export default function HeroSection() {
 
             <div className="relative z-10 max-w-7xl mx-auto">
                 <div className="max-w-3xl">
-                    {/* Label */}
-                    <div className="flex items-center gap-2 mb-6">
-                        <span className="material-symbols-outlined text-[var(--primary)] text-xl">electric_bolt</span>
-                        <span className="text-xs font-bold tracking-[0.2em] uppercase text-[var(--primary)]">
-                            Todo Motor Uruguay
-                        </span>
-                    </div>
-
                     {/* Headline */}
                     <h1 className="text-5xl md:text-7xl lg:text-8xl font-black italic uppercase tracking-tighter leading-[0.9] mb-6">
                         <span className="electric-gradient">Encontr&aacute;</span>

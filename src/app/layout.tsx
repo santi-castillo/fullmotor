@@ -43,6 +43,7 @@ export default function RootLayout({
               <span className="text-xl font-black italic uppercase tracking-tighter text-[var(--accent)]">
                 Todo Motor
               </span>
+              <span className="text-sm font-medium text-[var(--foreground-muted)]">Uruguay</span>
             </Link>
 
             <div className="ml-auto max-w-md w-full hidden md:block">
