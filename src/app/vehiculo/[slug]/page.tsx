@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getVehicleBySlug, getAllVehicles } from "@/lib/data";
 import ImageCarousel from "@/app/components/ImageCarousel";
+import JsonLd from "@/app/components/JsonLd";
 
 type Params = Promise<{ slug: string }>
 
@@ -10,9 +11,31 @@ export async function generateMetadata({ params }: { params: Params }) {
   const vehicle = await getVehicleBySlug(slug);
   if (!vehicle) return { title: 'Vehiculo no encontrado' };
 
+  const title = `${vehicle.brand} ${vehicle.model} ${vehicle.year}`;
+  const priceText = vehicle.price ? ` - ${vehicle.currency} ${vehicle.price.toLocaleString('es-UY')}` : '';
+  const description = vehicle.description || `Ficha t\u00e9cnica del ${vehicle.brand} ${vehicle.model} ${vehicle.year}${priceText}. Especificaciones, precios y equipamiento en Uruguay.`;
+
   return {
-    title: `${vehicle.brand} ${vehicle.model} ${vehicle.year} | TodoMotor`,
-    description: vehicle.description || `Ficha tecnica del ${vehicle.brand} ${vehicle.model} ${vehicle.year}. Especificaciones, precios y equipamiento.`
+    title,
+    description,
+    openGraph: {
+      title: `${title}${priceText}`,
+      description,
+      type: 'website',
+      url: `https://todomotor.uy/vehiculo/${slug}`,
+      images: vehicle.images?.length > 0
+        ? vehicle.images.map((img) => ({ url: img }))
+        : vehicle.image ? [{ url: vehicle.image }] : [],
+    },
+    twitter: {
+      card: 'summary_large_image' as const,
+      title: `${title}${priceText}`,
+      description,
+      images: vehicle.image ? [vehicle.image] : [],
+    },
+    alternates: {
+      canonical: `https://todomotor.uy/vehiculo/${slug}`,
+    },
   };
 }
 
@@ -54,8 +77,49 @@ export default async function VehiclePage({ params }: { params: Params }) {
     ? [vehicle.image, ...vehicle.images].filter((v, i, a) => v && a.indexOf(v) === i) as string[]
     : vehicle.image ? [vehicle.image] : [];
 
+  const categorySchemaType = ['autos', 'suvs', 'pickups'].includes(vehicle.category)
+    ? 'Car'
+    : vehicle.category === 'motos'
+      ? 'Motorcycle'
+      : 'Vehicle';
+
+  const productJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': categorySchemaType,
+    name: `${vehicle.brand} ${vehicle.model} ${vehicle.year}`,
+    brand: { '@type': 'Brand', name: vehicle.brand },
+    model: vehicle.model,
+    modelDate: String(vehicle.year),
+    vehicleModelDate: String(vehicle.year),
+    image: allImages,
+    description: vehicle.description || `Ficha t\u00e9cnica del ${vehicle.brand} ${vehicle.model} ${vehicle.year}`,
+    url: `https://todomotor.uy/vehiculo/${vehicle.slug}`,
+    ...(vehicle.fuelType && { fuelType: vehicle.fuelType }),
+    ...(vehicle.transmission && { vehicleTransmission: vehicle.transmission }),
+    ...(vehicle.engineCc && { vehicleEngine: { '@type': 'EngineSpecification', engineDisplacement: { '@type': 'QuantitativeValue', value: vehicle.engineCc, unitCode: 'CMQ' } } }),
+    offers: vehicle.price ? {
+      '@type': 'Offer',
+      price: vehicle.price,
+      priceCurrency: vehicle.currency === 'US$' ? 'USD' : 'UYU',
+      availability: 'https://schema.org/InStock',
+      url: `https://todomotor.uy/vehiculo/${vehicle.slug}`,
+    } : undefined,
+  };
+
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Inicio', item: 'https://todomotor.uy' },
+      { '@type': 'ListItem', position: 2, name: categoryNames[vehicle.category], item: `https://todomotor.uy/?category=${vehicle.category}` },
+      { '@type': 'ListItem', position: 3, name: `${vehicle.brand} ${vehicle.model}` },
+    ],
+  };
+
   return (
     <div className="fade-in">
+      <JsonLd data={productJsonLd} />
+      <JsonLd data={breadcrumbJsonLd} />
       {/* Breadcrumb */}
       <div className="bg-[var(--muted)] py-4">
         <div className="max-w-7xl mx-auto px-4">

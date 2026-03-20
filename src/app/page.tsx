@@ -8,6 +8,7 @@ import PremiumListings from "./components/PremiumListings";
 import VehicleList from "./components/VehicleList";
 import VehicleFilters from "./components/VehicleFilters";
 import Pagination from "./components/Pagination";
+import JsonLd from "./components/JsonLd";
 
 interface PageProps {
   searchParams: Promise<{
@@ -60,8 +61,35 @@ export default async function Home({ searchParams }: PageProps) {
       getCountByCategory(),
     ]);
 
+    const websiteJsonLd = {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: 'TodoMotor Uruguay',
+      url: 'https://todomotor.uy',
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: { '@type': 'EntryPoint', urlTemplate: 'https://todomotor.uy/?category=all&brand={search_term_string}' },
+        'query-input': 'required name=search_term_string',
+      },
+    };
+
+    const organizationJsonLd = {
+      '@context': 'https://schema.org',
+      '@type': 'Organization',
+      name: 'TodoMotor Uruguay',
+      url: 'https://todomotor.uy',
+      logo: 'https://todomotor.uy/favicon.ico',
+      contactPoint: {
+        '@type': 'ContactPoint',
+        email: 'contacto@todomotor.uy',
+        contactType: 'customer service',
+      },
+    };
+
     return (
       <div className="fade-in">
+        <JsonLd data={websiteJsonLd} />
+        <JsonLd data={organizationJsonLd} />
         <HeroSection />
         <PremiumListings vehicles={latestVehicles} />
         <CategoryGrid categories={categoryCounts} totalCount={meta.total} />

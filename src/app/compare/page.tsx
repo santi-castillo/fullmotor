@@ -1,7 +1,13 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getVehicleBySlug } from "@/lib/data";
 import ComparatorSelector from "@/app/components/ComparatorSelector";
 import { Vehicle } from "@/types/vehicle";
+
+export const metadata: Metadata = {
+    title: "Comparador de Vehículos",
+    robots: { index: false, follow: true },
+};
 
 // Helper to format values safely
 const formatCurrency = (currency: string, value?: number) => {

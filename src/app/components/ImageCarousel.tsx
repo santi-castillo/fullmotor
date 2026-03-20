@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
 
 interface ImageCarouselProps {
   images: string[];
@@ -94,11 +95,13 @@ export default function ImageCarousel({ images, altPrefix, category }: ImageCaro
                 onClick={() => openLightbox(index)}
                 aria-label={`Ampliar imagen ${index + 1}`}
               >
-                <img
+                <Image
                   src={img}
                   alt={`${altPrefix} - Imagen ${index + 1}`}
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover/img:scale-[1.02] -z-10"
-                  loading={index === 0 ? "eager" : "lazy"}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  priority={index === 0}
+                  className="object-cover transition-transform duration-500 group-hover/img:scale-[1.02] -z-10"
                 />
               </button>
             </div>
@@ -165,8 +168,9 @@ export default function ImageCarousel({ images, altPrefix, category }: ImageCaro
           </button>
           
           <div className="relative w-full h-full flex items-center justify-center p-4 sm:p-8">
-            <img 
-              src={images[lightboxIndex]} 
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={images[lightboxIndex]}
               alt={`${altPrefix} - Imagen ${lightboxIndex + 1} ampliada`}
               className="max-w-full max-h-full object-contain drop-shadow-2xl select-none"
             />

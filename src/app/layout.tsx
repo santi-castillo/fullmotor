@@ -11,14 +11,34 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "TodoMotor Uruguay | Fichas Técnicas de Vehículos",
+  metadataBase: new URL('https://todomotor.uy'),
+  title: {
+    default: "TodoMotor Uruguay | Fichas Técnicas de Vehículos",
+    template: "%s | TodoMotor Uruguay",
+  },
   description: "Encuentra las fichas técnicas completas de autos, SUVs, camionetas y motos disponibles en Uruguay. Especificaciones, precios y equipamiento.",
   keywords: "autos uruguay, motos uruguay, fichas técnicas, precios autos, suvs, camionetas",
   openGraph: {
     title: "TodoMotor Uruguay",
     description: "Fichas técnicas de vehículos en Uruguay",
     type: "website",
-  }
+    siteName: "TodoMotor Uruguay",
+    locale: "es_UY",
+    url: "https://todomotor.uy",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "TodoMotor Uruguay",
+    description: "Fichas técnicas de vehículos en Uruguay",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    'max-image-preview': 'large' as const,
+  },
+  alternates: {
+    canonical: "https://todomotor.uy",
+  },
 };
 
 export default function RootLayout({
@@ -73,9 +93,13 @@ export default function RootLayout({
                 <span className="text-xl font-black italic uppercase tracking-tighter text-[var(--accent)]">Todo Motor</span>
                 <span className="text-[var(--foreground-muted)] text-sm font-medium">Uruguay</span>
               </div>
-              <p className="text-[var(--foreground-muted)] text-sm">
-                &copy; {new Date().getFullYear()} Todo Motor Uruguay. Informaci&oacute;n de referencia.
-              </p>
+              <nav className="flex flex-wrap justify-center gap-4 text-sm text-[var(--foreground-muted)]">
+                <Link href="/?category=autos" className="hover:text-[var(--primary)] transition-colors">Autos</Link>
+                <Link href="/?category=suvs" className="hover:text-[var(--primary)] transition-colors">SUVs</Link>
+                <Link href="/?category=pickups" className="hover:text-[var(--primary)] transition-colors">Camionetas</Link>
+                <Link href="/?category=motos" className="hover:text-[var(--primary)] transition-colors">Motos</Link>
+                <Link href="/?category=utilitarios" className="hover:text-[var(--primary)] transition-colors">Utilitarios</Link>
+              </nav>
               <a
                 href="mailto:contacto@todomotor.uy"
                 className="flex items-center gap-2 px-4 py-2 rounded-full border border-[var(--border)] bg-[var(--background)] hover:border-[var(--primary)] transition-colors text-sm font-medium"
@@ -84,6 +108,9 @@ export default function RootLayout({
                 Cont&aacute;ctanos
               </a>
             </div>
+            <p className="text-[var(--foreground-muted)] text-xs text-center mt-4">
+              &copy; {new Date().getFullYear()} Todo Motor Uruguay. Informaci&oacute;n de referencia.
+            </p>
           </div>
         </footer>
 

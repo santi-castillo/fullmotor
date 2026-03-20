@@ -6,8 +6,18 @@ export { CATEGORIES }
 
 export async function getAllVehicles(): Promise<Vehicle[]> {
   try {
-    const { vehicles } = await fetchVehicles({ limit: 100 })
-    return vehicles
+    const allVehicles: Vehicle[] = []
+    let page = 1
+    const limit = 100
+
+    while (true) {
+      const { vehicles, meta } = await fetchVehicles({ page, limit })
+      allVehicles.push(...vehicles)
+      if (page >= meta.lastPage) break
+      page++
+    }
+
+    return allVehicles
   } catch (error) {
     console.warn("getAllVehicles failed:", error)
     return []
