@@ -111,7 +111,7 @@ export default function SearchBar() {
 
             {/* Results Dropdown */}
             {isOpen && results.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-[var(--card)] border border-[var(--glass-border)] rounded-xl shadow-2xl overflow-hidden z-50">
+                <div className="absolute top-full left-0 right-0 mt-2 bg-[var(--card)] border border-[var(--glass-border)] rounded-xl shadow-2xl max-h-[60vh] overflow-y-auto z-50">
                     {results.map((vehicle) => (
                         <Link
                             key={vehicle.id}

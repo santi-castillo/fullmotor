@@ -72,11 +72,6 @@ export default function RootLayout({
               </Suspense>
             </div>
 
-            <div className="flex items-center gap-2">
-              <button className="md:hidden w-10 h-10 rounded-full flex items-center justify-center glass-panel hover:border-[var(--primary)] transition-colors">
-                <span className="material-symbols-outlined text-[var(--foreground-muted)] text-xl">search</span>
-              </button>
-            </div>
           </nav>
         </header>
 

@@ -71,7 +71,7 @@ export default function HeroSection() {
     };
 
     return (
-        <section className="relative py-8 md:py-14 px-4 overflow-hidden">
+        <section className="relative py-8 md:py-14 px-4">
             {/* Background glow effects */}
             <div className="absolute inset-0 bg-gradient-to-br from-[#0b1326] via-[#131b2e] to-[#0b1326]" />
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(0,220,229,0.08)_0%,transparent_70%)]" />
@@ -116,7 +116,7 @@ export default function HeroSection() {
 
                         {/* Results Dropdown */}
                         {isOpen && results.length > 0 && (
-                            <div className="absolute top-full left-0 right-0 mt-2 bg-[var(--card)] border border-[var(--glass-border)] rounded-xl shadow-2xl overflow-hidden z-50">
+                            <div className="absolute top-full left-0 right-0 mt-2 bg-[var(--card)] border border-[var(--glass-border)] rounded-xl shadow-2xl max-h-[60vh] overflow-y-auto z-50">
                                 {results.map((vehicle) => (
                                     <Link
                                         key={vehicle.id}
