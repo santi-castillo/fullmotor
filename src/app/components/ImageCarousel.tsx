@@ -62,8 +62,15 @@ export default function ImageCarousel({ images, altPrefix, category }: ImageCaro
   const closeLightbox = () => {
     setIsLightboxOpen(false);
     // Restore scrolling
-    document.body.style.overflow = 'unset';
+    document.body.style.overflow = '';
   };
+
+  // Restore scroll if component unmounts while lightbox is open
+  useEffect(() => {
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, []);
 
   // Keyboard navigation for lightbox
   useEffect(() => {
