@@ -5,9 +5,8 @@ import { Category } from "@/types/vehicle";
 import HeroSection from "./components/HeroSection";
 import CategoryGrid from "./components/CategoryGrid";
 import PremiumListings from "./components/PremiumListings";
-import VehicleList from "./components/VehicleList";
 import VehicleFilters from "./components/VehicleFilters";
-import Pagination from "./components/Pagination";
+import InfiniteVehicleList from "./components/InfiniteVehicleList";
 import JsonLd from "./components/JsonLd";
 
 interface PageProps {
@@ -123,16 +122,9 @@ export default async function Home({ searchParams }: PageProps) {
           <VehicleFilters brands={brands} />
         </Suspense>
 
-        {/* Vehicle grid */}
-        <VehicleList vehicles={vehicles} />
-
-        {/* Pagination */}
+        {/* Vehicle grid with infinite scroll */}
         <Suspense fallback={null}>
-          <Pagination
-            currentPage={meta.page}
-            totalPages={meta.lastPage}
-            total={meta.total}
-          />
+          <InfiniteVehicleList initialVehicles={vehicles} initialMeta={meta} />
         </Suspense>
       </section>
     </div>
