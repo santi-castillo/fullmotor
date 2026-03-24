@@ -53,7 +53,6 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     const [loading, setLoading] = useState(true)
     const [gsiReady, setGsiReady] = useState(false)
     const [showLoginModal, setShowLoginModal] = useState(false)
-    const googleBtnRef = useRef<HTMLDivElement | null>(null)
 
     // Handle Google credential response
     const handleCredentialResponse = useCallback(async (response: { credential: string }) => {
@@ -100,12 +99,12 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
         })
     }, [gsiReady, handleCredentialResponse])
 
-    // Render Google button inside the modal when it opens
-    useEffect(() => {
-        if (!showLoginModal || !gsiReady || !window.google || !googleBtnRef.current) return
+    // Callback ref: render Google button as soon as the DOM node mounts
+    const googleBtnRef = useCallback((node: HTMLDivElement | null) => {
+        if (!node || !gsiReady || !window.google) return
 
-        googleBtnRef.current.innerHTML = ''
-        window.google.accounts.id.renderButton(googleBtnRef.current, {
+        node.innerHTML = ''
+        window.google.accounts.id.renderButton(node, {
             type: 'standard',
             size: 'large',
             theme: 'filled_black',
@@ -113,7 +112,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
             shape: 'pill',
             width: 280,
         })
-    }, [showLoginModal, gsiReady])
+    }, [gsiReady])
 
     // On mount: validate stored token
     useEffect(() => {
