@@ -52,7 +52,8 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     const [token, setToken] = useState<string | null>(null)
     const [loading, setLoading] = useState(true)
     const [gsiReady, setGsiReady] = useState(false)
-    const loginBtnRef = useRef<HTMLDivElement | null>(null)
+    const [showLoginModal, setShowLoginModal] = useState(false)
+    const googleBtnRef = useRef<HTMLDivElement | null>(null)
 
     // Handle Google credential response
     const handleCredentialResponse = useCallback(async (response: { credential: string }) => {
@@ -61,6 +62,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
             storeToken(data.token)
             setToken(data.token)
             setUser(data.user)
+            setShowLoginModal(false)
         } catch (err) {
             console.error('Login failed:', err)
             removeToken()
@@ -96,18 +98,22 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
             auto_select: false,
             cancel_on_tap_outside: true,
         })
-
-        // Render hidden Google button so we can programmatically click it
-        if (loginBtnRef.current) {
-            loginBtnRef.current.innerHTML = ''
-            window.google.accounts.id.renderButton(loginBtnRef.current, {
-                type: 'standard',
-                size: 'large',
-                theme: 'filled_black',
-                text: 'signin_with',
-            })
-        }
     }, [gsiReady, handleCredentialResponse])
+
+    // Render Google button inside the modal when it opens
+    useEffect(() => {
+        if (!showLoginModal || !gsiReady || !window.google || !googleBtnRef.current) return
+
+        googleBtnRef.current.innerHTML = ''
+        window.google.accounts.id.renderButton(googleBtnRef.current, {
+            type: 'standard',
+            size: 'large',
+            theme: 'filled_black',
+            text: 'signin_with',
+            shape: 'pill',
+            width: 280,
+        })
+    }, [showLoginModal, gsiReady])
 
     // On mount: validate stored token
     useEffect(() => {
@@ -129,17 +135,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     }, [])
 
     const login = useCallback(() => {
-        if (!window.google || !GOOGLE_CLIENT_ID) return
-
-        // Click the hidden Google rendered button to trigger the popup flow
-        const btn = loginBtnRef.current?.querySelector('[role="button"]') as HTMLElement
-            || loginBtnRef.current?.querySelector('div[style]') as HTMLElement
-        if (btn) {
-            btn.click()
-        } else {
-            // Fallback: try prompt (works in production with HTTPS)
-            window.google.accounts.id.prompt()
-        }
+        setShowLoginModal(true)
     }, [])
 
     const logout = useCallback(() => {
@@ -151,8 +147,32 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     return (
         <AuthContext.Provider value={{ user, token, loading, login, logout }}>
             {children}
-            {/* Hidden Google sign-in button — clicked programmatically */}
-            <div ref={loginBtnRef} style={{ position: 'absolute', width: 0, height: 0, overflow: 'hidden', opacity: 0, pointerEvents: 'none' }} />
+
+            {/* Login modal with real Google button */}
+            {showLoginModal && (
+                <div
+                    className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+                    onClick={(e) => {
+                        if (e.target === e.currentTarget) setShowLoginModal(false)
+                    }}
+                >
+                    <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-8 mx-4 max-w-sm w-full shadow-2xl text-center">
+                        <h3 className="text-lg font-bold mb-2">Iniciar sesión</h3>
+                        <p className="text-sm text-[var(--foreground-muted)] mb-6">
+                            Usá tu cuenta de Google para comentar
+                        </p>
+                        <div className="flex justify-center mb-4">
+                            <div ref={googleBtnRef} />
+                        </div>
+                        <button
+                            onClick={() => setShowLoginModal(false)}
+                            className="text-xs text-[var(--foreground-muted)] hover:text-[var(--foreground)] transition-colors mt-2"
+                        >
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
+            )}
         </AuthContext.Provider>
     )
 }
