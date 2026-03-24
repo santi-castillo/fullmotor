@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getVehicleBySlug, getAllVehicles } from "@/lib/data";
 import ImageCarousel from "@/app/components/ImageCarousel";
 import JsonLd from "@/app/components/JsonLd";
+import CommentsSection from "@/app/components/CommentsSection";
 
 type Params = Promise<{ slug: string }>
 
@@ -419,6 +420,9 @@ export default async function VehiclePage({ params }: { params: Params }) {
             )}
           </div>
         </section>
+
+        {/* Comments */}
+        <CommentsSection resourceId={slug} />
       </div>
     </div>
   );

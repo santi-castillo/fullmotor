@@ -4,6 +4,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
 import HeaderSearch from "./components/HeaderSearch";
+import AuthProvider from "./components/AuthProvider";
+import UserMenu from "./components/UserMenu";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -55,6 +57,7 @@ export default function RootLayout({
         />
       </head>
       <body className={`${inter.variable} antialiased pb-0`}>
+        <AuthProvider>
         {/* Header */}
         <header className="sticky top-0 z-50 bg-[var(--background)]/80 backdrop-blur-xl border-b border-[var(--border)]">
           <nav className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
@@ -72,6 +75,7 @@ export default function RootLayout({
               </Suspense>
             </div>
 
+            <UserMenu />
           </nav>
         </header>
 
@@ -122,6 +126,7 @@ export default function RootLayout({
             </p>
           </div>
         </footer>
+        </AuthProvider>
       </body>
     </html>
   );
