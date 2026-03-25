@@ -79,21 +79,12 @@ export default function HeroSection() {
 
             <div className="relative z-10 max-w-7xl mx-auto">
                 <div className="max-w-3xl">
-                    {/* Headline */}
-                    <h1 className="text-5xl md:text-7xl lg:text-8xl font-black italic uppercase tracking-normal leading-[1.05] mb-6">
-                        <span className="electric-gradient">Encontr&aacute;</span>
-                        <br />
-                        <span className="text-[var(--accent)]">Tu Pr&oacute;ximo</span>
-                        <br />
-                        <span className="electric-gradient">Veh&iacute;culo</span>
+                    <h1 className="text-3xl md:text-4xl font-black italic uppercase tracking-tighter text-[var(--accent)] mb-2">
+                        Encontr&aacute; tu veh&iacute;culo
                     </h1>
-
-                    {/* Subtitle with left cyan border */}
-                    <div className="border-l-2 border-[var(--primary)] pl-4 mb-10">
-                        <p className="text-[var(--foreground-muted)] text-base md:text-lg max-w-lg">
-                            Fichas t&eacute;cnicas completas de autos, SUVs, camionetas y motos disponibles en Uruguay.
-                        </p>
-                    </div>
+                    <p className="text-[var(--foreground-muted)] text-sm md:text-base mb-6">
+                        Fichas t&eacute;cnicas, precios y comparativas en Uruguay
+                    </p>
 
                     {/* Search bar with live results */}
                     <div ref={searchRef} className="relative max-w-xl">

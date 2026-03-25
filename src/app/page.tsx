@@ -93,9 +93,9 @@ export default async function Home({ searchParams }: PageProps) {
         <JsonLd data={websiteJsonLd} />
         <JsonLd data={organizationJsonLd} />
         <HeroSection />
+        <BlogPreviewSection posts={latestBlogPosts} />
         <PremiumListings vehicles={latestVehicles} />
         <CategoryGrid categories={categoryCounts} totalCount={meta.total} />
-        <BlogPreviewSection posts={latestBlogPosts} />
       </div>
     );
   }

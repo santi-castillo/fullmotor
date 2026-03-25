@@ -69,6 +69,15 @@ export default function RootLayout({
               <span className="text-sm font-medium text-[var(--foreground-muted)]">Uruguay</span>
             </Link>
 
+            <nav className="hidden md:flex items-center gap-1 ml-6">
+              <Link href="/?category=all" className="px-3 py-1.5 rounded-lg text-sm font-medium text-[var(--foreground-muted)] hover:text-[var(--accent)] hover:bg-[var(--muted)] transition-colors">
+                Veh&iacute;culos
+              </Link>
+              <Link href="/blog" className="px-3 py-1.5 rounded-lg text-sm font-medium text-[var(--foreground-muted)] hover:text-[var(--accent)] hover:bg-[var(--muted)] transition-colors">
+                Blog
+              </Link>
+            </nav>
+
             <div className="ml-auto max-w-md w-full hidden md:block">
               <Suspense fallback={null}>
                 <HeaderSearch />
