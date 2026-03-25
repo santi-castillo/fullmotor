@@ -20,15 +20,17 @@ export default function BlogCard({ post, compact }: BlogCardProps) {
     return (
       <Link href={`/blog/${post.slug}`} className="group block">
         <article className="bg-[var(--surface-mid)] rounded-xl overflow-hidden border border-[var(--glass-border)] hover:border-[rgba(0,220,229,0.3)] transition-all">
-          <div className="relative h-44 w-full">
-            <Image
-              src={post.coverImage}
-              alt={post.title}
-              fill
-              className="object-cover group-hover:scale-105 transition-transform duration-500"
-              sizes="(max-width: 768px) 100vw, 33vw"
-            />
-          </div>
+          {post.coverImage && (
+            <div className="relative h-44 w-full">
+              <Image
+                src={post.coverImage}
+                alt={post.title}
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-500"
+                sizes="(max-width: 768px) 100vw, 33vw"
+              />
+            </div>
+          )}
           <div className="p-4">
             {post.tags[0] && (
               <span className="inline-block bg-[var(--surface-highest)] text-[var(--primary)] text-xs font-semibold px-3 py-1 rounded-full mb-2">
@@ -51,15 +53,17 @@ export default function BlogCard({ post, compact }: BlogCardProps) {
     <Link href={`/blog/${post.slug}`} className="group block">
       <article className="bg-[var(--surface-mid)] rounded-xl overflow-hidden border border-[var(--glass-border)] hover:border-[rgba(0,220,229,0.3)] transition-all">
         <div className="flex flex-col md:flex-row">
-          <div className="relative h-48 md:h-auto md:w-[280px] flex-shrink-0">
-            <Image
-              src={post.coverImage}
-              alt={post.title}
-              fill
-              className="object-cover group-hover:scale-105 transition-transform duration-500"
-              sizes="(max-width: 768px) 100vw, 280px"
-            />
-          </div>
+          {post.coverImage && (
+            <div className="relative h-48 md:h-auto md:w-[280px] flex-shrink-0">
+              <Image
+                src={post.coverImage}
+                alt={post.title}
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-500"
+                sizes="(max-width: 768px) 100vw, 280px"
+              />
+            </div>
+          )}
           <div className="p-6 md:p-8 flex-1 flex flex-col justify-between">
             <div>
               {post.tags[0] && (
