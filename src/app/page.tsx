@@ -8,6 +8,8 @@ import PremiumListings from "./components/PremiumListings";
 import VehicleFilters from "./components/VehicleFilters";
 import InfiniteVehicleList from "./components/InfiniteVehicleList";
 import JsonLd from "./components/JsonLd";
+import BlogPreviewSection from "./components/BlogPreviewSection";
+import { getLatestBlogPosts } from "@/lib/blog";
 
 interface PageProps {
   searchParams: Promise<{
@@ -55,9 +57,10 @@ export default async function Home({ searchParams }: PageProps) {
 
   // For the home page (no filters), also fetch hero data
   if (!isShowingInventory) {
-    const [latestVehicles, categoryCounts] = await Promise.all([
+    const [latestVehicles, categoryCounts, latestBlogPosts] = await Promise.all([
       getLatestVehicles(6),
       getCountByCategory(),
+      getLatestBlogPosts(3),
     ]);
 
     const websiteJsonLd = {
@@ -92,6 +95,7 @@ export default async function Home({ searchParams }: PageProps) {
         <HeroSection />
         <PremiumListings vehicles={latestVehicles} />
         <CategoryGrid categories={categoryCounts} totalCount={meta.total} />
+        <BlogPreviewSection posts={latestBlogPosts} />
       </div>
     );
   }

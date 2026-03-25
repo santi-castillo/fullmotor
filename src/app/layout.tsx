@@ -98,6 +98,7 @@ export default function RootLayout({
                 <Link href="/?category=pickups" className="hover:text-[var(--primary)] transition-colors">Camionetas</Link>
                 <Link href="/?category=motos" className="hover:text-[var(--primary)] transition-colors">Motos</Link>
                 <Link href="/?category=utilitarios" className="hover:text-[var(--primary)] transition-colors">Utilitarios</Link>
+                <Link href="/blog" className="hover:text-[var(--primary)] transition-colors">Blog</Link>
               </nav>
               <a
                 href="mailto:contacto@todomotor.uy"

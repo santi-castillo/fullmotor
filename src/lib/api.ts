@@ -320,4 +320,4 @@ export async function searchVehicles(query: string, type: 'text' | 'semantic' = 
 }
 
 // Export mappers for use in other modules (if needed elsewhere)
-export { categoryToVehicleType, vehicleTypeToCategory }
+export { categoryToVehicleType, vehicleTypeToCategory, getHeaders }
