@@ -8,11 +8,12 @@ interface PremiumListingsProps {
 
 function getFuelLabel(fuelType: string | undefined): string {
     const fuel = fuelType?.toLowerCase() || '';
-    if (fuel === 'electrico' || fuel === 'eléctrico') return 'Eléctrico';
-    if (fuel === 'hibrido' || fuel === 'híbrido') return 'Híbrido';
+    if (fuel === 'electrico' || fuel === 'eléctrico' || fuel === 'electric') return 'Eléctrico';
+    if (fuel === 'hibrido' || fuel === 'híbrido' || fuel === 'hybrid') return 'Híbrido';
+    if (fuel === 'mild-hybrid' || fuel === 'mild hybrid') return 'Mild Hybrid';
     if (fuel === 'diesel') return 'Diesel';
-    if (fuel === 'nafta') return 'Nafta';
-    return 'Combustión';
+    if (fuel === 'nafta' || fuel === 'gasoline') return 'Nafta';
+    return '-';
 }
 
 export default function PremiumListings({ vehicles }: PremiumListingsProps) {

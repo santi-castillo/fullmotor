@@ -64,8 +64,9 @@ export default async function VehiclePage({ params }: { params: Params }) {
   const fuelNames: Record<string, string> = {
     nafta: 'Nafta',
     diesel: 'Diesel',
-    electrico: 'Electrico',
-    hibrido: 'Hibrido'
+    'eléctrico': 'Eléctrico',
+    'híbrido': 'Híbrido',
+    'mild-hybrid': 'Mild Hybrid'
   };
 
   const transmissionNames: Record<string, string> = {
