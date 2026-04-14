@@ -36,6 +36,7 @@ const fuelTypeToFrontend: Record<string, string> = {
     'gasoline': 'nafta',
     'diesel': 'diesel',
     'hybrid': 'híbrido',
+    'mild-hybrid': 'mild-hybrid',
     'electric': 'eléctrico',
 }
 
@@ -121,6 +122,7 @@ interface CarouselItem {
     countryCode: string
     createdAt?: string
     engineHp?: number
+    fuelType?: string
 }
 
 interface CarouselResponse {
@@ -284,6 +286,7 @@ export async function fetchCarouselItems(category?: Category): Promise<Vehicle[]
             equipment: [],
             createdAt: item.createdAt,
             engineHp: item.engineHp,
+            fuelType: item.fuelType ? fuelTypeToFrontend[item.fuelType] || item.fuelType : undefined,
         }
     })
 }
