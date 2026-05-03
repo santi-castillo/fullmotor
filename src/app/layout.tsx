@@ -73,6 +73,9 @@ export default function RootLayout({
               <Link href="/?category=all" className="px-3 py-1.5 rounded-lg text-sm font-medium text-[var(--foreground-muted)] hover:text-[var(--accent)] hover:bg-[var(--muted)] transition-colors">
                 Veh&iacute;culos
               </Link>
+              <Link href="/clasificados" className="px-3 py-1.5 rounded-lg text-sm font-medium text-[var(--foreground-muted)] hover:text-[var(--accent)] hover:bg-[var(--muted)] transition-colors">
+                Clasificados
+              </Link>
               <Link href="/blog" className="px-3 py-1.5 rounded-lg text-sm font-medium text-[var(--foreground-muted)] hover:text-[var(--accent)] hover:bg-[var(--muted)] transition-colors">
                 Blog
               </Link>
