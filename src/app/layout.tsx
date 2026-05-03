@@ -81,6 +81,13 @@ export default function RootLayout({
               </Link>
             </nav>
 
+            <Link
+              href="/clasificados"
+              className="md:hidden ml-2 px-2.5 py-1 rounded-lg text-xs font-semibold border border-[var(--border)] text-[var(--foreground-muted)] hover:text-[var(--accent)] hover:border-[var(--accent)] transition-colors flex-shrink-0"
+            >
+              Clasificados
+            </Link>
+
             <div className="ml-auto max-w-md w-full hidden md:block">
               <Suspense fallback={null}>
                 <HeaderSearch />
