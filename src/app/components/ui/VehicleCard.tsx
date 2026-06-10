@@ -26,7 +26,7 @@ export function VehicleCard({
   currency = 'USD',
   power,
   fuelType,
-  condition = 'Nuevo',
+  condition,
   image,
   hideSave = false,
   sizes = '(max-width: 560px) 100vw, (max-width: 1000px) 50vw, 25vw',
@@ -42,9 +42,11 @@ export function VehicleCard({
         {image
           ? <Image src={image} alt={`${brand} ${model}`} fill sizes={sizes} style={{ objectFit: 'cover' }} />
           : <GaugePH />}
-        <div className="tm-vcard__topl">
-          <span className={`tm-cond${used ? ' tm-cond--used' : ''}`}>{condition}</span>
-        </div>
+        {condition && (
+          <div className="tm-vcard__topl">
+            <span className={`tm-cond${used ? ' tm-cond--used' : ''}`}>{condition}</span>
+          </div>
+        )}
         {!hideSave && (
           <div className="tm-vcard__topr">
             <button

@@ -11,6 +11,7 @@ import { Badge } from "@/app/components/ui/Badge";
 import { FuelTag } from "@/app/components/ui/FuelTag";
 import { ButtonLink } from "@/app/components/ui/Button";
 import { SpecGrid, type SpecGroup } from "@/app/components/ui/SpecGrid";
+import { isRecentlyListed } from "@/lib/vehicle-card";
 
 type Params = Promise<{ slug: string }>
 
@@ -200,7 +201,7 @@ export default async function VehiclePage({ params }: { params: Params }) {
             <ImageCarousel
               images={allImages}
               altPrefix={`${vehicle.brand} ${vehicle.model} ${vehicle.year}`}
-              badge={`Nuevo · ${vehicle.year}`}
+              badge={isRecentlyListed(vehicle.createdAt) ? `Nuevo · ${vehicle.year}` : undefined}
             />
             {vehicle.description && (
               <p className="dt__desc" style={{ marginTop: 24 }}>
