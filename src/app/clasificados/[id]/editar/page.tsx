@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import { Classified } from '@/types/classified'
 import { fetchClassifiedById } from '@/lib/classifieds-api'
 import { useAuth } from '../../../components/AuthProvider'
+import { ButtonLink } from '../../../components/ui/Button'
 import RequireAuth from '../../../components/RequireAuth'
 import ClassifiedForm from '../../../components/ClassifiedForm'
 
@@ -47,7 +48,7 @@ function EditInner() {
 
   if (loading) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-20 text-center text-sm text-[var(--foreground-muted)]">
+      <div className="max-w-2xl mx-auto px-4 py-20 text-center text-sm text-muted">
         Cargando…
       </div>
     )
@@ -55,34 +56,27 @@ function EditInner() {
 
   if (error || !classified) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-20 text-center">
-        <p className="text-red-400 mb-4">{error || 'No se encontró la publicación.'}</p>
-        <Link href="/clasificados/mis" className="btn btn-primary inline-flex">
-          Volver a mis publicaciones
-        </Link>
+      <div className="max-w-2xl mx-auto px-4 py-20 text-center">
+        <p className="text-danger-ink mb-4">{error || 'No se encontró la publicación.'}</p>
+        <ButtonLink href="/clasificados/mis">Volvé a tus avisos</ButtonLink>
       </div>
     )
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
+    <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
       <div>
-        <nav className="mb-2 text-sm text-[var(--foreground-muted)]">
-          <Link href="/clasificados" className="hover:text-[var(--primary-light)]">
-            Clasificados
-          </Link>
-          <span className="mx-2">›</span>
-          <Link
-            href={`/clasificados/${classified.id}`}
-            className="hover:text-[var(--primary-light)]"
-          >
+        <nav className="iv__crumb mb-3">
+          <Link href="/clasificados">Clasificados</Link>
+          <span>/</span>
+          <Link href={`/clasificados/${classified.id}`} className="truncate max-w-48">
             {classified.title}
           </Link>
-          <span className="mx-2">›</span>
+          <span>/</span>
           <span>Editar</span>
         </nav>
-        <h1 className="text-3xl font-bold">
-          Editar <span className="gradient-text">publicación</span>
+        <h1 className="font-display text-3xl font-bold text-ink" style={{ letterSpacing: '-0.03em' }}>
+          Editá tu aviso
         </h1>
       </div>
 

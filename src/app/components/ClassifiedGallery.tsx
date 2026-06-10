@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { ImageOff } from 'lucide-react'
 
 interface ClassifiedGalleryProps {
   images: string[]
@@ -12,35 +13,31 @@ export default function ClassifiedGallery({ images, title }: ClassifiedGalleryPr
 
   if (images.length === 0) {
     return (
-      <div className="card aspect-[4/3] flex items-center justify-center text-6xl opacity-40">
-        📷
+      <div className="dt__stage">
+        <ImageOff size={40} className="text-faint" aria-hidden="true" />
       </div>
     )
   }
 
   return (
-    <div className="space-y-3">
-      <div className="card aspect-[4/3] overflow-hidden">
+    <div className="dt__gallery">
+      <div className="dt__stage">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={images[active]}
-          alt={title}
-          className="w-full h-full object-cover"
-        />
+        <img src={images[active]} alt={title} />
       </div>
       {images.length > 1 && (
-        <div className="grid grid-cols-5 gap-2">
+        <div className="dt__thumbs" style={{ gridTemplateColumns: 'repeat(5, 1fr)' }}>
           {images.map((url, i) => (
             <button
               key={url}
               type="button"
               onClick={() => setActive(i)}
-              className={`aspect-square rounded-lg overflow-hidden border-2 transition-colors ${
-                i === active ? 'border-[var(--primary)]' : 'border-transparent hover:border-[var(--border)]'
-              }`}
+              className={`dt__thumb${i === active ? ' on' : ''}`}
+              aria-label={`Ver foto ${i + 1}`}
+              aria-current={i === active || undefined}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={url} alt="" className="w-full h-full object-cover" />
+              <img src={url} alt="" />
             </button>
           ))}
         </div>

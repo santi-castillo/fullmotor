@@ -1,0 +1,40 @@
+<!-- @dsCard group="Brand" viewport="700x200" name="Logo — lockup" subtitle="Primary horizontal lockup, light & dark" -->
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body { margin: 0; background: var(--bg-app); font-family: var(--font-sans); }
+  .wrap { display: grid; grid-template-columns: 1fr 1fr; }
+  .cell { padding: 36px 32px; display: flex; align-items: center; }
+  .cell.dark { background: var(--brand-deep); }
+  .lockup { display: inline-flex; align-items: flex-end; gap: 12px; }
+  .wm { font-family: var(--font-display); font-weight: 700; letter-spacing: -0.03em; line-height: 0.9; font-size: 34px; }
+  .todo { color: var(--text-strong); }
+  .motor { color: var(--accent); }
+  .dark .todo { color: #fff; }
+  .dark .motor { color: #6E97FF; }
+  .uy { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-muted); padding-bottom: 4px; }
+  .dark .uy { color: var(--text-inverse-muted); }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="cell">
+      <div class="lockup">
+        <img src="../assets/logo/todomotor-mark.svg" width="46" height="46" alt="">
+        <span class="wm"><span class="todo">todo</span><span class="motor">motor</span></span>
+        <span class="uy">UY</span>
+      </div>
+    </div>
+    <div class="cell dark">
+      <div class="lockup">
+        <img src="../assets/logo/todomotor-mark.svg" width="46" height="46" alt="">
+        <span class="wm"><span class="todo">todo</span><span class="motor">motor</span></span>
+        <span class="uy">UY</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

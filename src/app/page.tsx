@@ -1,11 +1,15 @@
 import { Suspense } from "react";
+import Link from "next/link";
+import { ChevronRight } from "lucide-react";
 import { fetchVehicles, fetchFilters } from "@/lib/api";
 import { getLatestVehicles, getCountByCategory } from "@/lib/data";
 import { Category } from "@/types/vehicle";
+import { formatNumber } from "@/lib/format";
 import HeroSection from "./components/HeroSection";
 import CategoryGrid from "./components/CategoryGrid";
 import PremiumListings from "./components/PremiumListings";
 import VehicleFilters from "./components/VehicleFilters";
+import InventoryToolbar from "./components/InventoryToolbar";
 import InfiniteVehicleList from "./components/InfiniteVehicleList";
 import JsonLd from "./components/JsonLd";
 import BlogPreviewSection from "./components/BlogPreviewSection";
@@ -49,7 +53,7 @@ export default async function Home({ searchParams }: PageProps) {
     fuelType: params.fuel || undefined,
     minPrice: params.min_price ? parseInt(params.min_price) : undefined,
     maxPrice: params.max_price ? parseInt(params.max_price) : undefined,
-    sort: params.sort as any || undefined,
+    sort: (params.sort as NonNullable<Parameters<typeof fetchVehicles>[0]>['sort']) || undefined,
   });
 
   const filters = await fetchFilters();
@@ -58,7 +62,7 @@ export default async function Home({ searchParams }: PageProps) {
   // For the home page (no filters), also fetch hero data
   if (!isShowingInventory) {
     const [latestVehicles, categoryCounts, latestBlogPosts] = await Promise.all([
-      getLatestVehicles(6),
+      getLatestVehicles(8),
       getCountByCategory(),
       getLatestBlogPosts(3),
     ]);
@@ -80,7 +84,7 @@ export default async function Home({ searchParams }: PageProps) {
       '@type': 'Organization',
       name: 'TodoMotor Uruguay',
       url: 'https://todomotor.uy',
-      logo: 'https://todomotor.uy/favicon.ico',
+      logo: 'https://todomotor.uy/brand/todomotor-mark.svg',
       contactPoint: {
         '@type': 'ContactPoint',
         email: 'contacto@todomotor.uy',
@@ -89,13 +93,13 @@ export default async function Home({ searchParams }: PageProps) {
     };
 
     return (
-      <div className="fade-in">
+      <div style={{ paddingBottom: 24 }}>
         <JsonLd data={websiteJsonLd} />
         <JsonLd data={organizationJsonLd} />
-        <HeroSection />
-        <BlogPreviewSection posts={latestBlogPosts} />
-        <PremiumListings vehicles={latestVehicles} />
+        <HeroSection total={meta.total} brandsCount={brands.length} />
         <CategoryGrid categories={categoryCounts} totalCount={meta.total} />
+        <PremiumListings vehicles={latestVehicles} />
+        <BlogPreviewSection posts={latestBlogPosts} />
       </div>
     );
   }
@@ -105,32 +109,34 @@ export default async function Home({ searchParams }: PageProps) {
     ? CATEGORY_NAMES[params.category] || params.category
     : null;
 
+  const categoryCounts = await getCountByCategory();
+
   return (
-    <div className="fade-in">
-      {/* Inventory header */}
-      <section className="max-w-7xl mx-auto px-4 pt-10 pb-2">
-        <span className="text-xs font-bold tracking-[0.2em] uppercase text-[var(--primary)]">
-          Cat&aacute;logo
-        </span>
-        <h1 className="text-3xl md:text-5xl font-black italic uppercase tracking-tighter text-[var(--accent)] mt-1">
-          {categoryName ? `Inventario de ${categoryName}` : 'Inventario'}
-        </h1>
-        <p className="text-[var(--foreground-muted)] text-sm mt-2">
-          {meta.total} veh&iacute;culos encontrados
-        </p>
-      </section>
+    <div className="iv" style={{ paddingBottom: 24 }}>
+      <div className="iv__crumb">
+        <Link href="/">Inicio</Link>
+        <ChevronRight size={13} aria-hidden="true" />
+        <span>Vehículos</span>
+        <ChevronRight size={13} aria-hidden="true" />
+        <span style={{ color: 'var(--text-strong)' }}>{categoryName || 'Todos'}</span>
+      </div>
+      <h1 className="iv__title">{categoryName || 'Todos los vehículos'}</h1>
+      <p className="iv__count">{formatNumber(meta.total)} vehículos encontrados</p>
 
-      {/* Filters */}
-      <section className="max-w-7xl mx-auto px-4 pt-6">
-        <Suspense fallback={<div className="h-12 bg-[var(--muted)] rounded-lg animate-pulse" />}>
-          <VehicleFilters brands={brands} />
+      <div className="iv__body">
+        <Suspense fallback={<div />}>
+          <VehicleFilters brands={brands} categories={categoryCounts} />
         </Suspense>
 
-        {/* Vehicle grid with infinite scroll */}
-        <Suspense fallback={null}>
-          <InfiniteVehicleList initialVehicles={vehicles} initialMeta={meta} />
-        </Suspense>
-      </section>
+        <div>
+          <Suspense fallback={<div className="iv__toolbar" />}>
+            <InventoryToolbar />
+          </Suspense>
+          <Suspense fallback={null}>
+            <InfiniteVehicleList initialVehicles={vehicles} initialMeta={meta} />
+          </Suspense>
+        </div>
+      </div>
     </div>
   );
 }

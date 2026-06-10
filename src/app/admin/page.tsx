@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { getAllVehicles } from '@/lib/data'
 import { Vehicle } from '@/types/vehicle'
+import { Button } from '../components/ui/Button'
 
 export default function AdminPage() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([])
@@ -25,7 +26,7 @@ export default function AdminPage() {
     e.preventDefault()
 
     if (!file || !selectedVehicle) {
-      setMessage('Selecciona un vehículo y una imagen')
+      setMessage('Elegí un vehículo y una imagen')
       return
     }
 
@@ -66,72 +67,69 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen p-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Admin - Subir Imágenes</h1>
+        <h1 className="font-display text-2xl font-bold text-ink mb-8">Admin · Subir imágenes</h1>
 
-        <form onSubmit={handleUpload} className="bg-white p-6 rounded-lg shadow-md space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Seleccionar Vehículo
-            </label>
-            <select
-              value={selectedVehicle}
-              onChange={(e) => setSelectedVehicle(e.target.value)}
-              className="w-full p-2 border rounded-md"
-              required
-            >
-              <option value="">-- Selecciona un vehículo --</option>
-              {vehicles.map((v) => (
-                <option key={v.id} value={v.id}>
-                  {v.brand} {v.model} {v.version} ({v.year})
-                  {v.image && ' ✓'}
-                </option>
-              ))}
-            </select>
+        <form onSubmit={handleUpload} className="bg-surface border border-line p-6 rounded-[var(--radius-lg)] shadow-xs space-y-4">
+          <div className="tm-field">
+            <label className="tm-field__label">Seleccionar vehículo</label>
+            <span className="tm-select-wrap">
+              <select
+                value={selectedVehicle}
+                onChange={(e) => setSelectedVehicle(e.target.value)}
+                className="tm-select"
+                required
+              >
+                <option value="">Elegí un vehículo</option>
+                {vehicles.map((v) => (
+                  <option key={v.id} value={v.id}>
+                    {v.brand} {v.model} {v.version} ({v.year})
+                    {v.image && ' — con imagen'}
+                  </option>
+                ))}
+              </select>
+              <span className="tm-select__chev" aria-hidden="true" />
+            </span>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Seleccionar Imagen
-            </label>
+          <div className="tm-field">
+            <label className="tm-field__label">Seleccionar imagen</label>
             <input
               type="file"
               accept="image/*"
               onChange={handleFileChange}
-              className="w-full p-2 border rounded-md"
+              className="tm-input"
+              style={{ paddingTop: 7 }}
               required
             />
           </div>
 
-          <button
-            type="submit"
-            disabled={uploading}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400"
-          >
-            {uploading ? 'Subiendo...' : 'Subir Imagen'}
-          </button>
+          <Button type="submit" block loading={uploading}>
+            Subir imagen
+          </Button>
 
           {message && (
-            <div className={`p-4 rounded-md ${message.includes('Error') ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+            <div className={`p-4 rounded-[var(--radius-md)] text-sm ${message.includes('Error') ? 'bg-danger-soft text-danger-ink' : 'bg-positive-soft text-positive-ink'}`}>
               {message}
             </div>
           )}
         </form>
 
-        <div className="mt-8 bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-bold mb-4">Vehículos con Imágenes</h2>
+        <div className="mt-8 bg-surface border border-line p-6 rounded-[var(--radius-lg)] shadow-xs">
+          <h2 className="font-display text-lg font-bold text-ink mb-4">Vehículos con imágenes</h2>
           <div className="space-y-2">
             {vehicles
               .filter(v => v.image)
               .map(v => (
-                <div key={v.id} className="flex items-center gap-4 p-3 border rounded">
+                <div key={v.id} className="flex items-center gap-4 p-3 border border-hairline rounded-[var(--radius-md)]">
                   {v.image && (
-                    <img src={v.image} alt={v.model} className="w-20 h-20 object-cover rounded" />
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={v.image} alt={v.model} className="w-20 h-20 object-cover rounded-[var(--radius-sm)]" />
                   )}
-                  <div>
-                    <p className="font-medium">{v.brand} {v.model}</p>
-                    <p className="text-sm text-gray-500">{v.image}</p>
+                  <div className="min-w-0">
+                    <p className="font-semibold text-ink">{v.brand} {v.model}</p>
+                    <p className="font-mono text-xs text-muted truncate">{v.image}</p>
                   </div>
                 </div>
               ))}

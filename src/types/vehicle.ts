@@ -45,10 +45,13 @@ export interface Vehicle {
 
 export type Category = 'autos' | 'suvs' | 'pickups' | 'motos' | 'utilitarios'
 
-export const CATEGORIES: { id: Category; name: string; icon: string }[] = [
-  { id: 'autos', name: 'Autos', icon: '🚗' },
-  { id: 'suvs', name: 'SUVs', icon: '🚙' },
-  { id: 'pickups', name: 'Camionetas', icon: '🛻' },
-  { id: 'motos', name: 'Motos', icon: '🏍️' },
-  { id: 'utilitarios', name: 'Utilitarios', icon: '🚐' },
+// icon: Lucide glyph name, rendered via components/ui/CategoryIcon
+export type CategoryIconName = 'car-front' | 'caravan' | 'truck' | 'bike' | 'bus' | 'layout-grid'
+
+export const CATEGORIES: { id: Category; name: string; icon: CategoryIconName }[] = [
+  { id: 'autos', name: 'Autos', icon: 'car-front' },
+  { id: 'suvs', name: 'SUVs', icon: 'caravan' },
+  { id: 'pickups', name: 'Camionetas', icon: 'truck' },
+  { id: 'motos', name: 'Motos', icon: 'bike' },
+  { id: 'utilitarios', name: 'Utilitarios', icon: 'bus' },
 ]

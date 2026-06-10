@@ -1,0 +1,27 @@
+<!-- @dsCard group="Colors" viewport="700x180" name="Cobalt — primary accent" subtitle="CTAs, links, selection · Direction A" -->
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body { margin: 0; background: var(--surface); padding: 26px 30px; }
+  .grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+  .sw { display: flex; flex-direction: column; gap: 8px; }
+  .chip { height: 64px; border-radius: var(--radius-md); border: 1px solid rgba(11,31,68,0.08); display:flex; align-items:flex-end; padding:8px; }
+  .name { font-family: var(--font-mono); font-size: 10px; color: var(--text-strong); }
+  .hex { font-family: var(--font-mono); font-size: 9.5px; color: var(--text-faint); }
+  .on { font-family: var(--font-mono); font-size: 10px; color:#fff; }
+</style>
+</head>
+<body>
+  <div class="grid">
+    <div class="sw"><div class="chip" style="background:var(--c-cobalt-50)"></div><span class="name">faint</span><span class="hex">EDF2FF</span></div>
+    <div class="sw"><div class="chip" style="background:var(--c-cobalt-100)"></div><span class="name">soft</span><span class="hex">DEE8FF</span></div>
+    <div class="sw"><div class="chip" style="background:var(--c-cobalt-500)"><span class="on">hover</span></div><span class="name">cobalt-500</span><span class="hex">3A66F0</span></div>
+    <div class="sw"><div class="chip" style="background:var(--c-cobalt-600)"><span class="on">base</span></div><span class="name">cobalt-600</span><span class="hex">1F4FE0</span></div>
+    <div class="sw"><div class="chip" style="background:var(--c-cobalt-700)"><span class="on">press</span></div><span class="name">cobalt-700</span><span class="hex">1740BE</span></div>
+    <div class="sw"><div class="chip" style="background:var(--c-cobalt-ink)"><span class="on">ink</span></div><span class="name">cobalt-ink</span><span class="hex">102B78</span></div>
+  </div>
+</body>
+</html>

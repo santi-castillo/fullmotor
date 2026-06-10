@@ -1,21 +1,69 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
+import { X, CarFront } from "lucide-react";
 import { getVehicleBySlug } from "@/lib/data";
-import ComparatorSelector from "@/app/components/ComparatorSelector";
 import { Vehicle } from "@/types/vehicle";
+import { formatNumber, fuelToTagType } from "@/lib/format";
+import { FuelTag } from "@/app/components/ui/FuelTag";
+import { ButtonLink } from "@/app/components/ui/Button";
+import CompareAdd from "@/app/components/CompareAdd";
 
 export const metadata: Metadata = {
     title: "Comparador de Vehículos",
     robots: { index: false, follow: true },
 };
 
-// Helper to format values safely
-const formatCurrency = (currency: string, value?: number) => {
-    if (!value) return null;
-    return `${currency} ${value.toLocaleString()}`;
+const MAX_VEHICLES = 4;
+
+interface Row {
+    label: string;
+    get: (v: Vehicle) => React.ReactNode;
+    /** Numeric value for best-of-row highlight */
+    val?: (v: Vehicle) => number | undefined;
+    best?: 'min' | 'max';
+    cls?: string;
+}
+
+const transmissionNames: Record<string, string> = {
+    manual: 'Manual',
+    automatica: 'Automática',
+    cvt: 'CVT',
 };
 
-const formatValue = (value?: string | number) => value || '-';
+const ROWS: Row[] = [
+    {
+        label: 'Precio',
+        get: (v) => v.price ? `${v.currency === 'US$' || v.currency === 'U$S' ? 'USD' : v.currency} ${formatNumber(v.price)}` : '–',
+        val: (v) => v.price || undefined,
+        best: 'min',
+        cls: 'price',
+    },
+    { label: 'Combustible', get: (v) => v.fuelType ? <FuelTag type={fuelToTagType(v.fuelType)} plain /> : '–' },
+    { label: 'Potencia', get: (v) => v.engineHp ? `${v.engineHp} HP` : '–', val: (v) => v.engineHp, best: 'max' },
+    { label: 'Torque', get: (v) => v.engineTorque ? `${v.engineTorque} Nm` : '–', val: (v) => v.engineTorque, best: 'max' },
+    { label: 'Cilindrada', get: (v) => v.engineCc ? `${formatNumber(v.engineCc)} cc` : '–' },
+    { label: 'Caja', get: (v) => v.transmission ? `${transmissionNames[v.transmission] || v.transmission}${v.gears ? ` · ${v.gears}` : ''}` : '–' },
+    { label: 'Batería', get: (v) => v.batteryKwh ? `${v.batteryKwh} kWh` : '–', val: (v) => v.batteryKwh, best: 'max' },
+    { label: 'Autonomía', get: (v) => v.autonomyKm ? `${formatNumber(v.autonomyKm)} km` : '–', val: (v) => v.autonomyKm, best: 'max' },
+    { label: 'Baúl / Carga', get: (v) => v.trunkCapacity ? `${formatNumber(v.trunkCapacity)} L` : '–', val: (v) => v.trunkCapacity, best: 'max' },
+    { label: 'Tanque', get: (v) => v.fuelTank ? `${v.fuelTank} L` : '–' },
+    { label: 'Largo', get: (v) => v.length ? `${formatNumber(v.length)} mm` : '–' },
+    { label: 'Ancho', get: (v) => v.width ? `${formatNumber(v.width)} mm` : '–' },
+    { label: 'Alto', get: (v) => v.height ? `${formatNumber(v.height)} mm` : '–' },
+    { label: 'Entre ejes', get: (v) => v.wheelbase ? `${formatNumber(v.wheelbase)} mm` : '–' },
+    { label: 'Peso', get: (v) => v.weight ? `${formatNumber(v.weight)} kg` : '–', val: (v) => v.weight, best: 'min' },
+];
+
+/** Slugs of the winners for a row — only when every vehicle has the value. */
+function bestSlugs(row: Row, cars: Vehicle[]): string[] {
+    if (!row.best || !row.val || cars.length < 2) return [];
+    const vals = cars.map((c) => ({ slug: c.slug, n: row.val!(c) }));
+    if (vals.some((x) => x.n == null)) return [];
+    const nums = vals.map((x) => x.n as number);
+    const pick = row.best === 'min' ? Math.min(...nums) : Math.max(...nums);
+    return vals.filter((x) => x.n === pick).map((x) => x.slug);
+}
 
 export default async function ComparatorPage({
     searchParams,
@@ -23,148 +71,94 @@ export default async function ComparatorPage({
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
     const params = await searchParams;
-    const v1Slug = params.vehicle1 as string | undefined;
-    const v2Slug = params.vehicle2 as string | undefined;
 
-    const vehicle1 = v1Slug ? await getVehicleBySlug(v1Slug) : null;
-    const vehicle2 = v2Slug ? await getVehicleBySlug(v2Slug) : null;
+    // Canonical param: ?vehicles=slug1,slug2,… — legacy ?vehicle1=&vehicle2= still accepted
+    const fromList = typeof params.vehicles === 'string' ? params.vehicles.split(',') : [];
+    const legacy = [params.vehicle1, params.vehicle2].filter((s): s is string => typeof s === 'string' && s.length > 0);
+    const slugs = [...new Set([...fromList, ...legacy].map((s) => s.trim()).filter(Boolean))].slice(0, MAX_VEHICLES);
 
-    const vehicles = [
-        { data: vehicle1, slot: 1, currentSlug: v1Slug },
-        { data: vehicle2, slot: 2, currentSlug: v2Slug }
-    ];
+    const cars = (await Promise.all(slugs.map((s) => getVehicleBySlug(s)))).filter((v): v is Vehicle => !!v);
+    const carSlugs = cars.map((c) => c.slug);
 
-    const hasVehicles = vehicle1 || vehicle2;
+    const removeHref = (slug: string) => {
+        const rest = carSlugs.filter((s) => s !== slug);
+        return rest.length > 0 ? `/compare?vehicles=${rest.join(',')}` : '/compare';
+    };
 
-    // Comparison Rows Configuration
-    const rows = [
-        { label: "Precio", render: (v: Vehicle) => formatCurrency(v.currency, v.price) },
-        { section: "Motor y Transmisión" },
-        { label: "Combustible", render: (v: Vehicle) => v.fuelType },
-        { label: "Transmisión", render: (v: Vehicle) => v.transmission },
-        { label: "Marchas", render: (v: Vehicle) => v.gears || '-' },
-        { label: "Cilindrada", render: (v: Vehicle) => v.engineCc ? `${v.engineCc} cc` : '-' },
-        { label: "Potencia", render: (v: Vehicle) => v.engineHp ? `${v.engineHp} HP` : '-' },
-        { label: "Torque", render: (v: Vehicle) => v.engineTorque ? `${v.engineTorque} Nm` : '-' },
-        { label: "Batería", render: (v: Vehicle) => v.batteryKwh ? `${v.batteryKwh} kWh` : '-' },
-        { label: "Autonomía eléctrica", render: (v: Vehicle) => v.autonomyKm ? `${v.autonomyKm} km` : '-' },
-        { section: "Dimensiones y Capacidades" },
-        { label: "Largo", render: (v: Vehicle) => v.length ? `${v.length} mm` : '-' },
-        { label: "Ancho", render: (v: Vehicle) => v.width ? `${v.width} mm` : '-' },
-        { label: "Alto", render: (v: Vehicle) => v.height ? `${v.height} mm` : '-' },
-        { label: "Entre ejes", render: (v: Vehicle) => v.wheelbase ? `${v.wheelbase} mm` : '-' },
-        { label: "Peso", render: (v: Vehicle) => v.weight ? `${v.weight} kg` : '-' },
-        { label: "Baúl", render: (v: Vehicle) => v.trunkCapacity ? `${v.trunkCapacity} L` : '-' },
-        { label: "Tanque", render: (v: Vehicle) => v.fuelTank ? `${v.fuelTank} L` : '-' },
-        { section: "Seguridad y Equip." },
-        { label: "Airbags", render: (v: Vehicle) => v.safetyFeatures?.find(f => f.includes('Airbag')) || '-' }, // Naive extraction
-        { label: "Seguridad", render: (v: Vehicle) => v.safetyFeatures?.join(', ') || '-' },
-        { label: "Equipamiento", render: (v: Vehicle) => v.equipment?.join(', ') || '-' },
-    ];
+    // Skip rows where no vehicle has data
+    const visibleRows = ROWS.filter((row) => cars.some((c) => {
+        const content = row.get(c);
+        return content !== '–';
+    }));
 
     return (
-        <div className="fade-in min-h-screen pb-12">
-            {/* Breadcrumb */}
-            <div className="bg-[var(--muted)] py-4 mb-6">
-                <div className="max-w-7xl mx-auto px-4">
-                    <nav className="flex items-center gap-2 text-sm text-[var(--secondary)]">
-                        <Link href="/" className="hover:text-[var(--foreground)]">Inicio</Link>
-                        <span>/</span>
-                        <span className="text-[var(--foreground)]">Comparador</span>
-                    </nav>
+        <div className="cm" style={{ paddingBottom: 24 }}>
+            <h1 className="cm__title">Comparador</h1>
+            <p className="cm__sub">Enfrentá hasta {MAX_VEHICLES} vehículos y mirá las diferencias que importan.</p>
+
+            {cars.length === 0 ? (
+                <div className="iv__empty" style={{ maxWidth: 520 }}>
+                    <p style={{ margin: '0 0 18px' }}>Elegí hasta {MAX_VEHICLES} vehículos para enfrentarlos.</p>
+                    <CompareAdd current={[]} />
                 </div>
-            </div>
-
-            <div className="max-w-7xl mx-auto px-2 md:px-4">
-                <h1 className="text-2xl md:text-3xl font-bold mb-6 text-center">Comparador de Vehículos</h1>
-
-                <div className="overflow-x-auto rounded-xl border border-[var(--border)] bg-[var(--background)] shadow-sm">
-                    <div className="min-w-[350px]"> {/* Ensure min width for very small screens */}
-
-                        {/* Header Row (Images & Names) */}
-                        <div className="grid grid-cols-[90px_1fr_1fr] md:grid-cols-[180px_1fr_1fr] divide-x divide-[var(--border)] border-b border-[var(--border)] bg-[var(--muted)]/20">
-                            <div className="p-3 flex items-end font-semibold text-[var(--secondary)] text-sm md:text-base">
-                                Vehículo
-                            </div>
-                            {vehicles.map((item, idx) => (
-                                <div key={idx} className="p-3 md:p-6 text-center relative group">
-                                    {item.data ? (
-                                        <>
-                                            {/* Remove vehicle button */}
-                                            <Link
-                                                href={`/compare?vehicle${item.slot === 1 ? '1' : '2'}=&vehicle${item.slot === 1 ? '2' : '1'}=${item.slot === 1 ? item.currentSlug || '' : vehicles[0].currentSlug || ''}`}
-                                                className="absolute top-2 right-2 text-[var(--secondary)] hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
-                                                title="Quitar"
-                                            >
-                                                ✕
-                                            </Link>
-
-                                            {/* Image - Hidden on mobile as requested */}
-                                            <div className="hidden md:block aspect-[16/10] mb-4 bg-[var(--muted)] rounded-lg overflow-hidden mx-auto max-w-[200px]">
-                                                {item.data.image ? (
-                                                    <img src={item.data.image} alt={item.data.model} className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <div className="w-full h-full flex items-center justify-center text-4xl">🚗</div>
-                                                )}
-                                            </div>
-
-                                            <div className="text-xs font-bold text-[var(--secondary)] uppercase tracking-wider mb-1">
-                                                {item.data.brand}
-                                            </div>
-                                            <h3 className="text-sm md:text-xl font-bold leading-tight mb-2">
-                                                <Link href={`/vehiculo/${item.data.slug}`} className="hover:underline">
-                                                    {item.data.model}
+            ) : (
+                <div className="cm__wrap">
+                    <table className="cm__table">
+                        <thead>
+                            <tr>
+                                <th className="cm__rowlabel" style={{ borderTop: 'none' }}></th>
+                                {cars.map((v) => (
+                                    <th className="cm__col cm__head" key={v.slug}>
+                                        <div className="cm__hcard">
+                                            <div className="cm__media">
+                                                <Link className="cm__rm" href={removeHref(v.slug)} aria-label={`Quitar ${v.brand} ${v.model}`}>
+                                                    <X size={15} aria-hidden="true" />
                                                 </Link>
-                                            </h3>
-                                            <p className="text-xs md:text-sm text-[var(--secondary)]">
-                                                {item.data.year} • {item.data.version}
-                                            </p>
-                                        </>
-                                    ) : (
-                                        <div className="h-full min-h-[150px] flex items-center justify-center">
-                                            <ComparatorSelector
-                                                slot={item.slot as 1 | 2}
-                                                currentSlug={item.currentSlug}
-                                            />
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-
-                        {/* Data Rows */}
-                        <div className="divide-y divide-[var(--border)]">
-                            {rows.map((row, idx) => {
-                                if (row.section) {
-                                    return (
-                                        <div key={idx} className="grid grid-cols-[1fr] bg-[var(--muted)]/50 p-2 font-bold text-xs md:text-sm text-center uppercase tracking-wider text-[var(--secondary)]">
-                                            {row.section}
-                                        </div>
-                                    );
-                                }
-
-                                return (
-                                    <div key={idx} className="grid grid-cols-[90px_1fr_1fr] md:grid-cols-[180px_1fr_1fr] divide-x divide-[var(--border)] hover:bg-[var(--muted)]/10 transition-colors">
-                                        <div className="p-3 flex items-center text-xs md:text-sm font-medium text-[var(--secondary)] break-words">
-                                            {row.label}
-                                        </div>
-                                        {vehicles.map((item, vIdx) => (
-                                            <div key={vIdx} className="p-3 flex items-center justify-center text-center text-sm md:text-base">
-                                                {item.data ? (
-                                                    row.render ? row.render(item.data) || '-' : '-'
-                                                ) : (
-                                                    <span className="text-[var(--border)]">-</span>
-                                                )}
+                                                {v.image
+                                                    ? <Image src={v.image} alt={`${v.brand} ${v.model}`} fill sizes="240px" style={{ objectFit: 'cover' }} />
+                                                    : <CarFront size={26} aria-hidden="true" />}
                                             </div>
+                                            <span className="cm__hbrand">{v.brand} · {v.year}</span>
+                                            <span className="cm__hmodel">{v.model}</span>
+                                            {v.version && <span className="cm__htrim">{v.version}</span>}
+                                        </div>
+                                    </th>
+                                ))}
+                                {cars.length < MAX_VEHICLES && (
+                                    <th className="cm__col cm__add">
+                                        <CompareAdd current={carSlugs} />
+                                    </th>
+                                )}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {visibleRows.map((row, ri) => {
+                                const best = bestSlugs(row, cars);
+                                return (
+                                    <tr key={ri}>
+                                        <td className="cm__rowlabel">{row.label}</td>
+                                        {cars.map((v) => (
+                                            <td key={v.slug} className={`cm__col cm__cell ${row.cls || ''}${best.includes(v.slug) ? ' best' : ''}`}>
+                                                {row.get(v)}
+                                            </td>
                                         ))}
-                                    </div>
+                                        {cars.length < MAX_VEHICLES && <td className="cm__col"></td>}
+                                    </tr>
                                 );
                             })}
-                        </div>
-
-                    </div>
+                            <tr>
+                                <td className="cm__rowlabel"></td>
+                                {cars.map((v) => (
+                                    <td key={v.slug} className="cm__col cm__cell">
+                                        <ButtonLink size="sm" variant="secondary" block href={`/vehiculo/${v.slug}`}>Ver ficha</ButtonLink>
+                                    </td>
+                                ))}
+                                {cars.length < MAX_VEHICLES && <td className="cm__col"></td>}
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-            </div>
+            )}
         </div>
     );
 }

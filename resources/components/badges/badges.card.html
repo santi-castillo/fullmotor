@@ -1,0 +1,54 @@
+<!-- @dsCard group="Components" viewport="700x230" name="Badges & Fuel tags" subtitle="Status labels + powertrain chips" -->
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>
+  body { margin: 0; background: var(--bg-app); padding: 26px 30px; }
+  .stack { display: flex; flex-direction: column; gap: 16px; }
+  .row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .lbl { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-faint); width: 64px; flex: none; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+  const { Badge, FuelTag } = window.TodoMotorDesignSystem_d01d9d;
+  function Demo() {
+    return (
+      <div className="stack">
+        <div className="row"><span className="lbl">Soft</span>
+          <Badge tone="neutral">2026</Badge>
+          <Badge tone="accent">Nuevo</Badge>
+          <Badge tone="positive" dot>Disponible</Badge>
+          <Badge tone="warning">Por encargo</Badge>
+          <Badge tone="danger">Agotado</Badge>
+        </div>
+        <div className="row"><span className="lbl">Solid</span>
+          <Badge tone="accent" variant="solid">−12%</Badge>
+          <Badge tone="positive" variant="solid">USD ↓</Badge>
+          <Badge tone="neutral" variant="solid">0 km</Badge>
+        </div>
+        <div className="row"><span className="lbl">Outline</span>
+          <Badge tone="neutral" variant="outline">SUV</Badge>
+          <Badge tone="accent" variant="outline">Comparar</Badge>
+          <Badge tone="warning" variant="outline">Stock bajo</Badge>
+        </div>
+        <div className="row"><span className="lbl">Fuel</span>
+          <FuelTag type="nafta" />
+          <FuelTag type="electrico" />
+          <FuelTag type="hibrido" />
+          <FuelTag type="diesel" />
+        </div>
+      </div>
+    );
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script>
+</body>
+</html>

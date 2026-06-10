@@ -1,0 +1,24 @@
+<!-- @dsCard group="Colors" viewport="700x160" name="Powertrain — fuel chips" subtitle="Domain colors for nafta / eléctrico / híbrido / diésel" -->
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body { margin: 0; background: var(--surface); padding: 30px; display:flex; flex-direction:column; gap:18px; }
+  .row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .chip { display:inline-flex; align-items:center; gap:7px; padding:7px 14px; border-radius: var(--radius-pill); font-family: var(--font-mono); font-size: 12px; font-weight:500; letter-spacing:0.02em; }
+  .dot { width:8px; height:8px; border-radius:50%; }
+  .name { font-family: var(--font-mono); font-size: 10px; color: var(--text-faint); }
+</style>
+</head>
+<body>
+  <div class="row">
+    <span class="chip" style="background:var(--c-fuel-nafta-bg);color:var(--c-fuel-nafta)"><span class="dot" style="background:var(--c-fuel-nafta)"></span>Nafta</span>
+    <span class="chip" style="background:var(--c-fuel-elec-bg);color:var(--c-fuel-elec)"><span class="dot" style="background:var(--c-fuel-elec)"></span>Eléctrico</span>
+    <span class="chip" style="background:var(--c-fuel-hibrido-bg);color:var(--c-fuel-hibrido)"><span class="dot" style="background:var(--c-fuel-hibrido)"></span>Híbrido</span>
+    <span class="chip" style="background:var(--c-fuel-diesel-bg);color:var(--c-fuel-diesel)"><span class="dot" style="background:var(--c-fuel-diesel)"></span>Diésel</span>
+  </div>
+  <span class="name">2A6FDB · 0E9F6E · 0E9CB0 · 6B7686 — used on cards, filters & ficha técnica</span>
+</body>
+</html>

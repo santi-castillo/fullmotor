@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { LogOut, User as UserIcon } from 'lucide-react'
 import { useAuth } from './AuthProvider'
 
 export default function UserMenu() {
@@ -21,18 +22,15 @@ export default function UserMenu() {
 
     if (loading) {
         return (
-            <div className="w-8 h-8 rounded-full bg-[var(--surface-mid)] animate-pulse flex-shrink-0" />
+            <div className="w-8 h-8 rounded-full bg-sunken animate-pulse flex-shrink-0" />
         )
     }
 
     if (!user) {
         return (
-            <button
-                onClick={login}
-                className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border border-[var(--border)] hover:border-[var(--primary)] hover:text-[var(--primary)] transition-colors flex-shrink-0"
-            >
-                <span className="material-symbols-outlined text-base">person</span>
-                <span className="hidden sm:inline">Iniciar sesión</span>
+            <button onClick={login} className="k-icbtn flex-shrink-0">
+                <UserIcon size={16} aria-hidden="true" />
+                <span className="k-icbtn__label hidden sm:inline">Iniciar sesión</span>
             </button>
         )
     }
@@ -41,9 +39,11 @@ export default function UserMenu() {
         <div ref={menuRef} className="relative flex-shrink-0">
             <button
                 onClick={() => setOpen(!open)}
-                className="flex items-center gap-2 rounded-lg hover:bg-[var(--surface-mid)] transition-colors p-1"
+                className="flex items-center gap-2 rounded-[var(--radius-md)] hover:bg-sunken transition-colors p-1"
+                aria-label="Menú de usuario"
             >
                 {user.avatarUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
                     <img
                         src={user.avatarUrl}
                         alt={user.name}
@@ -51,26 +51,26 @@ export default function UserMenu() {
                         referrerPolicy="no-referrer"
                     />
                 ) : (
-                    <div className="w-8 h-8 rounded-full bg-[var(--primary)] flex items-center justify-center text-sm font-bold text-[#0b1326]">
+                    <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-sm font-bold text-white">
                         {user.name?.charAt(0)?.toUpperCase() || '?'}
                     </div>
                 )}
             </button>
 
             {open && (
-                <div className="absolute right-0 top-full mt-2 w-56 rounded-xl border border-[var(--border)] bg-[var(--card)] shadow-lg z-50 overflow-hidden">
-                    <div className="px-4 py-3 border-b border-[var(--border)]">
-                        <p className="text-sm font-medium truncate">{user.name}</p>
-                        <p className="text-xs text-[var(--foreground-muted)] truncate">{user.email}</p>
+                <div className="absolute right-0 top-full mt-2 w-56 rounded-[var(--radius-lg)] border border-line bg-surface shadow-pop z-50 overflow-hidden">
+                    <div className="px-4 py-3 border-b border-hairline">
+                        <p className="text-sm font-semibold text-ink truncate">{user.name}</p>
+                        <p className="text-xs text-muted truncate">{user.email}</p>
                     </div>
                     <button
                         onClick={() => {
                             setOpen(false)
                             logout()
                         }}
-                        className="w-full px-4 py-3 text-left text-sm hover:bg-[var(--surface-mid)] transition-colors flex items-center gap-2 text-[var(--foreground-muted)]"
+                        className="w-full px-4 py-3 text-left text-sm text-body hover:bg-sunken transition-colors flex items-center gap-2"
                     >
-                        <span className="material-symbols-outlined text-base">logout</span>
+                        <LogOut size={15} aria-hidden="true" />
                         Cerrar sesión
                     </button>
                 </div>

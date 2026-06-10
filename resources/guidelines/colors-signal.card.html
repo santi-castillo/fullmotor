@@ -1,0 +1,29 @@
+<!-- @dsCard group="Colors" viewport="700x190" name="Direction B — Signal theme" subtitle="Warm cream + racing red · data-theme=signal" -->
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body { margin: 0; padding: 0; }
+  .stage { background: var(--bg-app); padding: 26px 30px; }
+  .grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+  .sw { display: flex; flex-direction: column; gap: 8px; }
+  .chip { height: 56px; border-radius: var(--radius-md); border: 1px solid rgba(28,24,19,0.10); }
+  .name { font-family: var(--font-mono); font-size: 10px; color: var(--text-strong); }
+  .hex { font-family: var(--font-mono); font-size: 9.5px; color: var(--text-faint); }
+</style>
+</head>
+<body data-theme="signal">
+  <div class="stage">
+    <div class="grid">
+      <div class="sw"><div class="chip" style="background:var(--c-cream)"></div><span class="name">cream</span><span class="hex">F5F1E8</span></div>
+      <div class="sw"><div class="chip" style="background:var(--c-cream-2)"></div><span class="name">cream-2</span><span class="hex">ECE6D8</span></div>
+      <div class="sw"><div class="chip" style="background:var(--c-signal-100)"></div><span class="name">soft</span><span class="hex">FBE0DB</span></div>
+      <div class="sw"><div class="chip" style="background:var(--c-signal-600)"></div><span class="name">signal</span><span class="hex">E5402A</span></div>
+      <div class="sw"><div class="chip" style="background:var(--c-signal-700)"></div><span class="name">press</span><span class="hex">C42E1C</span></div>
+      <div class="sw"><div class="chip" style="background:var(--c-warm-ink)"></div><span class="name">warm-ink</span><span class="hex">1C1813</span></div>
+    </div>
+  </div>
+</body>
+</html>

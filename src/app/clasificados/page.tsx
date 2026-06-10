@@ -1,7 +1,8 @@
-import Link from 'next/link'
 import { Suspense } from 'react'
+import { Plus } from 'lucide-react'
 import { fetchClassifieds } from '@/lib/classifieds-api'
 import { ClassifiedCategory } from '@/types/classified'
+import { ButtonLink } from '../components/ui/Button'
 import ClassifiedFilters from '../components/ClassifiedFilters'
 import ClassifiedList from '../components/ClassifiedList'
 import Pagination from '../components/Pagination'
@@ -38,56 +39,53 @@ export default async function ClassifiedsPage({ searchParams }: PageProps) {
   }
 
   return (
-    <div className="fade-in">
+    <div className="iv pb-16">
       <Suspense fallback={null}>
         <LoginAutoOpener />
       </Suspense>
 
-      <section className="max-w-7xl mx-auto px-4 pt-8">
-        <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <h1 className="text-3xl font-bold">
-              <span className="gradient-text">Clasificados</span>
-            </h1>
-            <p className="text-sm text-[var(--foreground-muted)] mt-1">
-              Compra y vende vehículos, repuestos y accesorios entre usuarios.
-            </p>
-          </div>
-          <Link href="/clasificados/nuevo" className="btn btn-primary">
-            ➕ Publicar
-          </Link>
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="iv__title">Clasificados</h1>
+          <p className="iv__count">
+            {data.meta.total} avisos entre usuarios · vehículos, repuestos y accesorios
+          </p>
         </div>
+        <ButtonLink href="/clasificados/nuevo" iconLeft={<Plus size={16} aria-hidden="true" />}>
+          Publicá tu aviso
+        </ButtonLink>
+      </div>
 
-        <Suspense fallback={<div className="h-12 bg-[var(--muted)] rounded-lg animate-pulse mb-6" />}>
-          <ClassifiedFilters />
-        </Suspense>
+      <Suspense fallback={<div className="h-12 bg-sunken rounded-[var(--radius-md)] animate-pulse mb-6" />}>
+        <ClassifiedFilters />
+      </Suspense>
 
-        <div className="mb-4 text-sm text-[var(--foreground-muted)]">
-          Mostrando {data.data.length} de {data.meta.total} publicaciones
+      <div className="mb-4 text-sm text-muted">
+        Mostrando <span className="font-mono text-ink">{data.data.length}</span> de{' '}
+        <span className="font-mono text-ink">{data.meta.total}</span> publicaciones
+      </div>
+
+      {errorMessage && (
+        <div className="p-4 mb-4 rounded-[var(--radius-md)] bg-danger-soft text-danger-ink text-sm">
+          {errorMessage}
         </div>
+      )}
 
-        {errorMessage && (
-          <div className="card p-4 mb-4 border-red-500/40 bg-red-500/10 text-red-400 text-sm">
-            {errorMessage}
-          </div>
-        )}
+      <ClassifiedList
+        classifieds={data.data}
+        emptyTitle="Todavía no hay clasificados acá"
+        emptyDescription="Publicá el tuyo y conectá con compradores de todo el país."
+        emptyCta={{ label: 'Publicá el primero', href: '/clasificados/nuevo' }}
+      />
 
-        <ClassifiedList
-          classifieds={data.data}
-          emptyTitle="Aún no hay publicaciones en tu zona"
-          emptyDescription="Sé el primero en publicar y conectá con compradores."
-          emptyCta={{ label: 'Publicar el primero', href: '/clasificados/nuevo' }}
+      <Suspense fallback={null}>
+        <Pagination
+          currentPage={data.meta.page}
+          totalPages={data.meta.lastPage}
+          total={data.meta.total}
+          basePath="/clasificados"
         />
-
-        <Suspense fallback={null}>
-          <Pagination
-            currentPage={data.meta.page}
-            totalPages={data.meta.lastPage}
-            total={data.meta.total}
-            basePath="/clasificados"
-          />
-        </Suspense>
-      </section>
+      </Suspense>
     </div>
   )
 }

@@ -2,10 +2,11 @@
 
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import Link from 'next/link'
-import { Classified, ClassifiedStatus, statusLabels } from '@/types/classified'
+import { CheckCircle, Pause, Pencil, Play, Sparkles, Trash2 } from 'lucide-react'
+import { Classified, ClassifiedStatus } from '@/types/classified'
 import { deleteClassified, updateClassified } from '@/lib/classifieds-api'
 import { useAuth } from './AuthProvider'
+import { Button, ButtonLink } from './ui/Button'
 import UpgradeDialog from './UpgradeDialog'
 import StatusBadge from './StatusBadge'
 
@@ -57,64 +58,85 @@ export default function OwnerActions({ classified }: OwnerActionsProps) {
   }
 
   return (
-    <div className="card p-4 space-y-4">
+    <div className="bg-surface border border-line rounded-[var(--radius-lg)] p-5 space-y-4">
       <div className="flex items-center justify-between gap-3">
-        <h3 className="text-sm font-semibold uppercase tracking-wider text-[var(--foreground-muted)]">
-          Tus acciones
-        </h3>
+        <h3 className="tm-eyebrow">Tus acciones</h3>
         <StatusBadge status={status} expiresAt={classified.expiresAt} />
       </div>
 
-      <div className="grid grid-cols-3 gap-2">
-        {(['active', 'sold', 'paused'] as const).map((s) => (
-          <button
-            key={s}
-            type="button"
-            onClick={() => handleStatusChange(s)}
-            disabled={busy || s === status}
-            className={`px-3 py-2 rounded-lg text-xs font-medium border transition-colors ${
-              s === status
-                ? 'bg-[var(--primary)]/20 border-[var(--primary)] text-[var(--primary-light)]'
-                : 'bg-[var(--glass-bg)] border-[var(--border)] hover:border-[var(--primary)] disabled:opacity-50'
-            }`}
+      <div className="flex flex-wrap gap-2">
+        <ButtonLink
+          href={`/clasificados/${classified.id}/editar`}
+          variant="secondary"
+          size="sm"
+          iconLeft={<Pencil size={14} aria-hidden="true" />}
+        >
+          Editar
+        </ButtonLink>
+
+        {status === 'active' && (
+          <Button
+            variant="secondary"
+            size="sm"
+            disabled={busy}
+            iconLeft={<Pause size={14} aria-hidden="true" />}
+            onClick={() => handleStatusChange('paused')}
           >
-            {statusLabels[s]}
-          </button>
-        ))}
+            Pausá
+          </Button>
+        )}
+        {status !== 'active' && (
+          <Button
+            variant="secondary"
+            size="sm"
+            disabled={busy}
+            iconLeft={<Play size={14} aria-hidden="true" />}
+            onClick={() => handleStatusChange('active')}
+          >
+            Reactivá
+          </Button>
+        )}
+        {status !== 'sold' && (
+          <Button
+            variant="soft"
+            size="sm"
+            disabled={busy}
+            iconLeft={<CheckCircle size={14} aria-hidden="true" />}
+            onClick={() => handleStatusChange('sold')}
+          >
+            Marcá como vendido
+          </Button>
+        )}
       </div>
 
-      <div className="flex flex-wrap gap-2">
-        <Link
-          href={`/clasificados/${classified.id}/editar`}
-          className="px-4 py-2 rounded-lg bg-[var(--glass-bg)] border border-[var(--border)] text-sm hover:border-[var(--primary)] transition-colors"
-        >
-          ✏️ Editar
-        </Link>
-        <button
-          type="button"
+      <div className="flex flex-wrap items-center gap-2 pt-1">
+        <Button
+          size="sm"
+          disabled={busy}
+          iconLeft={<Sparkles size={14} aria-hidden="true" />}
           onClick={() => setUpgradeOpen(true)}
-          disabled={busy}
-          className="px-4 py-2 rounded-lg text-sm font-semibold bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] text-white hover:opacity-90 transition-opacity"
         >
-          ✨ Renovar / Mejorar
-        </button>
-        <button
-          type="button"
+          Destacá tu aviso
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          disabled={busy}
+          className="ml-auto [--_fg:var(--danger)]"
+          iconLeft={<Trash2 size={14} aria-hidden="true" />}
           onClick={handleDelete}
-          disabled={busy}
-          className="px-4 py-2 rounded-lg text-sm border border-red-500/40 text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50 ml-auto"
         >
-          🗑️ Eliminar
-        </button>
+          Eliminar
+        </Button>
       </div>
 
       {classified.contactInfo && !classified.showContactInfo && (
-        <p className="text-xs text-[var(--foreground-muted)] border-t border-[var(--border)] pt-3">
-          Contacto privado: <span className="font-mono">{classified.contactInfo}</span>
+        <p className="text-xs text-muted border-t border-line pt-3">
+          Contacto privado: <span className="font-mono text-ink">{classified.contactInfo}</span>
         </p>
       )}
 
-      {error && <p className="text-sm text-red-400">{error}</p>}
+      {error && <p className="text-sm text-danger-ink">{error}</p>}
 
       <UpgradeDialog
         open={upgradeOpen}

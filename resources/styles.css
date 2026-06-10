@@ -1,0 +1,11 @@
+/* ============================================================
+   TodoMotor Design System — global entry point
+   Consumers link THIS file only. Import order matters:
+   fonts → tokens → semantic roles → base element styles.
+   ============================================================ */
+@import "tokens/fonts.css";
+@import "tokens/colors.css";
+@import "tokens/typography.css";
+@import "tokens/spacing.css";
+@import "tokens/semantic.css";
+@import "tokens/base.css";

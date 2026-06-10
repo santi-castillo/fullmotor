@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useState } from 'react'
+import { AlertCircle, ImagePlus, Loader2, X } from 'lucide-react'
 import {
   ALLOWED_IMAGE_TYPES,
   MAX_CLASSIFIED_IMAGES,
@@ -117,29 +118,39 @@ export default function ClassifiedImageUploader({
         {images.map((url) => (
           <div
             key={url}
-            className="relative aspect-square rounded-lg overflow-hidden border border-[var(--border)] group"
+            className="relative aspect-square rounded-[var(--radius-md)] overflow-hidden border border-line bg-sunken group"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={url} alt="" className="w-full h-full object-cover" />
             <button
               type="button"
               onClick={() => handleDelete(url)}
-              className="absolute top-1 right-1 w-7 h-7 rounded-full bg-black/60 backdrop-blur text-white text-xs hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100"
+              className="absolute top-1.5 right-1.5 w-7 h-7 rounded-full bg-surface shadow-sm text-muted hover:text-danger transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 focus-visible:opacity-100 cursor-pointer"
               aria-label="Eliminar imagen"
             >
-              ✕
+              <X size={14} aria-hidden="true" />
             </button>
           </div>
         ))}
         {pending.map((p, i) => (
           <div
             key={`p-${i}`}
-            className="relative aspect-square rounded-lg overflow-hidden border border-[var(--border)]"
+            className="relative aspect-square rounded-[var(--radius-md)] overflow-hidden border border-line bg-sunken"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={p.preview} alt="" className="w-full h-full object-cover opacity-50" />
-            <div className="absolute inset-0 flex items-center justify-center text-xs">
-              {p.status === 'uploading' ? '⏳ Subiendo…' : p.status === 'error' ? `❌ ${p.error}` : '⏳'}
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 px-2 text-center text-xs text-ink">
+              {p.status === 'error' ? (
+                <>
+                  <AlertCircle size={16} className="text-danger" aria-hidden="true" />
+                  <span className="text-danger-ink">{p.error}</span>
+                </>
+              ) : (
+                <>
+                  <Loader2 size={16} className="animate-spin" aria-hidden="true" />
+                  {p.status === 'uploading' && <span>Subiendo…</span>}
+                </>
+              )}
             </div>
           </div>
         ))}
@@ -148,10 +159,10 @@ export default function ClassifiedImageUploader({
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={busy}
-            className="aspect-square rounded-lg border-2 border-dashed border-[var(--border)] hover:border-[var(--primary)] flex flex-col items-center justify-center text-[var(--foreground-muted)] hover:text-[var(--primary)] transition-colors disabled:opacity-50"
+            className="aspect-square rounded-[var(--radius-md)] border border-dashed border-line-strong text-muted hover:border-accent hover:text-accent transition-colors flex flex-col items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
           >
-            <span className="text-3xl">+</span>
-            <span className="text-xs mt-1">Agregar foto</span>
+            <ImagePlus size={22} aria-hidden="true" />
+            <span className="text-xs">Agregar foto</span>
           </button>
         )}
       </div>
@@ -163,10 +174,14 @@ export default function ClassifiedImageUploader({
         className="hidden"
         onChange={(e) => handleFiles(e.target.files)}
       />
-      <p className="text-xs text-[var(--foreground-muted)]">
-        {totalCount} de {MAX_CLASSIFIED_IMAGES} imágenes · Máx 10 MB · JPG, PNG, WEBP, GIF
+      <p className="text-xs text-muted">
+        Subí hasta {MAX_CLASSIFIED_IMAGES} fotos (JPG, PNG o WebP) ·{' '}
+        <span className="font-mono">
+          {totalCount}/{MAX_CLASSIFIED_IMAGES}
+        </span>{' '}
+        · Máx 10 MB cada una
       </p>
-      {error && <p className="text-sm text-red-400">{error}</p>}
+      {error && <p className="text-sm text-danger-ink">{error}</p>}
     </div>
   )
 }

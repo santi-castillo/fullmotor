@@ -1,19 +1,22 @@
+import { Star } from 'lucide-react'
 import { ClassifiedTier } from '@/types/classified'
+import { Badge } from './ui/Badge'
 
 export default function TierBadge({ tier }: { tier: ClassifiedTier }) {
   if (tier === 'free') return null
 
   if (tier === 'featured') {
     return (
-      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-amber-400 to-orange-500 text-black shadow-md">
-        ⭐ Destacado
-      </span>
+      <Badge tone="accent" variant="solid" size="sm">
+        <Star size={11} aria-hidden="true" />
+        Destacado
+      </Badge>
     )
   }
 
   return (
-    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] text-white shadow-md">
-      ✨ Premium
-    </span>
+    <Badge tone="accent" variant="soft" size="sm">
+      Premium
+    </Badge>
   )
 }

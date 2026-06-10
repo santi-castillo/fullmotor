@@ -3,6 +3,9 @@
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { CLASSIFIED_CATEGORIES, ClassifiedCategory } from '@/types/classified'
+import { Button } from './ui/Button'
+import { Input } from './ui/Input'
+import { Select } from './ui/Select'
 
 export default function ClassifiedFilters() {
   const router = useRouter()
@@ -31,52 +34,35 @@ export default function ClassifiedFilters() {
   }
 
   return (
-    <div className="card p-4 mb-6 flex flex-col md:flex-row gap-3 md:items-end">
-      <div className="flex-1">
-        <label className="block text-xs uppercase tracking-wider text-[var(--foreground-muted)] mb-1">
-          Categoría
-        </label>
-        <select
+    <div className="mb-6 flex flex-col md:flex-row gap-3 md:items-end">
+      <div className="w-full md:max-w-60">
+        <Select
+          label="Categoría"
           value={currentCategory}
           onChange={(e) => updateParam('category', e.target.value)}
-          className="w-full px-3 py-2 rounded-lg bg-[var(--glass-bg)] border border-[var(--border)] text-sm focus:border-[var(--primary)] outline-none"
-        >
-          <option value="">Todas las categorías</option>
-          {CLASSIFIED_CATEGORIES.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.icon} {c.label}
-            </option>
-          ))}
-        </select>
+          placeholder="Todas las categorías"
+          options={CLASSIFIED_CATEGORIES.map((c) => ({ value: c.id, label: c.label }))}
+        />
       </div>
-      <form onSubmit={onSubmitCity} className="flex-1 flex gap-2 items-end">
-        <div className="flex-1">
-          <label className="block text-xs uppercase tracking-wider text-[var(--foreground-muted)] mb-1">
-            Ciudad
-          </label>
-          <input
-            type="text"
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-            placeholder="Ej. Montevideo"
-            className="w-full px-3 py-2 rounded-lg bg-[var(--glass-bg)] border border-[var(--border)] text-sm focus:border-[var(--primary)] outline-none"
-          />
+      <form onSubmit={onSubmitCity} className="flex-1 flex flex-col sm:flex-row gap-3 sm:items-end">
+        <Input
+          label="Ciudad"
+          type="text"
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+          placeholder="Ej. Montevideo"
+          className="flex-1 md:max-w-60"
+        />
+        <div className="flex gap-2">
+          <Button type="submit" variant="secondary">
+            Aplicar
+          </Button>
+          {(currentCategory || currentCity) && (
+            <Button variant="ghost" onClick={() => router.push('/clasificados')}>
+              Limpiar
+            </Button>
+          )}
         </div>
-        <button
-          type="submit"
-          className="px-4 py-2 rounded-lg bg-[var(--glass-bg)] border border-[var(--border)] text-sm hover:border-[var(--primary)] transition-colors"
-        >
-          Aplicar
-        </button>
-        {(currentCategory || currentCity) && (
-          <button
-            type="button"
-            onClick={() => router.push('/clasificados')}
-            className="px-4 py-2 rounded-lg text-sm text-[var(--foreground-muted)] hover:text-[var(--foreground)] transition-colors"
-          >
-            Limpiar
-          </button>
-        )}
       </form>
     </div>
   )

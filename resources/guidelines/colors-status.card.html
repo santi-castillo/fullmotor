@@ -1,0 +1,33 @@
+<!-- @dsCard group="Colors" viewport="700x160" name="Status colors" subtitle="Positive / warning / danger + soft tints" -->
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body { margin: 0; background: var(--surface); padding: 26px 30px; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .item { display: flex; flex-direction: column; gap: 8px; }
+  .pair { display: flex; gap: 8px; }
+  .chip { height: 52px; flex: 1; border-radius: var(--radius-md); display:flex; align-items:center; justify-content:center; font-family: var(--font-mono); font-size: 11px; }
+  .soft { border: 1px solid rgba(11,31,68,0.06); }
+  .name { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); }
+</style>
+</head>
+<body>
+  <div class="grid">
+    <div class="item">
+      <div class="pair"><div class="chip" style="background:var(--positive);color:#fff">USD ↓</div><div class="chip soft" style="background:var(--positive-soft);color:var(--positive-ink)">Disponible</div></div>
+      <span class="name">positive · 0E9F6E</span>
+    </div>
+    <div class="item">
+      <div class="pair"><div class="chip" style="background:var(--warning);color:#fff">!</div><div class="chip soft" style="background:var(--warning-soft);color:var(--warning-ink)">Por encargo</div></div>
+      <span class="name">warning · D98412</span>
+    </div>
+    <div class="item">
+      <div class="pair"><div class="chip" style="background:var(--danger);color:#fff">×</div><div class="chip soft" style="background:var(--danger-soft);color:var(--danger-ink)">Agotado</div></div>
+      <span class="name">danger · DC3B30</span>
+    </div>
+  </div>
+</body>
+</html>

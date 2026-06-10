@@ -1,0 +1,25 @@
+<!-- @dsCard group="Colors" viewport="700x170" name="Navy — deep brand surface" subtitle="Footer, dark hero, inverse sections" -->
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body { margin: 0; background: var(--surface); padding: 26px 30px; }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .sw { display: flex; flex-direction: column; gap: 8px; }
+  .chip { height: 70px; border-radius: var(--radius-md); display:flex; align-items:flex-end; padding:8px; }
+  .name { font-family: var(--font-mono); font-size: 10px; color: var(--text-strong); }
+  .hex { font-family: var(--font-mono); font-size: 9.5px; color: var(--text-faint); }
+  .on { font-family: var(--font-mono); font-size: 10px; color:#9DB0CC; }
+</style>
+</head>
+<body>
+  <div class="grid">
+    <div class="sw"><div class="chip" style="background:var(--c-navy-600)"><span class="on">600</span></div><span class="name">navy-600</span><span class="hex">1C3D72</span></div>
+    <div class="sw"><div class="chip" style="background:var(--c-navy-700)"><span class="on">700</span></div><span class="name">navy-700</span><span class="hex">122B58</span></div>
+    <div class="sw"><div class="chip" style="background:var(--c-navy-800)"><span class="on">deep</span></div><span class="name">navy-800</span><span class="hex">0B1F44</span></div>
+    <div class="sw"><div class="chip" style="background:var(--c-navy-900)"><span class="on">900</span></div><span class="name">navy-900</span><span class="hex">08152E</span></div>
+  </div>
+</body>
+</html>

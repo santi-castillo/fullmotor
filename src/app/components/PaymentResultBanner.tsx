@@ -2,25 +2,26 @@
 
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
+import { AlertCircle, CheckCircle, Clock, X } from 'lucide-react'
 
 const messages = {
   success: {
-    icon: '✅',
-    title: '¡Pago confirmado!',
+    Icon: CheckCircle,
+    title: 'Pago confirmado',
     description: 'Tu publicación ya fue mejorada. Si no se actualiza al instante, puede tardar unos segundos.',
-    classes: 'border-emerald-500/50 bg-emerald-500/10 text-emerald-300',
+    classes: 'bg-positive-soft text-positive-ink',
   },
   failure: {
-    icon: '❌',
+    Icon: AlertCircle,
     title: 'Pago no completado',
-    description: 'No pudimos procesar el pago. Intentá nuevamente desde "Renovar / Mejorar".',
-    classes: 'border-red-500/50 bg-red-500/10 text-red-300',
+    description: 'No pudimos procesar el pago. Intentá de nuevo desde "Destacá tu aviso".',
+    classes: 'bg-danger-soft text-danger-ink',
   },
   pending: {
-    icon: '⏳',
+    Icon: Clock,
     title: 'Pago pendiente',
-    description: 'Estamos esperando la confirmación. Te avisaremos cuando se complete.',
-    classes: 'border-yellow-500/50 bg-yellow-500/10 text-yellow-300',
+    description: 'Estamos esperando la confirmación. Te avisamos cuando se complete.',
+    classes: 'bg-warning-soft text-warning-ink',
   },
 }
 
@@ -33,6 +34,7 @@ export default function PaymentResultBanner() {
   if (!status || dismissedFor === status || !messages[status]) return null
 
   const msg = messages[status]
+  const Icon = msg.Icon
 
   const handleClose = () => {
     setDismissedFor(status)
@@ -43,19 +45,19 @@ export default function PaymentResultBanner() {
   }
 
   return (
-    <div className={`card border ${msg.classes} p-4 mb-6 flex items-start gap-3`}>
-      <span className="text-2xl">{msg.icon}</span>
+    <div className={`rounded-[var(--radius-md)] ${msg.classes} p-4 mb-6 flex items-start gap-3`}>
+      <Icon size={18} className="flex-shrink-0 mt-0.5" aria-hidden="true" />
       <div className="flex-1">
-        <h3 className="font-semibold">{msg.title}</h3>
-        <p className="text-sm opacity-90">{msg.description}</p>
+        <h3 className="font-semibold text-sm">{msg.title}</h3>
+        <p className="text-sm opacity-90 mt-0.5">{msg.description}</p>
       </div>
       <button
         type="button"
         onClick={handleClose}
         aria-label="Cerrar"
-        className="text-current opacity-60 hover:opacity-100 transition-opacity"
+        className="text-current opacity-60 hover:opacity-100 transition-opacity cursor-pointer"
       >
-        ✕
+        <X size={16} aria-hidden="true" />
       </button>
     </div>
   )

@@ -1,6 +1,8 @@
 import Link from 'next/link'
+import Image from 'next/image'
+import { ArrowRight, Newspaper } from 'lucide-react'
 import { BlogPost } from '@/types/blog'
-import BlogCard from './BlogCard'
+import { formatDate } from '@/lib/format'
 
 interface BlogPreviewSectionProps {
   posts: BlogPost[]
@@ -10,28 +12,30 @@ export default function BlogPreviewSection({ posts }: BlogPreviewSectionProps) {
   if (posts.length === 0) return null
 
   return (
-    <section className="max-w-7xl mx-auto px-4 py-16">
-      <div className="flex items-end justify-between mb-8">
+    <section className="h-sect">
+      <div className="h-sect__head">
         <div>
-          <span className="text-xs font-bold tracking-[0.2em] uppercase text-[var(--primary)]">
-            Blog
-          </span>
-          <h2 className="text-3xl md:text-4xl font-black italic uppercase tracking-tighter text-[var(--accent)] mt-1">
-            Blog del Motor
-          </h2>
+          <h2>Blog del Motor</h2>
+          <p>Contexto, impuestos y guías para comprar mejor</p>
         </div>
-        <Link
-          href="/blog"
-          className="flex items-center gap-1 text-[var(--primary)] text-sm font-semibold hover:gap-2 transition-all"
-        >
-          Ver todos
-          <span className="material-symbols-outlined text-base">arrow_forward</span>
+        <Link href="/blog" className="h-link">
+          Ver todos <ArrowRight size={16} aria-hidden="true" />
         </Link>
       </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="h-posts">
         {posts.map((post) => (
-          <BlogCard key={post.id} post={post} compact />
+          <Link href={`/blog/${post.slug}`} key={post.id} className="h-post">
+            <div className="h-post__top">
+              {post.coverImage
+                ? <Image src={post.coverImage} alt="" fill sizes="(max-width: 1000px) 100vw, 33vw" style={{ objectFit: 'cover' }} />
+                : <Newspaper size={30} aria-hidden="true" />}
+            </div>
+            <div className="h-post__b">
+              <span className="h-post__tag">{post.tags?.[0] || 'Blog'}</span>
+              <h3 className="h-post__t">{post.title}</h3>
+              <span className="h-post__d">{formatDate(post.publishedAt)}</span>
+            </div>
+          </Link>
         ))}
       </div>
     </section>

@@ -1,0 +1,25 @@
+<!-- @dsCard group="Spacing" viewport="700x190" name="Elevation" subtitle="Soft cool-tinted shadow ramp" -->
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body { margin: 0; background: var(--bg-app); padding: 34px 30px; }
+  .row { display: flex; gap: 26px; align-items: center; }
+  .item { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .box { width: 96px; height: 64px; background: var(--surface); border-radius: var(--radius-lg); border: 1px solid var(--hairline); }
+  .tok { font-family: var(--font-mono); font-size: 10px; color: var(--text-strong); }
+</style>
+</head>
+<body>
+  <div class="row">
+    <div class="item"><div class="box" style="box-shadow:var(--shadow-xs)"></div><span class="tok">xs</span></div>
+    <div class="item"><div class="box" style="box-shadow:var(--shadow-sm)"></div><span class="tok">sm</span></div>
+    <div class="item"><div class="box" style="box-shadow:var(--shadow-md)"></div><span class="tok">md</span></div>
+    <div class="item"><div class="box" style="box-shadow:var(--shadow-card)"></div><span class="tok">card</span></div>
+    <div class="item"><div class="box" style="box-shadow:var(--shadow-lg)"></div><span class="tok">lg</span></div>
+    <div class="item"><div class="box" style="box-shadow:var(--shadow-xl)"></div><span class="tok">xl</span></div>
+  </div>
+</body>
+</html>

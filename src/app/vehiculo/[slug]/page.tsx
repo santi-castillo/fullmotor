@@ -1,9 +1,16 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Check, ChevronRight, GitCompareArrows } from "lucide-react";
 import { getVehicleBySlug, getAllVehicles } from "@/lib/data";
+import { formatNumber, fuelLabel, fuelToTagType } from "@/lib/format";
 import ImageCarousel from "@/app/components/ImageCarousel";
 import JsonLd from "@/app/components/JsonLd";
 import CommentsSection from "@/app/components/CommentsSection";
+import SaveVehicleButton from "@/app/components/SaveVehicleButton";
+import { Badge } from "@/app/components/ui/Badge";
+import { FuelTag } from "@/app/components/ui/FuelTag";
+import { ButtonLink } from "@/app/components/ui/Button";
+import { SpecGrid, type SpecGroup } from "@/app/components/ui/SpecGrid";
 
 type Params = Promise<{ slug: string }>
 
@@ -14,7 +21,7 @@ export async function generateMetadata({ params }: { params: Params }) {
 
   const title = `${vehicle.brand} ${vehicle.model} ${vehicle.year}`;
   const priceText = vehicle.price ? ` - ${vehicle.currency} ${vehicle.price.toLocaleString('es-UY')}` : '';
-  const description = vehicle.description || `Ficha t\u00e9cnica del ${vehicle.brand} ${vehicle.model} ${vehicle.year}${priceText}. Especificaciones, precios y equipamiento en Uruguay.`;
+  const description = vehicle.description || `Ficha técnica del ${vehicle.brand} ${vehicle.model} ${vehicle.year}${priceText}. Especificaciones, precios y equipamiento en Uruguay.`;
 
   return {
     title,
@@ -45,6 +52,28 @@ export async function generateStaticParams() {
   return vehicles.map(v => ({ slug: v.slug }));
 }
 
+const categoryNames: Record<string, string> = {
+  autos: 'Autos',
+  suvs: 'SUVs',
+  pickups: 'Camionetas',
+  motos: 'Motos',
+  utilitarios: 'Utilitarios'
+};
+
+const categorySingular: Record<string, string> = {
+  autos: 'Auto',
+  suvs: 'SUV',
+  pickups: 'Camioneta',
+  motos: 'Moto',
+  utilitarios: 'Utilitario'
+};
+
+const transmissionNames: Record<string, string> = {
+  manual: 'Manual',
+  automatica: 'Automática',
+  cvt: 'CVT'
+};
+
 export default async function VehiclePage({ params }: { params: Params }) {
   const { slug } = await params;
   const vehicle = await getVehicleBySlug(slug);
@@ -53,29 +82,7 @@ export default async function VehiclePage({ params }: { params: Params }) {
     notFound();
   }
 
-  const categoryNames: Record<string, string> = {
-    autos: 'Autos',
-    suvs: 'SUVs',
-    pickups: 'Camionetas',
-    motos: 'Motos',
-    utilitarios: 'Utilitarios'
-  };
-
-  const fuelNames: Record<string, string> = {
-    nafta: 'Nafta',
-    diesel: 'Diesel',
-    'eléctrico': 'Eléctrico',
-    'híbrido': 'Híbrido',
-    'mild-hybrid': 'Mild Hybrid'
-  };
-
-  const transmissionNames: Record<string, string> = {
-    manual: 'Manual',
-    automatica: 'Automatica',
-    cvt: 'CVT'
-  };
-
-  const allImages = vehicle.images?.length > 0 
+  const allImages = vehicle.images?.length > 0
     ? [vehicle.image, ...vehicle.images].filter((v, i, a) => v && a.indexOf(v) === i) as string[]
     : vehicle.image ? [vehicle.image] : [];
 
@@ -94,7 +101,7 @@ export default async function VehiclePage({ params }: { params: Params }) {
     modelDate: String(vehicle.year),
     vehicleModelDate: String(vehicle.year),
     image: allImages,
-    description: vehicle.description || `Ficha t\u00e9cnica del ${vehicle.brand} ${vehicle.model} ${vehicle.year}`,
+    description: vehicle.description || `Ficha técnica del ${vehicle.brand} ${vehicle.model} ${vehicle.year}`,
     url: `https://todomotor.uy/vehiculo/${vehicle.slug}`,
     ...(vehicle.fuelType && { fuelType: vehicle.fuelType }),
     ...(vehicle.transmission && { vehicleTransmission: vehicle.transmission }),
@@ -118,311 +125,189 @@ export default async function VehiclePage({ params }: { params: Params }) {
     ],
   };
 
+  const isEV = fuelToTagType(vehicle.fuelType) === 'electrico';
+
+  // 4 KPI tiles — pick the most relevant available specs
+  const kpis: { k: string; v: string }[] = [];
+  if (vehicle.engineHp) kpis.push({ k: 'Potencia', v: `${vehicle.engineHp} HP` });
+  if (isEV && vehicle.batteryKwh) kpis.push({ k: 'Batería', v: `${vehicle.batteryKwh} kWh` });
+  else if (vehicle.engineCc) kpis.push({ k: 'Cilindrada', v: `${formatNumber(vehicle.engineCc)} cc` });
+  if (vehicle.transmission) kpis.push({ k: 'Caja', v: transmissionNames[vehicle.transmission] || vehicle.transmission });
+  if (isEV && vehicle.autonomyKm) kpis.push({ k: 'Autonomía', v: `${formatNumber(vehicle.autonomyKm)} km` });
+  else if (vehicle.fuelType) kpis.push({ k: 'Combustible', v: fuelLabel(vehicle.fuelType) });
+
+  // Ficha técnica groups
+  const motorItems = [
+    !isEV && vehicle.engineCc ? { label: 'Cilindrada', value: `${formatNumber(vehicle.engineCc)} cc` } : null,
+    vehicle.engineHp ? { label: 'Potencia', value: `${vehicle.engineHp} HP`, highlight: true } : null,
+    vehicle.engineTorque ? { label: 'Torque', value: `${vehicle.engineTorque} Nm` } : null,
+    vehicle.transmission ? { label: 'Caja', value: transmissionNames[vehicle.transmission] || vehicle.transmission } : null,
+    vehicle.gears ? { label: 'Marchas', value: String(vehicle.gears) } : null,
+    isEV && vehicle.batteryKwh ? { label: 'Batería', value: `${vehicle.batteryKwh} kWh` } : null,
+    isEV && vehicle.autonomyKm ? { label: 'Autonomía', value: `${formatNumber(vehicle.autonomyKm)} km` } : null,
+  ].filter(Boolean) as SpecGroup['items'];
+
+  const capacityItems = [
+    vehicle.fuelType ? { label: 'Combustible', value: fuelLabel(vehicle.fuelType) } : null,
+    vehicle.fuelTank ? { label: 'Tanque', value: `${vehicle.fuelTank} L` } : null,
+    vehicle.trunkCapacity ? { label: vehicle.category === 'pickups' ? 'Capacidad de carga' : 'Baúl', value: `${formatNumber(vehicle.trunkCapacity)} L` } : null,
+    vehicle.weight ? { label: 'Peso', value: `${formatNumber(vehicle.weight)} kg` } : null,
+  ].filter(Boolean) as SpecGroup['items'];
+
+  const dimensionItems = [
+    vehicle.length ? { label: 'Largo', value: `${formatNumber(vehicle.length)} mm` } : null,
+    vehicle.width ? { label: 'Ancho', value: `${formatNumber(vehicle.width)} mm` } : null,
+    vehicle.height ? { label: 'Alto', value: `${formatNumber(vehicle.height)} mm` } : null,
+    vehicle.wheelbase ? { label: 'Distancia entre ejes', value: `${formatNumber(vehicle.wheelbase)} mm` } : null,
+    { label: 'Año modelo', value: String(vehicle.year) },
+  ].filter(Boolean) as SpecGroup['items'];
+
+  const leftGroups: SpecGroup[] = motorItems.length ? [{ title: 'Motor y rendimiento', items: motorItems }] : [];
+  const rightGroups: SpecGroup[] = [
+    ...(capacityItems.length ? [{ title: isEV ? 'Energía y capacidad' : 'Consumo y capacidad', items: capacityItems }] : []),
+    ...(dimensionItems.length ? [{ title: 'Dimensiones', items: dimensionItems }] : []),
+  ];
+
+  const saveSnapshot = {
+    slug: vehicle.slug,
+    brand: vehicle.brand,
+    model: vehicle.model,
+    version: vehicle.version,
+    year: vehicle.year,
+    price: vehicle.price,
+    currency: vehicle.currency,
+    fuelType: vehicle.fuelType,
+    engineHp: vehicle.engineHp,
+    image: allImages[0],
+  };
+
   return (
-    <div className="fade-in">
+    <div style={{ paddingBottom: 24 }}>
       <JsonLd data={productJsonLd} />
       <JsonLd data={breadcrumbJsonLd} />
-      {/* Breadcrumb */}
-      <div className="bg-[var(--muted)] py-4">
-        <div className="max-w-7xl mx-auto px-4">
-          <nav className="flex items-center gap-2 text-sm text-[var(--secondary)]">
-            <Link href="/" className="hover:text-[var(--foreground)]">Inicio</Link>
-            <span>/</span>
-            <Link href={`/?category=${vehicle.category}`} className="hover:text-[var(--foreground)]">
-              {categoryNames[vehicle.category]}
-            </Link>
-            <span>/</span>
-            <span className="text-[var(--foreground)]">{vehicle.brand} {vehicle.model}</span>
-          </nav>
+
+      <div className="dt">
+        <div className="dt__crumb">
+          <Link href="/">Inicio</Link>
+          <ChevronRight size={13} aria-hidden="true" />
+          <Link href={`/?category=${vehicle.category}`}>{categoryNames[vehicle.category]}</Link>
+          <ChevronRight size={13} aria-hidden="true" />
+          <span style={{ color: 'var(--text-strong)' }}>{vehicle.brand} {vehicle.model}</span>
         </div>
-      </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid lg:grid-cols-2 gap-12">
-          {/* Image */}
+        <div className="dt__top">
           <div>
-            <ImageCarousel 
-              images={allImages} 
-              altPrefix={`${vehicle.brand} ${vehicle.model} ${vehicle.year}`} 
-              category={vehicle.category} 
+            <ImageCarousel
+              images={allImages}
+              altPrefix={`${vehicle.brand} ${vehicle.model} ${vehicle.year}`}
+              badge={`Nuevo · ${vehicle.year}`}
             />
-
-            {/* Description (Moved here) */}
             {vehicle.description && (
-              <div className="mt-8">
-                <p className="text-[var(--secondary)] leading-relaxed text-lg">
-                  {vehicle.description}
-                </p>
-              </div>
+              <p className="dt__desc" style={{ marginTop: 24 }}>
+                {vehicle.description}
+              </p>
             )}
           </div>
 
-          {/* Info */}
-          <div>
-            <div className="mb-6">
-              <span className="category-badge mb-3 inline-block">
-                {categoryNames[vehicle.category]}
-              </span>
-              <p className="text-[var(--secondary)] text-lg">{vehicle.brand}</p>
-              <h1 className="text-4xl font-bold mb-2">
-                {vehicle.model} {vehicle.year}
-              </h1>
-              {vehicle.version && (
-                <p className="text-xl text-[var(--secondary)]">{vehicle.version}</p>
-              )}
+          <div className="dt__panel">
+            <div className="dt__ey"><span>{vehicle.brand}</span><span>·</span><span>{vehicle.year}</span></div>
+            <h1 className="dt__model">{vehicle.model}</h1>
+            {vehicle.version && <div className="dt__trim">{vehicle.version}</div>}
 
-              <div className="mt-4">
-                <Link href={`/compare?vehicle1=${vehicle.slug}`} className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium glass-panel hover:border-[var(--primary)] transition-colors text-[var(--primary)]">
-                  <span className="material-symbols-outlined text-base">compare_arrows</span>
-                  Comparar
-                </Link>
+            <div className="dt__tags">
+              {vehicle.fuelType && <FuelTag type={fuelToTagType(vehicle.fuelType)} />}
+              <Badge tone="neutral" variant="outline">{categorySingular[vehicle.category]}</Badge>
+              <Badge tone="positive" dot>Disponible</Badge>
+            </div>
+
+            {vehicle.price ? (
+              <>
+                <div className="dt__price">
+                  <span className="cur">{vehicle.currency === 'US$' || vehicle.currency === 'U$S' ? 'USD' : vehicle.currency}</span>
+                  {formatNumber(vehicle.price)}
+                </div>
+                <div className="dt__pricenote">Precio de referencia · no incluye gastos de gestoría</div>
+              </>
+            ) : (
+              <div className="dt__pricenote" style={{ marginTop: 22 }}>Precio a consultar con el concesionario</div>
+            )}
+
+            <div className="dt__cta">
+              <ButtonLink size="lg" href={`/compare?vehicles=${vehicle.slug}`} iconLeft={<GitCompareArrows size={18} aria-hidden="true" />}>
+                Comparar
+              </ButtonLink>
+              <SaveVehicleButton snapshot={saveSnapshot} />
+            </div>
+
+            {kpis.length > 0 && (
+              <div className="dt__kpis">
+                {kpis.slice(0, 4).map((kpi) => (
+                  <div className="dt__kpi" key={kpi.k}>
+                    <div className="k">{kpi.k}</div>
+                    <div className="v">{kpi.v}</div>
+                  </div>
+                ))}
               </div>
-            </div>
+            )}
 
-            {/* Pricing */}
-            <div className="bg-[var(--muted)] rounded-xl p-6 mb-6">
-              {vehicle.price && (
-                <div className="mb-2">
-                  <p className="price-tag text-3xl">{vehicle.currency} {vehicle.price.toLocaleString()}</p>
-                </div>
-              )}
-              <p className="text-xs text-[var(--secondary)] mt-2">
-                * Precio de referencia. Consultar con concesionario.
-              </p>
-            </div>
-
-            {/* Quick Specs */}
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              {vehicle.engineHp && (
-                <div className="spec-item">
-                  <p className="spec-label">Potencia</p>
-                  <p className="spec-value">{vehicle.engineHp} HP</p>
-                </div>
-              )}
-              {vehicle.engineCc && (
-                <div className="spec-item">
-                  <p className="spec-label">Cilindrada</p>
-                  <p className="spec-value">{vehicle.engineCc} cc</p>
-                </div>
-              )}
-              {vehicle.transmission && (
-                <div className="spec-item">
-                  <p className="spec-label">Transmision</p>
-                  <p className="spec-value">{transmissionNames[vehicle.transmission] || vehicle.transmission}</p>
-                </div>
-              )}
-              {vehicle.fuelType && (
-                <div className="spec-item">
-                  <p className="spec-label">Combustible</p>
-                  <p className="spec-value">{fuelNames[vehicle.fuelType] || vehicle.fuelType}</p>
-                </div>
-              )}
-              {vehicle.batteryKwh != null && vehicle.batteryKwh > 0 && (
-                <div className="spec-item">
-                  <p className="spec-label">Batería</p>
-                  <p className="spec-value">{vehicle.batteryKwh} kWh</p>
-                </div>
-              )}
-              {vehicle.autonomyKm != null && vehicle.autonomyKm > 0 && (
-                <div className="spec-item">
-                  <p className="spec-label">Autonomía eléctrica</p>
-                  <p className="spec-value">{vehicle.autonomyKm} km</p>
-                </div>
-              )}
-            </div>
-
-            {/* Related Versions (Moved here) */}
             {vehicle.relatedVersions && vehicle.relatedVersions.length > 0 && (
-              <div className="mb-6">
-                <h3 className="text-lg font-bold mb-3">Otras versiones disponibles</h3>
-                <div className="flex flex-col gap-2">
+              <div style={{ marginTop: 22 }}>
+                <h4 className="tm-eyebrow" style={{ margin: '0 0 10px' }}>Otras versiones disponibles</h4>
+                <div className="dt__versions">
                   {vehicle.relatedVersions.map((v) => (
-                    <Link key={v.slug} href={`/vehiculo/${v.slug}`} className="flex justify-between items-center p-3 rounded-lg border border-[var(--border)] hover:border-[var(--primary)] hover:bg-[var(--muted)] transition-all">
-                      <span className="font-medium">{v.version || vehicle.model}</span>
-                      <span className="text-[var(--secondary)] font-semibold">{v.currency} {v.price?.toLocaleString()}</span>
+                    <Link key={v.slug} href={`/vehiculo/${v.slug}`}>
+                      <span>{v.version || vehicle.model}</span>
+                      {v.price != null && (
+                        <span className="p">
+                          {(v.currency === 'US$' || v.currency === 'U$S' ? 'USD' : v.currency) || 'USD'} {formatNumber(v.price)}
+                        </span>
+                      )}
                     </Link>
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Report */}
-            <div className="mt-8 border-t border-[var(--border)] pt-6">
-              <p className="text-xs text-[var(--foreground-muted)]">
-                ¿Encontraste un error? Escribinos a <span className="text-[var(--secondary)]">contacto@todomotor.uy</span>
-              </p>
-            </div>
+            <p style={{ marginTop: 24, fontSize: 'var(--text-xs)', color: 'var(--text-faint)' }}>
+              ¿Encontraste un error? Escribinos a <a href="mailto:contacto@todomotor.uy">contacto@todomotor.uy</a>
+            </p>
           </div>
         </div>
+      </div>
 
-        {/* Detailed Specs */}
-        <section className="mt-16">
-          <h2 className="text-2xl font-bold mb-8">Especificaciones Tecnicas</h2>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Motor */}
-            <div className="card p-6">
-              <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-                <span className="material-symbols-outlined text-[var(--primary)] text-xl">bolt</span> Motor
-              </h3>
-              <dl className="space-y-3">
-                {vehicle.engineCc && (
-                  <div className="flex justify-between">
-                    <dt className="text-[var(--secondary)]">Cilindrada</dt>
-                    <dd className="font-medium">{vehicle.engineCc} cc</dd>
-                  </div>
-                )}
-                {vehicle.engineHp && (
-                  <div className="flex justify-between">
-                    <dt className="text-[var(--secondary)]">Potencia</dt>
-                    <dd className="font-medium">{vehicle.engineHp} HP</dd>
-                  </div>
-                )}
-                {vehicle.engineTorque && (
-                  <div className="flex justify-between">
-                    <dt className="text-[var(--secondary)]">Torque</dt>
-                    <dd className="font-medium">{vehicle.engineTorque} Nm</dd>
-                  </div>
-                )}
-                {vehicle.fuelType && (
-                  <div className="flex justify-between">
-                    <dt className="text-[var(--secondary)]">Combustible</dt>
-                    <dd className="font-medium">{fuelNames[vehicle.fuelType] || vehicle.fuelType}</dd>
-                  </div>
-                )}
-                {vehicle.batteryKwh != null && vehicle.batteryKwh > 0 && (
-                  <div className="flex justify-between">
-                    <dt className="text-[var(--secondary)]">Capacidad Batería</dt>
-                    <dd className="font-medium">{vehicle.batteryKwh} kWh</dd>
-                  </div>
-                )}
-                {vehicle.autonomyKm != null && vehicle.autonomyKm > 0 && (
-                  <div className="flex justify-between">
-                    <dt className="text-[var(--secondary)]">Autonomía eléctrica</dt>
-                    <dd className="font-medium">{vehicle.autonomyKm} km</dd>
-                  </div>
-                )}
-              </dl>
-            </div>
-
-            {/* Transmission */}
-            <div className="card p-6">
-              <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-                <span className="material-symbols-outlined text-[var(--primary)] text-xl">settings</span> Transmision
-              </h3>
-              <dl className="space-y-3">
-                {vehicle.transmission && (
-                  <div className="flex justify-between">
-                    <dt className="text-[var(--secondary)]">Tipo</dt>
-                    <dd className="font-medium">{transmissionNames[vehicle.transmission] || vehicle.transmission}</dd>
-                  </div>
-                )}
-                {vehicle.gears !== null && vehicle.gears !== undefined && vehicle.gears > 0 && (
-                  <div className="flex justify-between">
-                    <dt className="text-[var(--secondary)]">Marchas</dt>
-                    <dd className="font-medium">{vehicle.gears}</dd>
-                  </div>
-                )}
-              </dl>
-            </div>
-
-            {/* Dimensions */}
-            <div className="card p-6">
-              <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-                <span className="material-symbols-outlined text-[var(--primary)] text-xl">straighten</span> Dimensiones
-              </h3>
-              <dl className="space-y-3">
-                {vehicle.length && (
-                  <div className="flex justify-between">
-                    <dt className="text-[var(--secondary)]">Largo</dt>
-                    <dd className="font-medium">{vehicle.length} mm</dd>
-                  </div>
-                )}
-                {vehicle.width && (
-                  <div className="flex justify-between">
-                    <dt className="text-[var(--secondary)]">Ancho</dt>
-                    <dd className="font-medium">{vehicle.width} mm</dd>
-                  </div>
-                )}
-                {vehicle.height && (
-                  <div className="flex justify-between">
-                    <dt className="text-[var(--secondary)]">Alto</dt>
-                    <dd className="font-medium">{vehicle.height} mm</dd>
-                  </div>
-                )}
-                {vehicle.wheelbase && (
-                  <div className="flex justify-between">
-                    <dt className="text-[var(--secondary)]">Distancia entre ejes</dt>
-                    <dd className="font-medium">{vehicle.wheelbase} mm</dd>
-                  </div>
-                )}
-              </dl>
-            </div>
-
-            {/* Capacities */}
-            <div className="card p-6">
-              <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-                <span className="material-symbols-outlined text-[var(--primary)] text-xl">inventory_2</span> Capacidades
-              </h3>
-              <dl className="space-y-3">
-                {vehicle.trunkCapacity !== null && vehicle.trunkCapacity !== undefined && vehicle.trunkCapacity > 0 && (
-                  <div className="flex justify-between">
-                    <dt className="text-[var(--secondary)]">Baul</dt>
-                    <dd className="font-medium">{vehicle.trunkCapacity} L</dd>
-                  </div>
-                )}
-                {vehicle.fuelTank && (
-                  <div className="flex justify-between">
-                    <dt className="text-[var(--secondary)]">Tanque</dt>
-                    <dd className="font-medium">{vehicle.fuelTank} L</dd>
-                  </div>
-                )}
-                {vehicle.weight && (
-                  <div className="flex justify-between">
-                    <dt className="text-[var(--secondary)]">Peso</dt>
-                    <dd className="font-medium">{vehicle.weight} kg</dd>
-                  </div>
-                )}
-              </dl>
-            </div>
-
-            {/* Safety */}
-            {vehicle.safetyFeatures && vehicle.safetyFeatures.length > 0 && (
-              <div className="card p-6">
-                <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[var(--primary)] text-xl">shield</span> Seguridad
-                </h3>
-                <ul className="space-y-2">
-                  {vehicle.safetyFeatures.map((feature: string, i: number) => (
-                    <li key={i} className="flex items-center gap-2 text-sm">
-                      <span className="material-symbols-outlined text-sm text-[var(--primary)]">check</span>
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* Equipment */}
-            {vehicle.equipment && vehicle.equipment.length > 0 && (
-              <div className="card p-6">
-                <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[var(--primary)] text-xl">star</span> Equipamiento
-                </h3>
-                <ul className="space-y-2">
-                  {vehicle.equipment.map((item: string, i: number) => (
-                    <li key={i} className="flex items-center gap-2 text-sm">
-                      <span className="material-symbols-outlined text-sm text-[var(--primary)]">check</span>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
+      {(leftGroups.length > 0 || rightGroups.length > 0) && (
+        <section className="dt__specs">
+          <h2>Ficha técnica</h2>
+          <div className="dt__cols">
+            {leftGroups.length > 0 && <SpecGrid cols={1} groups={leftGroups} />}
+            {rightGroups.length > 0 && <SpecGrid cols={1} groups={rightGroups} />}
           </div>
         </section>
+      )}
 
-        {/* Comments */}
+      {vehicle.safetyFeatures && vehicle.safetyFeatures.length > 0 && (
+        <section className="dt__specs">
+          <h2>Seguridad</h2>
+          <ul className="dt__feats">
+            {vehicle.safetyFeatures.map((feature: string, i: number) => (
+              <li key={i}><Check size={16} aria-hidden="true" />{feature}</li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {vehicle.equipment && vehicle.equipment.length > 0 && (
+        <section className="dt__specs">
+          <h2>Equipamiento</h2>
+          <ul className="dt__feats">
+            {vehicle.equipment.map((item: string, i: number) => (
+              <li key={i}><Check size={16} aria-hidden="true" />{item}</li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <div className="dt__specs">
         <CommentsSection resourceId={slug} />
       </div>
     </div>

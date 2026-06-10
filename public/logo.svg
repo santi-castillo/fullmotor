@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <!-- Top horizontal bar of T -->
-  <rect x="12" y="8" width="40" height="10" rx="3" fill="#8b5cf6"/>
-  <!-- Lightning Bolt Stem of T -->
-  <path d="M38 18 L24 40 L34 40 L24 60 L46 32 L34 32 L42 18 Z" fill="#8b5cf6"/>
-</svg>
