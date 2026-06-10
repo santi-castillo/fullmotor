@@ -1,0 +1,51 @@
+<!-- @dsCard group="Components" viewport="700x420" name="Catalog — VehicleCard & SpecGrid" subtitle="The product's signature card + ficha técnica" -->
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>
+  body { margin: 0; background: var(--bg-app); padding: 26px 30px; }
+  .grid { display: grid; grid-template-columns: 260px 1fr; gap: 26px; align-items: start; }
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px; }
+  .panel h4 { font-family: var(--font-display); font-size: var(--text-md); margin: 0 0 14px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+  const { VehicleCard, SpecGrid } = window.TodoMotorDesignSystem_d01d9d;
+  function Demo() {
+    const [saved, setSaved] = React.useState(true);
+    return (
+      <div className="grid">
+        <VehicleCard
+          brand="Volkswagen" model="Taos" year={2026}
+          trim="Highline 250 TSI 1.4 A/T" price={42390} power={150}
+          fuel="nafta" condition="Nuevo"
+          saved={saved} onToggleSave={() => setSaved(s => !s)}
+        />
+        <div className="panel">
+          <h4>Ficha técnica</h4>
+          <SpecGrid groups={[
+            { title: 'Motor y rendimiento', items: [
+              { label: 'Cilindrada', value: '1.4 L' },
+              { label: 'Potencia', value: '150 HP', highlight: true },
+              { label: 'Torque', value: '250 Nm' },
+              { label: '0–100 km/h', value: '8,9 s' },
+              { label: 'Caja', value: 'DSG 6v' },
+              { label: 'Tracción', value: 'Delantera' },
+            ]},
+          ]} />
+        </div>
+      </div>
+    );
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script>
+</body>
+</html>

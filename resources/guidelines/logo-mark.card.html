@@ -1,0 +1,41 @@
+<!-- @dsCard group="Brand" viewport="700x180" name="Logo — mark & app icon" subtitle="Tachometer mark: badge, on-light, on-dark" -->
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body { margin: 0; background: var(--bg-app); font-family: var(--font-sans); }
+  .row { display: flex; align-items: center; gap: 28px; padding: 32px; flex-wrap: wrap; }
+  .chip { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .swatch { width: 96px; height: 96px; border-radius: var(--radius-lg); display: grid; place-items: center; }
+  .s-light { background: var(--surface); border: 1px solid var(--border); }
+  .s-dark { background: var(--brand-deep); }
+  .lbl { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); }
+  .mask { width: 60px; height: 60px; -webkit-mask: url(../assets/logo/todomotor-mark-mono.svg) center/contain no-repeat; mask: url(../assets/logo/todomotor-mark-mono.svg) center/contain no-repeat; }
+  .cobalt { background: var(--accent); }
+  .ink { background: var(--text-strong); }
+  .white { background: #fff; }
+</style>
+</head>
+<body>
+  <div class="row">
+    <div class="chip">
+      <div class="swatch s-light"><img src="../assets/logo/todomotor-mark.svg" width="64" height="64" alt=""></div>
+      <span class="lbl">App icon</span>
+    </div>
+    <div class="chip">
+      <div class="swatch s-light"><span class="mask cobalt"></span></div>
+      <span class="lbl">Cobalt</span>
+    </div>
+    <div class="chip">
+      <div class="swatch s-light"><span class="mask ink"></span></div>
+      <span class="lbl">Ink mono</span>
+    </div>
+    <div class="chip">
+      <div class="swatch s-dark"><span class="mask white"></span></div>
+      <span class="lbl">Reverse</span>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!-- @dsCard group="Colors" viewport="700x180" name="Neutrals — ink & paper" subtitle="Cool-tinted showroom whites and ink ramp" -->
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body { margin: 0; background: var(--surface); padding: 26px 30px; }
+  .grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 10px; }
+  .sw { display: flex; flex-direction: column; gap: 8px; }
+  .chip { height: 56px; border-radius: var(--radius-md); border: 1px solid rgba(11,31,68,0.08); }
+  .name { font-family: var(--font-mono); font-size: 10px; color: var(--text-strong); }
+  .hex { font-family: var(--font-mono); font-size: 9.5px; color: var(--text-faint); }
+</style>
+</head>
+<body>
+  <div class="grid">
+    <div class="sw"><div class="chip" style="background:var(--c-paper)"></div><span class="name">paper</span><span class="hex">F6F8FB</span></div>
+    <div class="sw"><div class="chip" style="background:var(--c-sunken)"></div><span class="name">sunken</span><span class="hex">EDF0F5</span></div>
+    <div class="sw"><div class="chip" style="background:var(--c-ink-150)"></div><span class="name">border</span><span class="hex">DFE4EC</span></div>
+    <div class="sw"><div class="chip" style="background:var(--c-ink-400)"></div><span class="name">ink-400</span><span class="hex">8C97A6</span></div>
+    <div class="sw"><div class="chip" style="background:var(--c-ink-500)"></div><span class="name">ink-500</span><span class="hex">6B7686</span></div>
+    <div class="sw"><div class="chip" style="background:var(--c-ink-700)"></div><span class="name">ink-700</span><span class="hex">333D4C</span></div>
+    <div class="sw"><div class="chip" style="background:var(--c-ink-800)"></div><span class="name">ink-800</span><span class="hex">1A212C</span></div>
+    <div class="sw"><div class="chip" style="background:var(--c-ink-900)"></div><span class="name">ink-900</span><span class="hex">0E131B</span></div>
+  </div>
+</body>
+</html>
