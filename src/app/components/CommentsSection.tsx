@@ -148,12 +148,14 @@ function CommentItem({
     comment,
     resourceId,
     isReply,
+    disabled,
     onDelete,
     onReplyAdded,
 }: {
     comment: Comment
     resourceId: string
     isReply?: boolean
+    disabled?: boolean
     onDelete: (id: string, parentId?: string) => void
     onReplyAdded: (parentId: string, reply: Comment) => void
 }) {
@@ -192,6 +194,7 @@ function CommentItem({
                         comment={reply}
                         resourceId={resourceId}
                         isReply
+                        disabled={disabled}
                         onDelete={onDelete}
                         onReplyAdded={onReplyAdded}
                     />
@@ -211,7 +214,7 @@ function CommentItem({
                     </div>
                     <p className="text-sm mt-1 text-[var(--foreground)] break-words">{comment.body}</p>
                     <div className="flex items-center gap-3 mt-2">
-                        {!isReply && (
+                        {!isReply && !disabled && (
                             <button
                                 onClick={() => setShowReplyForm(!showReplyForm)}
                                 className="text-xs text-[var(--foreground-muted)] hover:text-[var(--primary)] transition-colors flex items-center gap-1"
@@ -255,6 +258,7 @@ function CommentItem({
                     comment={reply}
                     resourceId={resourceId}
                     isReply
+                    disabled={disabled}
                     onDelete={onDelete}
                     onReplyAdded={onReplyAdded}
                 />
@@ -263,7 +267,15 @@ function CommentItem({
     )
 }
 
-export default function CommentsSection({ resourceId }: { resourceId: string }) {
+export default function CommentsSection({
+    resourceId,
+    disabled = false,
+    disabledReason,
+}: {
+    resourceId: string
+    disabled?: boolean
+    disabledReason?: string
+}) {
     const [comments, setComments] = useState<Comment[]>([])
     const [loading, setLoading] = useState(true)
     const [page, setPage] = useState(1)
@@ -345,7 +357,14 @@ export default function CommentsSection({ resourceId }: { resourceId: string }) 
 
             {/* New comment form */}
             <div className="mb-8">
-                <CommentForm resourceId={resourceId} onSubmit={handleNewComment} />
+                {disabled ? (
+                    <div className="px-4 py-4 text-sm text-center text-[var(--foreground-muted)] border border-dashed border-[var(--border)] rounded-xl flex items-center justify-center gap-2">
+                        <span className="material-symbols-outlined text-base">lock</span>
+                        {disabledReason || 'Esta publicación no acepta nuevos comentarios.'}
+                    </div>
+                ) : (
+                    <CommentForm resourceId={resourceId} onSubmit={handleNewComment} />
+                )}
             </div>
 
             {/* Comments list */}
@@ -373,6 +392,7 @@ export default function CommentsSection({ resourceId }: { resourceId: string }) 
                             key={comment.id}
                             comment={comment}
                             resourceId={resourceId}
+                            disabled={disabled}
                             onDelete={handleDelete}
                             onReplyAdded={handleReplyAdded}
                         />

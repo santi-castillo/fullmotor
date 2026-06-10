@@ -92,7 +92,24 @@ export default async function ClassifiedDetailPage({ params }: PageProps) {
             </div>
           </div>
 
-          <CommentsSection resourceId={classified.id} />
+          {(() => {
+            const isExpired = new Date(classified.expiresAt) < new Date()
+            const reason =
+              classified.status === 'sold'
+                ? 'Esta publicación está marcada como vendida y no acepta más comentarios.'
+                : classified.status === 'paused'
+                  ? 'Esta publicación está pausada por el dueño y no acepta más comentarios.'
+                  : isExpired
+                    ? 'Esta publicación venció y no acepta más comentarios.'
+                    : undefined
+            return (
+              <CommentsSection
+                resourceId={classified.id}
+                disabled={!!reason}
+                disabledReason={reason}
+              />
+            )
+          })()}
         </div>
 
         <aside className="space-y-4">
