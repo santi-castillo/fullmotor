@@ -1,5 +1,5 @@
 import { Vehicle, Category, CATEGORIES } from '@/types/vehicle'
-import { fetchVehicles, fetchVehicleBySlug as apiFetchVehicleBySlug } from './api'
+import { fetchVehicles, fetchVehicleBySlug as apiFetchVehicleBySlug, fetchCarouselItems } from './api'
 
 // Re-export CATEGORIES for components that need it
 export { CATEGORIES }
@@ -46,11 +46,10 @@ export async function getVehiclesByCategory(category: Category): Promise<Vehicle
 
 export async function getLatestVehicles(limit: number = 6, category?: Category): Promise<Vehicle[]> {
   try {
-    // Use the full vehicles endpoint (sorted by newest) instead of /api/carousel
-    // because the carousel payload is a slim promo shape that omits fuelType,
-    // which causes EVs to render without a fuel label on the home.
-    const { vehicles } = await fetchVehicles({ category, limit, sort: 'newest' })
-    return vehicles
+    // /api/carousel returns one version per model family (the most expensive),
+    // newest first — /api/vehicles would list every version of the same family.
+    const vehicles = await fetchCarouselItems(category)
+    return vehicles.slice(0, limit)
   } catch (error) {
     console.warn("getLatestVehicles failed:", error)
     return []

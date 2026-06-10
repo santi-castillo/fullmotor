@@ -115,6 +115,10 @@ interface CarouselItem {
     title: string
     imageUrl: string
     linkUrl: string
+    slug?: string
+    brand?: string
+    model?: string
+    version?: string
     price: number
     currency: string
     year: number
@@ -265,17 +269,19 @@ export async function fetchCarouselItems(category?: Category): Promise<Vehicle[]
 
     const data: CarouselResponse = await response.json()
     return (data.data || []).map((item): Vehicle => {
-        // linkUrl is e.g. "/vehicles/uy-kawasaki-ninja-500-2026-se-abs"
-        const slug = item.linkUrl.split('/').pop() || item.id
-        const [brand = '', ...modelParts] = item.title.split(' ')
+        // Fallbacks parse slug/brand/model out of linkUrl/title for backends
+        // that predate those fields in the carousel payload
+        const slug = item.slug || item.linkUrl.split('/').pop() || item.id
+        const [titleBrand = '', ...modelParts] = item.title.split(' ')
         return {
             id: item.id,
             slug,
             countryCode: item.countryCode,
             vehicleType: item.vehicleType,
             vehicleSubtype: null,
-            brand,
-            model: modelParts.join(' '),
+            brand: item.brand || titleBrand,
+            model: item.model || modelParts.join(' '),
+            version: item.version,
             year: item.year,
             category: vehicleTypeToCategory[item.vehicleType] || 'autos', // Use simple mapping
             currency: item.currency,
