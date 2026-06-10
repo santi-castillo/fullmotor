@@ -22,7 +22,7 @@ export default function RequireAuth({ children, redirectTo = '/clasificados?logi
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-20 flex items-center justify-center">
-        <div className="w-10 h-10 border-2 border-[var(--primary)] border-t-transparent rounded-full animate-spin" />
+        <div className="w-10 h-10 border-2 border-accent border-t-transparent rounded-full animate-spin" aria-label="Cargando" />
       </div>
     )
   }

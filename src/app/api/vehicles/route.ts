@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
   const fuelType = searchParams.get('fuel_type') || undefined
   const minPrice = searchParams.get('min_price') ? parseInt(searchParams.get('min_price')!) : undefined
   const maxPrice = searchParams.get('max_price') ? parseInt(searchParams.get('max_price')!) : undefined
-  const sort = searchParams.get('sort') as any || undefined
+  const sort = (searchParams.get('sort') as NonNullable<Parameters<typeof fetchVehicles>[0]>['sort']) || undefined
 
   const result = await fetchVehicles({
     page,

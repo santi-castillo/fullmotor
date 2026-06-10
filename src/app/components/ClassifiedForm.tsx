@@ -1,7 +1,8 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import { AlertCircle, ImagePlus } from 'lucide-react'
 import {
   CLASSIFIED_CATEGORIES,
   Classified,
@@ -17,8 +18,12 @@ import {
   updateClassified,
   uploadClassifiedImages,
 } from '@/lib/classifieds-api'
-const COUNTRY = process.env.NEXT_PUBLIC_COUNTRY || 'uy'
+import { Button } from './ui/Button'
+import { Input, Textarea } from './ui/Input'
+import { Select } from './ui/Select'
 import ClassifiedImageUploader from './ClassifiedImageUploader'
+
+const COUNTRY = process.env.NEXT_PUBLIC_COUNTRY || 'uy'
 
 interface ClassifiedFormProps {
   mode: 'create' | 'edit'
@@ -43,6 +48,7 @@ export default function ClassifiedForm({ mode, initial }: ClassifiedFormProps) {
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [progress, setProgress] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
 
   const isCreate = mode === 'create'
 
@@ -167,151 +173,125 @@ export default function ClassifiedForm({ mode, initial }: ClassifiedFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="card p-6 space-y-4">
-        <h2 className="text-lg font-semibold">Datos del aviso</h2>
+      <div className="bg-surface border border-line rounded-[var(--radius-lg)] p-6 space-y-4">
+        <h2 className="font-display text-lg font-bold text-ink">Datos del aviso</h2>
 
-        <div>
-          <label className="block text-xs uppercase tracking-wider text-[var(--foreground-muted)] mb-1">
-            Título *
-          </label>
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            maxLength={120}
-            placeholder="Ej. Honda Civic 2020 impecable"
-            className="w-full px-3 py-2 rounded-lg bg-[var(--glass-bg)] border border-[var(--border)] text-sm focus:border-[var(--primary)] outline-none"
-            required
-          />
-          <p className="text-xs text-[var(--foreground-muted)] mt-1">{title.length}/120</p>
-        </div>
+        <Input
+          label="Título"
+          required
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          maxLength={120}
+          placeholder="Ej. Honda Civic 2020 impecable"
+          hint={`${title.length}/120`}
+          className="[&_.tm-field__hint]:font-mono"
+        />
 
-        <div>
-          <label className="block text-xs uppercase tracking-wider text-[var(--foreground-muted)] mb-1">
-            Descripción *
-          </label>
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            maxLength={2000}
-            rows={5}
-            placeholder="Detalles del vehículo, kilometraje, estado, etc."
-            className="w-full px-3 py-2 rounded-lg bg-[var(--glass-bg)] border border-[var(--border)] text-sm focus:border-[var(--primary)] outline-none resize-y"
-            required
-          />
-          <p className="text-xs text-[var(--foreground-muted)] mt-1">{description.length}/2000</p>
-        </div>
+        <Textarea
+          label="Descripción"
+          required
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          maxLength={2000}
+          rows={5}
+          placeholder="Detalles del vehículo, kilometraje, estado, etc."
+          hint={`${description.length}/2000`}
+          className="[&_.tm-field__hint]:font-mono"
+        />
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-xs uppercase tracking-wider text-[var(--foreground-muted)] mb-1">
-              Categoría *
-            </label>
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value as ClassifiedCategory)}
-              className="w-full px-3 py-2 rounded-lg bg-[var(--glass-bg)] border border-[var(--border)] text-sm focus:border-[var(--primary)] outline-none"
-            >
-              {CLASSIFIED_CATEGORIES.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.icon} {c.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-xs uppercase tracking-wider text-[var(--foreground-muted)] mb-1">
-              Ciudad *
-            </label>
-            <input
-              type="text"
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-              maxLength={100}
-              placeholder="Ej. Montevideo"
-              className="w-full px-3 py-2 rounded-lg bg-[var(--glass-bg)] border border-[var(--border)] text-sm focus:border-[var(--primary)] outline-none"
-              required
-            />
-          </div>
+          <Select
+            label="Categoría"
+            value={category}
+            onChange={(e) => setCategory(e.target.value as ClassifiedCategory)}
+            options={CLASSIFIED_CATEGORIES.map((c) => ({ value: c.id, label: c.label }))}
+          />
+          <Input
+            label="Ciudad"
+            required
+            type="text"
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+            maxLength={100}
+            placeholder="Ej. Montevideo"
+          />
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="sm:col-span-2">
-            <label className="block text-xs uppercase tracking-wider text-[var(--foreground-muted)] mb-1">
-              Precio *
-            </label>
-            <input
+            <Input
+              label="Precio"
+              required
               type="number"
               step="0.01"
               min="0"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               placeholder="15000"
-              className="w-full px-3 py-2 rounded-lg bg-[var(--glass-bg)] border border-[var(--border)] text-sm focus:border-[var(--primary)] outline-none"
-              required
+              className="[&_.tm-input]:font-mono"
             />
           </div>
-          <div>
-            <label className="block text-xs uppercase tracking-wider text-[var(--foreground-muted)] mb-1">
-              Moneda *
-            </label>
-            <select
-              value={currency}
-              onChange={(e) => setCurrency(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg bg-[var(--glass-bg)] border border-[var(--border)] text-sm focus:border-[var(--primary)] outline-none"
-            >
-              <option value="USD">USD</option>
-              <option value="UYU">UYU</option>
-              <option value="ARS">ARS</option>
-              <option value="CLP">CLP</option>
-            </select>
-          </div>
+          <Select
+            label="Moneda"
+            value={currency}
+            onChange={(e) => setCurrency(e.target.value)}
+            options={['USD', 'UYU', 'ARS', 'CLP']}
+          />
         </div>
 
-        <div>
-          <label className="block text-xs uppercase tracking-wider text-[var(--foreground-muted)] mb-1">
-            Contacto (teléfono, WhatsApp, email)
-          </label>
-          <input
+        <div className="space-y-2">
+          <Input
+            label="Contacto (teléfono, WhatsApp, email)"
             type="text"
             value={contactInfo}
             onChange={(e) => setContactInfo(e.target.value)}
             maxLength={200}
             placeholder="+598 99 123 456"
-            className="w-full px-3 py-2 rounded-lg bg-[var(--glass-bg)] border border-[var(--border)] text-sm focus:border-[var(--primary)] outline-none"
           />
-          <label className="flex items-center gap-2 mt-2 text-sm cursor-pointer">
+          <label className="flex items-center gap-2 text-sm text-body cursor-pointer">
             <input
               type="checkbox"
               checked={showContactInfo}
               onChange={(e) => setShowContactInfo(e.target.checked)}
-              className="w-4 h-4 accent-[var(--primary)]"
+              className="w-4 h-4 accent-[var(--accent)]"
             />
-            Mostrar contacto en la publicación
+            Mostrá tu contacto en la publicación
           </label>
         </div>
       </div>
 
-      <div className="card p-6 space-y-3">
-        <h2 className="text-lg font-semibold">Imágenes</h2>
+      <div className="bg-surface border border-line rounded-[var(--radius-lg)] p-6 space-y-3">
+        <h2 className="font-display text-lg font-bold text-ink">Fotos</h2>
         {isCreate ? (
           <>
-            <p className="text-xs text-[var(--foreground-muted)]">
-              Seleccioná hasta {MAX_CLASSIFIED_IMAGES} imágenes; se subirán al crear la publicación.
-            </p>
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="w-full py-8 px-4 border border-dashed border-line-strong rounded-[var(--radius-lg)] text-muted hover:border-accent hover:text-accent transition-colors cursor-pointer flex flex-col items-center justify-center gap-2"
+            >
+              <ImagePlus size={24} aria-hidden="true" />
+              <span className="text-sm">
+                Subí hasta {MAX_CLASSIFIED_IMAGES} fotos (JPG, PNG o WebP)
+              </span>
+            </button>
             <input
+              ref={fileInputRef}
               type="file"
               accept={ALLOWED_IMAGE_TYPES.join(',')}
               multiple
               onChange={(e) => handleCreateImages(e.target.files)}
-              className="block w-full text-sm text-[var(--foreground-muted)] file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[var(--primary)] file:text-white hover:file:bg-[var(--primary-light)]"
+              className="hidden"
             />
+            <p className="text-xs text-muted">
+              Las fotos se suben al crear la publicación.
+            </p>
             {pendingPreviews.length > 0 && (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
                 {pendingPreviews.map((src, i) => (
                   <div
                     key={i}
-                    className="relative aspect-square rounded-lg overflow-hidden border border-[var(--border)]"
+                    className="relative aspect-square rounded-[var(--radius-md)] overflow-hidden border border-line bg-sunken"
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={src} alt="" className="w-full h-full object-cover" />
@@ -331,26 +311,19 @@ export default function ClassifiedForm({ mode, initial }: ClassifiedFormProps) {
       </div>
 
       {error && (
-        <div className="card p-4 border-red-500/40 bg-red-500/10 text-red-400 text-sm">
+        <div className="flex items-start gap-2 p-4 rounded-[var(--radius-md)] bg-danger-soft text-danger-ink text-sm">
+          <AlertCircle size={16} className="flex-shrink-0 mt-0.5" aria-hidden="true" />
           {error}
         </div>
       )}
 
       <div className="flex items-center gap-3">
-        <button
-          type="submit"
-          disabled={submitting}
-          className="btn btn-primary disabled:opacity-60"
-        >
-          {submitting ? progress || 'Guardando…' : isCreate ? 'Publicar' : 'Guardar cambios'}
-        </button>
-        <button
-          type="button"
-          onClick={() => router.back()}
-          className="px-4 py-2 rounded-lg text-sm text-[var(--foreground-muted)] hover:text-[var(--foreground)] transition-colors"
-        >
+        <Button type="submit" loading={submitting}>
+          {submitting ? progress || 'Guardando…' : isCreate ? 'Publicá tu aviso' : 'Guardá los cambios'}
+        </Button>
+        <Button variant="ghost" onClick={() => router.back()} disabled={submitting}>
           Cancelar
-        </button>
+        </Button>
       </div>
     </form>
   )

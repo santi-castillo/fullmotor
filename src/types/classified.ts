@@ -70,13 +70,13 @@ export interface UpgradeResponse {
   initPoint: string
 }
 
-export const CLASSIFIED_CATEGORIES: { id: ClassifiedCategory; label: string; icon: string }[] = [
-  { id: 'cars', label: 'Autos', icon: '🚗' },
-  { id: 'motorcycles', label: 'Motos', icon: '🏍️' },
-  { id: 'trucks', label: 'Camionetas', icon: '🛻' },
-  { id: 'parts', label: 'Repuestos', icon: '🔧' },
-  { id: 'accessories', label: 'Accesorios', icon: '🛠️' },
-  { id: 'other', label: 'Otros', icon: '📦' },
+export const CLASSIFIED_CATEGORIES: { id: ClassifiedCategory; label: string }[] = [
+  { id: 'cars', label: 'Autos' },
+  { id: 'motorcycles', label: 'Motos' },
+  { id: 'trucks', label: 'Camionetas' },
+  { id: 'parts', label: 'Repuestos' },
+  { id: 'accessories', label: 'Accesorios' },
+  { id: 'other', label: 'Otros' },
 ]
 
 export const categoryLabels: Record<ClassifiedCategory, string> = {

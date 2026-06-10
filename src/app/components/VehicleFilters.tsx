@@ -2,31 +2,55 @@
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useState, useEffect, useRef } from 'react';
+import { CategoryIcon } from './ui/CategoryIcon';
+import { FuelTag } from './ui/FuelTag';
+import { Select } from './ui/Select';
+import type { FuelTagType } from '@/lib/format';
+import type { CategoryIconName } from '@/types/vehicle';
+
+interface CategoryCount {
+    id: string;
+    name: string;
+    icon: string;
+    count: number;
+}
 
 interface VehicleFiltersProps {
     brands: string[];
+    categories: CategoryCount[];
 }
 
-export default function VehicleFilters({ brands }: VehicleFiltersProps) {
+// URL/backend fuel values stay as-is (gasoline/diesel/electric/hybrid);
+// the FuelTag key is display-only.
+const FUELS: { value: string; tag: FuelTagType }[] = [
+    { value: 'gasoline', tag: 'nafta' },
+    { value: 'electric', tag: 'electrico' },
+    { value: 'hybrid', tag: 'hibrido' },
+    { value: 'diesel', tag: 'diesel' },
+];
+
+export default function VehicleFilters({ brands, categories }: VehicleFiltersProps) {
     const router = useRouter();
     const searchParams = useSearchParams();
 
     const currentBrand = searchParams.get('brand') || 'all';
     const currentCategory = searchParams.get('category') || 'all';
     const currentFuel = searchParams.get('fuel') || 'all';
-    const currentSort = searchParams.get('sort') || 'newest';
     const currentMinPrice = searchParams.get('min_price') || '';
     const currentMaxPrice = searchParams.get('max_price') || '';
 
     const [localMinPrice, setLocalMinPrice] = useState(currentMinPrice);
     const [localMaxPrice, setLocalMaxPrice] = useState(currentMaxPrice);
-    const [showFilters, setShowFilters] = useState(false);
     const isInitialMount = useRef(true);
 
-    useEffect(() => {
+    // Sync local inputs when the URL changes externally (render-phase
+    // adjustment — the pattern react.dev recommends over an effect)
+    const [prevUrlPrices, setPrevUrlPrices] = useState({ min: currentMinPrice, max: currentMaxPrice });
+    if (prevUrlPrices.min !== currentMinPrice || prevUrlPrices.max !== currentMaxPrice) {
+        setPrevUrlPrices({ min: currentMinPrice, max: currentMaxPrice });
         setLocalMinPrice(currentMinPrice);
         setLocalMaxPrice(currentMaxPrice);
-    }, [currentMinPrice, currentMaxPrice]);
+    }
 
     useEffect(() => {
         if (isInitialMount.current) {
@@ -48,20 +72,13 @@ export default function VehicleFilters({ brands }: VehicleFiltersProps) {
                     params.delete('max_price');
                 }
                 params.delete('page');
+                if (!params.has('category')) params.set('category', 'all');
                 router.push(`/?${params.toString()}`);
             }
         }, 1000);
 
         return () => clearTimeout(timeout);
-    }, [localMinPrice, localMaxPrice]);
-
-    const activeFilterCount = [
-        currentBrand !== 'all' ? 1 : 0,
-        currentCategory !== 'all' ? 1 : 0,
-        currentFuel !== 'all' ? 1 : 0,
-        currentMinPrice ? 1 : 0,
-        currentMaxPrice ? 1 : 0,
-    ].reduce((a, b) => a + b, 0);
+    }, [localMinPrice, localMaxPrice]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const createQueryString = useCallback(
         (updates: Record<string, string | null>) => {
@@ -75,7 +92,7 @@ export default function VehicleFilters({ brands }: VehicleFiltersProps) {
                 }
             });
 
-            if (!updates.hasOwnProperty('page')) {
+            if (!Object.prototype.hasOwnProperty.call(updates, 'page')) {
                 params.delete('page');
             }
 
@@ -94,101 +111,77 @@ export default function VehicleFilters({ brands }: VehicleFiltersProps) {
         router.push(`/?${query}`);
     };
 
-    const selectClass = "px-4 py-2.5 rounded-xl bg-[var(--surface-high)] border border-[var(--glass-border)] text-sm text-[var(--foreground)] focus:border-[var(--primary)] focus:outline-none cursor-pointer [&>option]:bg-[#131b2e] [&>option]:text-[var(--foreground)]";
+    const allCategories: CategoryCount[] = [
+        { id: 'all', name: 'Todos', icon: 'layout-grid', count: categories.reduce((a, c) => a + c.count, 0) },
+        ...categories,
+    ];
 
     return (
-        <div className="space-y-4">
-            {/* Top bar: filter toggle + sort */}
-            <div className="flex items-center justify-between gap-3">
-                <button
-                    onClick={() => setShowFilters(!showFilters)}
-                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold uppercase tracking-wider transition-all ${
-                        showFilters || activeFilterCount > 0
-                            ? 'bg-[var(--primary)] text-[#0b1326]'
-                            : 'bg-[var(--surface-high)] text-[var(--foreground)] border border-[var(--glass-border)]'
-                    }`}
-                >
-                    <span className="material-symbols-outlined text-lg">tune</span>
-                    Filtros{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
-                </button>
-
-                <div className="flex items-center gap-2 min-w-0">
-                    <span className="material-symbols-outlined text-[var(--foreground-muted)] text-lg flex-shrink-0">sort</span>
-                    <select
-                        value={currentSort}
-                        onChange={(e) => handleFilterChange('sort', e.target.value)}
-                        className={`${selectClass} min-w-0 truncate`}
-                    >
-                        <option value="newest">M&aacute;s recientes</option>
-                        <option value="oldest">M&aacute;s antiguos</option>
-                        <option value="price_asc">Menor precio</option>
-                        <option value="price_desc">Mayor precio</option>
-                        <option value="power_asc">Menor potencia</option>
-                        <option value="power_desc">Mayor potencia</option>
-                        <option value="value_asc">Mejor precio/HP</option>
-                        <option value="value_desc">Peor precio/HP</option>
-                    </select>
+        <aside className="iv__filters">
+            <div className="fgroup">
+                <h4>Categoría</h4>
+                <div className="fcat">
+                    {allCategories.map((c) => (
+                        <button
+                            key={c.id}
+                            type="button"
+                            className={currentCategory === c.id ? 'on' : ''}
+                            onClick={() => handleFilterChange('category', c.id === 'all' ? 'all' : c.id)}
+                        >
+                            <CategoryIcon name={c.icon as CategoryIconName} size={17} />
+                            {c.name}
+                            {c.count > 0 && <span className="c">{c.count}</span>}
+                        </button>
+                    ))}
                 </div>
             </div>
 
-            {/* Expandable filter panel */}
-            {showFilters && (
-                <div className="flex flex-wrap gap-3 p-4 rounded-xl bg-[var(--surface-mid)] border border-[var(--glass-border)] animate-[fadeIn_0.2s_ease-out]">
-                    <select
-                        value={currentBrand}
-                        onChange={(e) => handleFilterChange('brand', e.target.value)}
-                        className={selectClass}
-                    >
-                        <option value="all">Todas las marcas</option>
-                        {brands.map(brand => (
-                            <option key={brand} value={brand}>{brand}</option>
-                        ))}
-                    </select>
-
-                    <select
-                        value={currentCategory}
-                        onChange={(e) => handleFilterChange('category', e.target.value)}
-                        className={selectClass}
-                    >
-                        <option value="all">Todos los tipos</option>
-                        <option value="autos">Autos</option>
-                        <option value="suvs">SUVs</option>
-                        <option value="pickups">Camionetas</option>
-                        <option value="motos">Motos</option>
-                        <option value="utilitarios">Utilitarios</option>
-                    </select>
-
-                    <select
-                        value={currentFuel}
-                        onChange={(e) => handleFilterChange('fuel', e.target.value)}
-                        className={selectClass}
-                    >
-                        <option value="all">Todos los motores</option>
-                        <option value="gasoline">Nafta</option>
-                        <option value="diesel">Diesel</option>
-                        <option value="electric">El&eacute;ctrico</option>
-                        <option value="hybrid">H&iacute;brido</option>
-                    </select>
-
-                    <div className="flex items-center gap-2">
-                        <input
-                            type="number"
-                            placeholder="Precio Min"
-                            value={localMinPrice}
-                            onChange={(e) => setLocalMinPrice(e.target.value)}
-                            className="w-28 px-3 py-2.5 rounded-xl bg-[var(--surface-high)] border border-[var(--glass-border)] text-sm text-[var(--foreground)] focus:border-[var(--primary)] focus:outline-none"
-                        />
-                        <span className="text-[var(--foreground-muted)]">-</span>
-                        <input
-                            type="number"
-                            placeholder="Precio Max"
-                            value={localMaxPrice}
-                            onChange={(e) => setLocalMaxPrice(e.target.value)}
-                            className="w-28 px-3 py-2.5 rounded-xl bg-[var(--surface-high)] border border-[var(--glass-border)] text-sm text-[var(--foreground)] focus:border-[var(--primary)] focus:outline-none"
-                        />
-                    </div>
+            {brands.length > 0 && (
+                <div className="fgroup">
+                    <h4>Marca</h4>
+                    <Select
+                        value={currentBrand === 'all' ? '' : currentBrand}
+                        onChange={(e) => handleFilterChange('brand', e.target.value || 'all')}
+                        placeholder="Todas las marcas"
+                        options={brands.map((b) => ({ value: b, label: b }))}
+                    />
                 </div>
             )}
-        </div>
+
+            <div className="fgroup">
+                <h4>Combustible</h4>
+                <div className="fchecks">
+                    {FUELS.map((f) => (
+                        <label className="fcheck" key={f.value}>
+                            <input
+                                type="checkbox"
+                                checked={currentFuel === f.value}
+                                onChange={() => handleFilterChange('fuel', currentFuel === f.value ? 'all' : f.value)}
+                            />
+                            <FuelTag type={f.tag} plain />
+                        </label>
+                    ))}
+                </div>
+            </div>
+
+            <div className="fgroup">
+                <h4>Precio (USD)</h4>
+                <div className="fprice">
+                    <input
+                        inputMode="numeric"
+                        placeholder="Mín"
+                        value={localMinPrice}
+                        onChange={(e) => setLocalMinPrice(e.target.value.replace(/\D/g, ''))}
+                    />
+                    <span>–</span>
+                    <input
+                        inputMode="numeric"
+                        placeholder="Máx"
+                        value={localMaxPrice}
+                        onChange={(e) => setLocalMaxPrice(e.target.value.replace(/\D/g, ''))}
+                    />
+                </div>
+            </div>
+        </aside>
     );
 }

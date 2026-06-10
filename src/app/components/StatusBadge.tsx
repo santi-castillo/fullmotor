@@ -1,4 +1,5 @@
 import { ClassifiedStatus, statusLabels } from '@/types/classified'
+import { Badge } from './ui/Badge'
 
 interface StatusBadgeProps {
   status: ClassifiedStatus
@@ -10,23 +11,23 @@ export default function StatusBadge({ status, expiresAt }: StatusBadgeProps) {
 
   if (isExpired && status === 'active') {
     return (
-      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-700 text-gray-300">
+      <Badge tone="danger" variant="soft" size="sm">
         Vencida
-      </span>
+      </Badge>
     )
   }
 
-  const styles: Record<ClassifiedStatus, string> = {
-    active: 'bg-emerald-600/20 text-emerald-400 border border-emerald-600/40',
-    sold: 'bg-blue-600/20 text-blue-400 border border-blue-600/40',
-    paused: 'bg-yellow-600/20 text-yellow-400 border border-yellow-600/40',
+  const tones: Record<ClassifiedStatus, { tone: 'positive' | 'neutral' | 'warning'; variant: 'soft' | 'solid' }> = {
+    active: { tone: 'positive', variant: 'soft' },
+    sold: { tone: 'neutral', variant: 'solid' },
+    paused: { tone: 'warning', variant: 'soft' },
   }
 
+  const { tone, variant } = tones[status]
+
   return (
-    <span
-      className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${styles[status]}`}
-    >
+    <Badge tone={tone} variant={variant} size="sm">
       {statusLabels[status]}
-    </span>
+    </Badge>
   )
 }

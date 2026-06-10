@@ -1,10 +1,11 @@
 'use client'
 
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { Plus } from 'lucide-react'
 import { Classified } from '@/types/classified'
 import { fetchMyClassifieds } from '@/lib/classifieds-api'
 import { useAuth } from '../../components/AuthProvider'
+import { ButtonLink } from '../../components/ui/Button'
 import RequireAuth from '../../components/RequireAuth'
 import ClassifiedList from '../../components/ClassifiedList'
 
@@ -34,38 +35,45 @@ function MyClassifiedsInner() {
   }, [user])
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-3">
+    <div className="iv pb-16 space-y-6">
+      <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold">
-            Mis <span className="gradient-text">publicaciones</span>
-          </h1>
-          <p className="text-sm text-[var(--foreground-muted)] mt-1">
-            Todas tus publicaciones, incluyendo vencidas, pausadas y vendidas.
+          <h1 className="iv__title">Mis clasificados</h1>
+          <p className="iv__count">
+            Todos tus avisos, incluyendo vencidos, pausados y vendidos
           </p>
         </div>
-        <Link href="/clasificados/nuevo" className="btn btn-primary">
-          ➕ Nueva publicación
-        </Link>
+        <ButtonLink href="/clasificados/nuevo" iconLeft={<Plus size={16} aria-hidden="true" />}>
+          Publicá tu aviso
+        </ButtonLink>
       </div>
 
       {error && (
-        <div className="card p-4 border-red-500/40 bg-red-500/10 text-red-400 text-sm">
+        <div className="p-4 rounded-[var(--radius-md)] bg-danger-soft text-danger-ink text-sm">
           {error}
         </div>
       )}
 
       {loading ? (
-        <div className="card p-12 text-center text-sm text-[var(--foreground-muted)]">
-          Cargando…
+        <div className="iv__grid">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="iv__skel">
+              <div className="m" />
+              <div className="b">
+                <div className="l" />
+                <div className="l l--w60" />
+                <div className="l l--w40" />
+              </div>
+            </div>
+          ))}
         </div>
       ) : (
         <ClassifiedList
           classifieds={classifieds}
           showStatus
-          emptyTitle="No publicaste nada todavía"
-          emptyDescription="Creá tu primera publicación y conectá con compradores."
-          emptyCta={{ label: 'Publicar la primera', href: '/clasificados/nuevo' }}
+          emptyTitle="Todavía no publicaste nada"
+          emptyDescription="Creá tu primer aviso y conectá con compradores."
+          emptyCta={{ label: 'Publicá tu primer aviso', href: '/clasificados/nuevo' }}
         />
       )}
     </div>

@@ -1,19 +1,10 @@
 import { ClassifiedCategory, categoryLabels } from '@/types/classified'
-
-const categoryIcons: Record<ClassifiedCategory, string> = {
-  cars: '🚗',
-  motorcycles: '🏍️',
-  trucks: '🛻',
-  parts: '🔧',
-  accessories: '🛠️',
-  other: '📦',
-}
+import { Badge } from './ui/Badge'
 
 export default function CategoryBadge({ category }: { category: ClassifiedCategory }) {
   return (
-    <span className="category-badge">
-      <span aria-hidden>{categoryIcons[category]}</span>
+    <Badge tone="neutral" variant="outline" size="sm">
       {categoryLabels[category]}
-    </span>
+    </Badge>
   )
 }

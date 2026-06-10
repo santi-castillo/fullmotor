@@ -1,20 +1,15 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
+import { ArrowLeft, Newspaper } from 'lucide-react'
 import { fetchBlogPostBySlug, fetchBlogPosts, getAllBlogPosts } from '@/lib/blog'
+import { formatDate } from '@/lib/format'
 import JsonLd from '@/app/components/JsonLd'
 import CommentsSection from '@/app/components/CommentsSection'
 import BlogCard from '@/app/components/BlogCard'
+import { Badge } from '@/app/components/ui/Badge'
 
 type Params = Promise<{ slug: string }>
-
-function formatDate(dateString: string): string {
-  return new Date(dateString).toLocaleDateString('es-UY', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  })
-}
 
 export async function generateMetadata({ params }: { params: Params }) {
   const { slug } = await params
@@ -99,107 +94,79 @@ export default async function BlogPostPage({ params }: { params: Params }) {
   }
 
   return (
-    <div className="fade-in">
+    <div style={{ paddingBottom: 24 }}>
       <JsonLd data={articleJsonLd} />
       <JsonLd data={breadcrumbJsonLd} />
 
-      {/* Breadcrumb */}
-      <div className="bg-[var(--muted)] py-4">
-        <div className="max-w-4xl mx-auto px-4">
-          <nav className="flex items-center gap-2 text-sm text-[var(--foreground-muted)]">
-            <Link href="/" className="hover:text-[var(--foreground)]">Inicio</Link>
-            <span>/</span>
-            <Link href="/blog" className="hover:text-[var(--foreground)]">Blog</Link>
-            <span>/</span>
-            <span className="text-[var(--foreground)] line-clamp-1">{post.title}</span>
-          </nav>
+      <article className="art">
+        <Link href="/blog" className="art__back">
+          <ArrowLeft size={16} aria-hidden="true" /> Volver al blog
+        </Link>
+
+        <div className="art__meta">
+          {post.tags[0] && <Badge tone="accent">{post.tags[0]}</Badge>}
+          <span className="bl__date">{formatDate(post.publishedAt)}</span>
         </div>
-      </div>
 
-      <article className="max-w-4xl mx-auto px-4 py-8">
-        {/* Hero Image */}
-        {post.coverImage && (
-          <div className="relative aspect-[16/9] rounded-xl overflow-hidden mb-8">
-            <Image
-              src={post.coverImage}
-              alt={post.title}
-              fill
-              className="object-cover"
-              sizes="(max-width: 896px) 100vw, 896px"
-              priority
-            />
-          </div>
-        )}
+        <h1 className="art__title">{post.title}</h1>
 
-        {/* Category */}
-        {post.tags[0] && (
-          <span className="text-[var(--primary)] text-sm font-semibold uppercase tracking-wider">
-            {post.tags[0]}
-          </span>
-        )}
-
-        {/* Title */}
-        <h1 className="text-3xl md:text-4xl font-bold text-[var(--accent)] mt-2 mb-4">
-          {post.title}
-        </h1>
-
-        {/* Author & Date */}
-        <div className="flex items-center gap-3 text-[var(--foreground-muted)] text-sm mb-8">
+        <div className="art__author">
           {post.author.avatarUrl && (
             <Image
               src={post.author.avatarUrl}
               alt={post.author.name}
-              width={40}
-              height={40}
-              className="rounded-full"
+              width={32}
+              height={32}
             />
           )}
-          <span className="font-medium text-[var(--foreground)]">{post.author.name}</span>
-          <span>&middot;</span>
-          <span className="flex items-center gap-1">
-            <span className="material-symbols-outlined text-base">calendar_today</span>
-            {formatDate(post.publishedAt)}
-          </span>
+          <span>{post.author.name}</span>
         </div>
 
-        {/* Content */}
+        <div className="art__hero">
+          {post.coverImage ? (
+            <Image
+              src={post.coverImage}
+              alt={post.title}
+              fill
+              sizes="(max-width: 768px) 100vw, 720px"
+              priority
+              style={{ objectFit: 'cover' }}
+            />
+          ) : (
+            <Newspaper size={44} aria-hidden="true" />
+          )}
+        </div>
+
         <div
           className="blog-content"
           dangerouslySetInnerHTML={{ __html: post.contentHtml }}
         />
 
-        {/* Tags */}
         {post.tags.length > 0 && (
-          <div className="flex flex-wrap gap-2 mt-8 pt-6 border-t border-[var(--border)]">
+          <div className="flex flex-wrap gap-2 mt-8 pt-6 border-t border-hairline">
             {post.tags.map((tag) => (
-              <Link
-                key={tag}
-                href={`/blog?tag=${encodeURIComponent(tag)}`}
-                className="px-4 py-1.5 rounded-full text-sm bg-[var(--surface-mid)] border border-[var(--surface-highest)] text-[var(--primary)] hover:border-[var(--primary)] transition-colors"
-              >
+              <Link key={tag} href={`/blog?tag=${encodeURIComponent(tag)}`} className="tm-chip">
                 #{tag}
               </Link>
             ))}
           </div>
         )}
 
-        {/* Comments */}
         <CommentsSection resourceId={slug} />
-
-        {/* Related Articles */}
-        {relatedPosts.length > 0 && (
-          <section className="mt-12 pt-8 border-t border-[var(--border)]">
-            <h2 className="text-xl font-bold text-[var(--accent)] mb-6">
-              Art&iacute;culos relacionados
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {relatedPosts.map((relatedPost) => (
-                <BlogCard key={relatedPost.id} post={relatedPost} compact />
-              ))}
-            </div>
-          </section>
-        )}
       </article>
+
+      {relatedPosts.length > 0 && (
+        <section className="bl" style={{ paddingTop: 48 }}>
+          <h2 style={{ fontSize: 'var(--text-2xl)', letterSpacing: '-0.02em', margin: '0 0 20px' }}>
+            Artículos relacionados
+          </h2>
+          <div className="bl__grid">
+            {relatedPosts.map((relatedPost) => (
+              <BlogCard key={relatedPost.id} post={relatedPost} />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   )
 }

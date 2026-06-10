@@ -2,11 +2,20 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { BadgeCheck, Search, ArrowRight } from 'lucide-react';
 import { Vehicle } from '@/types/vehicle';
+import { formatNumber, formatPrice } from '@/lib/format';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
-export default function HeroSection() {
+interface HeroSectionProps {
+    total?: number;
+    brandsCount?: number;
+}
+
+export default function HeroSection({ total, brandsCount }: HeroSectionProps) {
+    const router = useRouter();
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<Vehicle[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -70,69 +79,61 @@ export default function HeroSection() {
         setResults([]);
     };
 
+    const goToInventory = () => {
+        router.push(query ? `/?category=all&brand=${encodeURIComponent(query)}` : '/?category=all');
+    };
+
     return (
-        <section className="relative overflow-hidden py-8 md:py-14 px-4">
-            {/* Background glow effects */}
-            <div className="absolute inset-0 bg-gradient-to-br from-[#0b1326] via-[#131b2e] to-[#0b1326]" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(0,220,229,0.08)_0%,transparent_70%)]" />
-            <div className="absolute top-0 right-0 w-96 h-96 bg-[radial-gradient(ellipse_at_center,rgba(0,245,255,0.05)_0%,transparent_70%)]" />
+        <section className="h-hero">
+            <div className="h-hero__in">
+                <span className="h-eyebrow">
+                    <BadgeCheck size={14} aria-hidden="true" />
+                    {total ? `${formatNumber(total)} fichas técnicas en Uruguay` : 'Fichas técnicas en Uruguay'}
+                </span>
+                <h1 className="h-title">Encontrá tu <em>próximo</em> vehículo</h1>
+                <p className="h-sub">Fichas técnicas completas, precios de referencia y comparativas. Sin vueltas, con datos.</p>
 
-            <div className="relative z-10 max-w-7xl mx-auto">
-                <div className="max-w-3xl">
-                    <h1 className="text-3xl md:text-4xl font-black italic uppercase tracking-tighter text-[var(--accent)] mb-2">
-                        Encontr&aacute; tu veh&iacute;culo
-                    </h1>
-                    <p className="text-[var(--foreground-muted)] text-sm md:text-base mb-6">
-                        Fichas t&eacute;cnicas, precios y comparativas en Uruguay
-                    </p>
+                <div className="h-searchbar" ref={searchRef}>
+                    <div className="field">
+                        <Search size={20} aria-hidden="true" />
+                        <input
+                            type="text"
+                            value={query}
+                            onChange={handleInputChange}
+                            onFocus={() => results.length > 0 && setIsOpen(true)}
+                            onKeyDown={(e) => { if (e.key === 'Enter') goToInventory(); }}
+                            placeholder="Buscá por marca o modelo — ej. Taos, Corolla…"
+                        />
+                        {isLoading && (
+                            <span className="tm-btn__spinner" style={{ position: 'absolute', right: 16, color: 'var(--accent)' }} aria-hidden="true" />
+                        )}
 
-                    {/* Search bar with live results */}
-                    <div ref={searchRef} className="relative max-w-xl">
-                        <div className="relative">
-                            <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[var(--foreground-muted)] text-xl">search</span>
-                            <input
-                                type="text"
-                                value={query}
-                                onChange={handleInputChange}
-                                onFocus={() => results.length > 0 && setIsOpen(true)}
-                                placeholder="Marca, modelo o tipo..."
-                                className="w-full pl-12 pr-4 py-4 rounded-xl glass-panel text-[var(--foreground)] placeholder:text-[var(--foreground-muted)] focus:outline-none focus:border-[var(--primary)] transition-colors"
-                            />
-                            {isLoading && (
-                                <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                                    <div className="w-5 h-5 border-2 border-[var(--primary)] border-t-transparent rounded-full animate-spin" />
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Results Dropdown */}
                         {isOpen && results.length > 0 && (
-                            <div className="absolute top-full left-0 right-0 mt-2 bg-[var(--card)] border border-[var(--glass-border)] rounded-xl shadow-2xl max-h-[60vh] overflow-y-auto z-50">
+                            <div className="absolute top-full left-0 right-0 mt-2 bg-surface border border-line rounded-[var(--radius-lg)] shadow-pop max-h-[60vh] overflow-y-auto z-50">
                                 {results.map((vehicle) => (
                                     <Link
                                         key={vehicle.id}
                                         href={`/vehiculo/${vehicle.slug}`}
                                         onClick={handleResultClick}
-                                        className="flex items-center gap-3 px-4 py-3 hover:bg-[var(--surface-high)] transition-colors border-b border-[var(--border)] last:border-b-0"
+                                        className="flex items-center gap-3 px-4 py-3 text-body hover:bg-sunken transition-colors border-b border-hairline last:border-b-0"
                                     >
                                         {vehicle.image ? (
-                                            <img src={vehicle.image} alt="" className="w-10 h-10 rounded-lg object-cover flex-shrink-0" />
+                                            // eslint-disable-next-line @next/next/no-img-element
+                                            <img src={vehicle.image} alt="" className="w-10 h-10 rounded-[var(--radius-sm)] object-cover flex-shrink-0" />
                                         ) : (
-                                            <div className="w-10 h-10 rounded-lg bg-[var(--surface-high)] flex items-center justify-center flex-shrink-0">
-                                                <span className="material-symbols-outlined text-[var(--foreground-muted)] text-lg">directions_car</span>
-                                            </div>
+                                            <div className="w-10 h-10 rounded-[var(--radius-sm)] bg-sunken flex-shrink-0" />
                                         )}
                                         <div className="flex-1 min-w-0">
-                                            <p className="font-semibold text-sm text-[var(--accent)] truncate">
+                                            <p className="font-semibold text-sm text-ink truncate">
                                                 {vehicle.brand} {vehicle.model}
                                             </p>
-                                            <p className="text-xs text-[var(--foreground-muted)]">
+                                            <p className="text-xs text-muted truncate">
                                                 {vehicle.year} {vehicle.version && `· ${vehicle.version}`}
                                             </p>
                                         </div>
-                                        {vehicle.price && (
-                                            <span className="text-sm font-bold text-[var(--primary)]">
-                                                {vehicle.currency} {vehicle.price.toLocaleString()}
+                                        {vehicle.price != null && (
+                                            <span className="tm-price text-sm whitespace-nowrap">
+                                                {formatPrice(vehicle.currency, vehicle.price)}
                                             </span>
                                         )}
                                     </Link>
@@ -140,26 +141,27 @@ export default function HeroSection() {
                             </div>
                         )}
 
-                        {/* No Results */}
                         {isOpen && query && results.length === 0 && !isLoading && (
-                            <div className="absolute top-full left-0 right-0 mt-2 bg-[var(--card)] border border-[var(--glass-border)] rounded-xl shadow-2xl p-4 text-center text-sm text-[var(--foreground-muted)] z-50">
-                                No se encontraron veh&iacute;culos para &ldquo;{query}&rdquo;
+                            <div className="absolute top-full left-0 right-0 mt-2 bg-surface border border-line rounded-[var(--radius-lg)] shadow-pop p-4 text-center text-sm text-muted z-50">
+                                No encontramos vehículos para &ldquo;{query}&rdquo;. Probá con otra búsqueda.
                             </div>
                         )}
                     </div>
+                    <button type="button" className="tm-btn tm-btn--lg" onClick={goToInventory}>
+                        Ver inventario
+                        <ArrowRight size={18} aria-hidden="true" />
+                    </button>
+                </div>
 
-                    {/* CTA */}
-                    <div className="mt-6 flex items-center gap-4">
-                        <Link
-                            href="/?category=all"
-                            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm uppercase tracking-wider text-[#0b1326] hover:shadow-[0_6px_30px_rgba(0,220,229,0.4)] transition-all"
-                            style={{ background: 'linear-gradient(135deg, #00dce5 0%, #00f5ff 100%)' }}
-                        >
-                            <span className="material-symbols-outlined text-lg">inventory_2</span>
-                            Ver Inventario
-                        </Link>
-                        <span className="text-xs text-[var(--foreground-muted)]">o busc&aacute; por nombre arriba</span>
-                    </div>
+                <div className="h-stats">
+                    {total != null && total > 0 && (
+                        <div className="h-stat"><div className="n">{formatNumber(total)}</div><div className="l">vehículos</div></div>
+                    )}
+                    {brandsCount != null && brandsCount > 0 && (
+                        <div className="h-stat"><div className="n">{brandsCount}</div><div className="l">marcas</div></div>
+                    )}
+                    <div className="h-stat"><div className="n">5</div><div className="l">categorías</div></div>
+                    <div className="h-stat"><div className="n">{new Date().getFullYear()}</div><div className="l">modelos al día</div></div>
                 </div>
             </div>
         </section>

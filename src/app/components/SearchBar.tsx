@@ -2,7 +2,11 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import { Search } from 'lucide-react';
 import { Vehicle } from '@/types/vehicle';
+import { CategoryIcon } from './ui/CategoryIcon';
+import { formatPrice } from '@/lib/format';
+import { CATEGORIES } from '@/types/vehicle';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
@@ -57,7 +61,6 @@ export default function SearchBar() {
         const value = e.target.value;
         setQuery(value);
 
-        // Debounce search
         if (debounceRef.current) {
             clearTimeout(debounceRef.current);
         }
@@ -72,65 +75,44 @@ export default function SearchBar() {
         setResults([]);
     };
 
-    const getCategoryIcon = (category: string) => {
-        switch (category) {
-            case 'motos': case 'motorcycles': return '🏍️';
-            case 'pickups': case 'trucks': return '🛻';
-            case 'suvs': return '🚙';
-            case 'utilitarios': return '🚐';
-            default: return '🚗';
-        }
-    };
+    const categoryIcon = (category: string) =>
+        CATEGORIES.find((c) => c.id === category)?.icon || 'car-front';
 
     return (
-        <div ref={searchRef} className="relative w-full max-w-md">
-            {/* Search Input */}
-            <div className="relative">
-                <input
-                    type="text"
-                    value={query}
-                    onChange={handleInputChange}
-                    onFocus={() => results.length > 0 && setIsOpen(true)}
-                    placeholder="Buscar vehículos..."
-                    className="w-full px-4 py-2 pl-10 rounded-lg bg-[var(--glass-bg)] border border-[var(--border)] text-sm focus:border-[var(--primary)] focus:outline-none transition-colors"
-                />
-                <svg
-                    className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--foreground-muted)]"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-                {isLoading && (
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                        <div className="w-4 h-4 border-2 border-[var(--primary)] border-t-transparent rounded-full animate-spin" />
-                    </div>
-                )}
-            </div>
+        <div ref={searchRef} className="k-search">
+            <Search size={17} aria-hidden="true" />
+            <input
+                type="text"
+                value={query}
+                onChange={handleInputChange}
+                onFocus={() => results.length > 0 && setIsOpen(true)}
+                placeholder="Buscar marca o modelo…"
+            />
+            {isLoading && (
+                <span className="tm-btn__spinner" style={{ position: 'absolute', right: 14, color: 'var(--accent)' }} aria-hidden="true" />
+            )}
 
-            {/* Results Dropdown */}
             {isOpen && results.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-[var(--card)] border border-[var(--glass-border)] rounded-xl shadow-2xl max-h-[60vh] overflow-y-auto z-50">
+                <div className="absolute top-full left-0 right-0 mt-2 bg-surface border border-line rounded-[var(--radius-lg)] shadow-pop max-h-[60vh] overflow-y-auto z-50">
                     {results.map((vehicle) => (
                         <Link
                             key={vehicle.id}
                             href={`/vehiculo/${vehicle.slug}`}
                             onClick={handleResultClick}
-                            className="flex items-center gap-3 px-4 py-3 hover:bg-[var(--surface-high)] transition-colors border-b border-[var(--border)] last:border-b-0"
+                            className="flex items-center gap-3 px-4 py-3 text-body hover:bg-sunken transition-colors border-b border-hairline last:border-b-0"
                         >
-                            <span className="text-xl">{getCategoryIcon(vehicle.category)}</span>
+                            <span className="text-muted shrink-0"><CategoryIcon name={categoryIcon(vehicle.category)} size={18} /></span>
                             <div className="flex-1 min-w-0">
-                                <p className="font-medium text-sm truncate">
+                                <p className="font-semibold text-sm text-ink truncate">
                                     {vehicle.brand} {vehicle.model}
                                 </p>
-                                <p className="text-xs text-[var(--foreground-muted)]">
+                                <p className="text-xs text-muted truncate">
                                     {vehicle.year} {vehicle.version && `· ${vehicle.version}`}
                                 </p>
                             </div>
-                            {vehicle.price && (
-                                <span className="text-sm font-bold text-[var(--primary)]">
-                                    {vehicle.currency} {vehicle.price.toLocaleString()}
+                            {vehicle.price != null && (
+                                <span className="tm-price text-sm whitespace-nowrap">
+                                    {formatPrice(vehicle.currency, vehicle.price)}
                                 </span>
                             )}
                         </Link>
@@ -138,10 +120,9 @@ export default function SearchBar() {
                 </div>
             )}
 
-            {/* No Results */}
             {isOpen && query && results.length === 0 && !isLoading && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-[var(--background)] border border-[var(--border)] rounded-lg shadow-xl p-4 text-center text-sm text-[var(--foreground-muted)] z-50">
-                    No se encontraron vehículos para "{query}"
+                <div className="absolute top-full left-0 right-0 mt-2 bg-surface border border-line rounded-[var(--radius-lg)] shadow-pop p-4 text-center text-sm text-muted z-50">
+                    No encontramos vehículos para &ldquo;{query}&rdquo;. Probá con otra búsqueda.
                 </div>
             )}
         </div>

@@ -1,8 +1,11 @@
 'use client'
 
 import { useState } from 'react'
+import { Star, X } from 'lucide-react'
 import { ClassifiedTier, TIER_PRICES } from '@/types/classified'
 import { upgradeClassified } from '@/lib/classifieds-api'
+import { formatPrice } from '@/lib/format'
+import { Button } from './ui/Button'
 
 interface UpgradeDialogProps {
   open: boolean
@@ -39,21 +42,28 @@ export default function UpgradeDialog({ open, onClose, classifiedId }: UpgradeDi
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-[1100] flex items-center justify-center bg-[rgba(8,21,46,0.45)] backdrop-blur-sm p-4"
       onClick={handleClose}
     >
-      <div className="card max-w-lg w-full p-8 relative" onClick={(e) => e.stopPropagation()}>
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Destacá tu aviso"
+        className="bg-surface rounded-[var(--radius-xl)] shadow-pop max-w-lg w-full p-7 relative"
+        onClick={(e) => e.stopPropagation()}
+      >
         <button
           type="button"
           onClick={handleClose}
           aria-label="Cerrar"
-          className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center text-[var(--foreground-muted)] hover:text-[var(--foreground)] hover:bg-[var(--glass-bg)] transition-colors"
+          className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center text-muted hover:text-ink hover:bg-sunken transition-colors cursor-pointer"
         >
-          ✕
+          <X size={16} aria-hidden="true" />
         </button>
-        <h2 className="text-2xl font-bold mb-2 gradient-text">Mejorar publicación</h2>
-        <p className="text-sm text-[var(--foreground-muted)] mb-6">
-          Cada upgrade extiende 30 días y mejora la visibilidad.
+
+        <h2 className="font-display text-2xl font-bold text-ink mb-1">¿Querés destacar tu aviso?</h2>
+        <p className="text-sm text-muted mb-6">
+          Cada mejora extiende la publicación 30 días y le da más visibilidad.
         </p>
 
         <div className="space-y-3 mb-6">
@@ -64,53 +74,47 @@ export default function UpgradeDialog({ open, onClose, classifiedId }: UpgradeDi
                 key={tier}
                 type="button"
                 onClick={() => setSelected(tier)}
-                className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
+                aria-pressed={isSelected}
+                className={`w-full text-left p-4 rounded-[var(--radius-lg)] border transition-colors cursor-pointer ${
                   isSelected
-                    ? 'border-[var(--primary)] bg-[var(--primary)]/10'
-                    : 'border-[var(--border)] hover:border-[var(--primary-light)]'
+                    ? 'border-accent bg-accent-soft'
+                    : 'border-line bg-surface hover:border-line-strong'
                 }`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <div className="font-semibold text-base">
-                      {tier === 'premium' ? '✨ Premium' : '⭐ Destacado'}
+                    <div className="font-display font-bold text-base text-ink flex items-center gap-1.5">
+                      {tier === 'featured' && (
+                        <Star size={14} className="text-accent" aria-hidden="true" />
+                      )}
+                      {tier === 'premium' ? 'Premium' : 'Destacado'}
                     </div>
-                    <p className="text-xs text-[var(--foreground-muted)] mt-1">
+                    <p className="text-xs text-muted mt-1">
                       {tier === 'premium'
                         ? 'Aparece arriba de los avisos gratuitos durante 30 días.'
                         : 'Primero en la lista durante 30 días, máxima visibilidad.'}
                     </p>
                   </div>
-                  <div className="price-tag whitespace-nowrap">
-                    USD {TIER_PRICES[tier].toFixed(2)}
-                  </div>
+                  <span className="tm-price text-lg whitespace-nowrap">
+                    {formatPrice('USD', TIER_PRICES[tier])}
+                  </span>
                 </div>
               </button>
             )
           })}
         </div>
 
-        {error && (
-          <p className="text-sm text-red-400 mb-3">{error}</p>
-        )}
+        {error && <p className="text-sm text-danger-ink mb-3">{error}</p>}
 
         <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={handleUpgrade}
-            disabled={busy}
-            className="btn btn-primary flex-1 disabled:opacity-60"
-          >
-            {busy ? 'Redirigiendo a MercadoPago…' : `Pagar USD ${TIER_PRICES[selected].toFixed(2)}`}
-          </button>
-          <button
-            type="button"
-            onClick={handleClose}
-            disabled={busy}
-            className="px-4 py-2 rounded-lg text-sm text-[var(--foreground-muted)] hover:text-[var(--foreground)] transition-colors"
-          >
+          <Button block loading={busy} onClick={handleUpgrade} className="flex-1">
+            {busy
+              ? 'Redirigiendo a MercadoPago…'
+              : `Pagá ${formatPrice('USD', TIER_PRICES[selected])}`}
+          </Button>
+          <Button variant="ghost" disabled={busy} onClick={handleClose}>
             Cancelar
-          </button>
+          </Button>
         </div>
       </div>
     </div>

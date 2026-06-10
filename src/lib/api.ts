@@ -20,7 +20,7 @@ const vehicleTypeToCategory: Record<string, Category> = {
     'suvs': 'suvs',
     'pickups': 'pickups',
     'motorcycles': 'motos',
-    'utilitarios': 'utilitarios',
+    'commercial': 'utilitarios',
 }
 
 // Maps frontend category to backend vehicleType (for headers and filters)
@@ -29,7 +29,7 @@ const categoryToVehicleType: Partial<Record<Category, string>> = {
     'suvs': 'suvs',
     'pickups': 'pickups',
     'motos': 'motorcycles',
-    'utilitarios': 'utilitarios',
+    'utilitarios': 'commercial',
 }
 
 const fuelTypeToFrontend: Record<string, string> = {

@@ -1,7 +1,9 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { LogIn, Lock, MessageCircle, Reply, Trash2 } from 'lucide-react'
 import { useAuth } from './AuthProvider'
+import { Button } from './ui/Button'
 import {
     Comment,
     fetchComments,
@@ -39,6 +41,7 @@ function timeAgo(dateStr: string): string {
 function Avatar({ user }: { user: Comment['user'] }) {
     if (user.avatarUrl) {
         return (
+            // eslint-disable-next-line @next/next/no-img-element
             <img
                 src={user.avatarUrl}
                 alt={user.name}
@@ -48,7 +51,7 @@ function Avatar({ user }: { user: Comment['user'] }) {
         )
     }
     return (
-        <div className="w-8 h-8 rounded-full bg-[var(--surface-highest)] flex items-center justify-center text-xs font-bold text-[var(--foreground-muted)] flex-shrink-0">
+        <div className="w-8 h-8 rounded-full bg-sunken flex items-center justify-center text-xs font-bold text-muted flex-shrink-0">
             {user.name?.charAt(0)?.toUpperCase() || '?'}
         </div>
     )
@@ -76,9 +79,9 @@ function CommentForm({
         return (
             <button
                 onClick={login}
-                className="w-full py-4 text-sm text-[var(--foreground-muted)] border border-dashed border-[var(--border)] rounded-xl hover:border-[var(--primary)] hover:text-[var(--primary)] transition-colors"
+                className="w-full py-4 text-sm text-muted border border-dashed border-line-strong rounded-[var(--radius-lg)] hover:border-accent hover:text-accent transition-colors cursor-pointer inline-flex items-center justify-center gap-2"
             >
-                <span className="material-symbols-outlined text-base align-middle mr-1">login</span>
+                <LogIn size={15} aria-hidden="true" />
                 Iniciá sesión con Google para comentar
             </button>
         )
@@ -110,34 +113,27 @@ function CommentForm({
                     <textarea
                         value={body}
                         onChange={(e) => setBody(e.target.value.slice(0, MAX_CHARS))}
-                        placeholder={placeholder || 'Escribí tu comentario...'}
+                        placeholder={placeholder || 'Dejá tu comentario…'}
                         rows={2}
-                        className="w-full px-4 py-3 bg-[var(--surface-mid)] border border-[var(--border)] rounded-xl text-sm text-[var(--foreground)] placeholder:text-[var(--foreground-muted)] focus:outline-none focus:border-[var(--primary)] transition-colors resize-none"
+                        className="tm-textarea"
+                        style={{ minHeight: 64 }}
                     />
-                    <div className="flex items-center justify-between mt-1">
-                        <span className={`text-xs ${body.length >= MAX_CHARS ? 'text-red-400' : 'text-[var(--foreground-muted)]'}`}>
+                    <div className="flex items-center justify-between mt-1.5">
+                        <span className={`font-mono text-xs ${body.length >= MAX_CHARS ? 'text-danger' : 'text-faint'}`}>
                             {body.length}/{MAX_CHARS}
                         </span>
                         <div className="flex gap-2">
                             {onCancel && (
-                                <button
-                                    type="button"
-                                    onClick={onCancel}
-                                    className="px-3 py-1.5 text-xs text-[var(--foreground-muted)] hover:text-[var(--foreground)] transition-colors"
-                                >
+                                <Button size="sm" variant="ghost" onClick={onCancel}>
                                     Cancelar
-                                </button>
+                                </Button>
                             )}
-                            <button
-                                type="submit"
-                                disabled={!body.trim() || submitting}
-                                className="px-4 py-1.5 text-xs font-semibold rounded-lg bg-[var(--primary)] text-[#0b1326] disabled:opacity-40 disabled:cursor-not-allowed hover:shadow-[0_0_20px_rgba(0,220,229,0.3)] transition-all"
-                            >
-                                {submitting ? 'Publicando...' : 'Publicar'}
-                            </button>
+                            <Button size="sm" type="submit" disabled={!body.trim()} loading={submitting}>
+                                Publicar
+                            </Button>
                         </div>
                     </div>
-                    {error && <p className="text-xs text-red-400 mt-1">{error}</p>}
+                    {error && <p className="text-xs text-danger mt-1">{error}</p>}
                 </div>
             </div>
         </form>
@@ -182,9 +178,9 @@ function CommentItem({
         return (
             <div className={`${isReply ? 'ml-11' : ''}`}>
                 <div className="flex gap-3 py-3">
-                    <div className="w-8 h-8 rounded-full bg-[var(--surface-mid)] flex-shrink-0" />
+                    <div className="w-8 h-8 rounded-full bg-sunken flex-shrink-0" />
                     <div className="flex-1">
-                        <p className="text-sm text-[var(--foreground-muted)] italic">Comentario eliminado</p>
+                        <p className="text-sm text-muted italic">Comentario eliminado</p>
                     </div>
                 </div>
                 {/* Still show replies of deleted comments */}
@@ -209,17 +205,17 @@ function CommentItem({
                 <Avatar user={comment.user} />
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-sm font-semibold">{comment.user.name || 'Usuario'}</span>
-                        <span className="text-xs text-[var(--foreground-muted)]">{timeAgo(comment.createdAt)}</span>
+                        <span className="text-sm font-semibold text-ink">{comment.user.name || 'Usuario'}</span>
+                        <span className="font-mono text-xs text-faint">{timeAgo(comment.createdAt)}</span>
                     </div>
-                    <p className="text-sm mt-1 text-[var(--foreground)] break-words">{comment.body}</p>
+                    <p className="text-sm mt-1 text-body break-words">{comment.body}</p>
                     <div className="flex items-center gap-3 mt-2">
                         {!isReply && !disabled && (
                             <button
                                 onClick={() => setShowReplyForm(!showReplyForm)}
-                                className="text-xs text-[var(--foreground-muted)] hover:text-[var(--primary)] transition-colors flex items-center gap-1"
+                                className="text-xs text-muted hover:text-accent transition-colors flex items-center gap-1 cursor-pointer"
                             >
-                                <span className="material-symbols-outlined text-sm">reply</span>
+                                <Reply size={13} aria-hidden="true" />
                                 Responder
                             </button>
                         )}
@@ -227,10 +223,10 @@ function CommentItem({
                             <button
                                 onClick={handleDelete}
                                 disabled={deleting}
-                                className="text-xs text-[var(--foreground-muted)] hover:text-red-400 transition-colors flex items-center gap-1"
+                                className="text-xs text-muted hover:text-danger transition-colors flex items-center gap-1 cursor-pointer"
                             >
-                                <span className="material-symbols-outlined text-sm">delete</span>
-                                {deleting ? 'Eliminando...' : 'Eliminar'}
+                                <Trash2 size={13} aria-hidden="true" />
+                                {deleting ? 'Eliminando…' : 'Eliminar'}
                             </button>
                         )}
                     </div>
@@ -242,7 +238,7 @@ function CommentItem({
                     <CommentForm
                         resourceId={resourceId}
                         parentId={comment.id}
-                        placeholder={`Responder a ${comment.user.name || 'Usuario'}...`}
+                        placeholder={`Responder a ${comment.user.name || 'Usuario'}…`}
                         onCancel={() => setShowReplyForm(false)}
                         onSubmit={(reply) => {
                             onReplyAdded(comment.id, reply)
@@ -277,11 +273,13 @@ export default function CommentsSection({
     disabledReason?: string
 }) {
     const [comments, setComments] = useState<Comment[]>([])
-    const [loading, setLoading] = useState(true)
+    const [loadedFor, setLoadedFor] = useState<string | null>(null)
     const [page, setPage] = useState(1)
     const [lastPage, setLastPage] = useState(1)
     const [total, setTotal] = useState(0)
     const [loadingMore, setLoadingMore] = useState(false)
+
+    const loading = loadedFor !== resourceId
 
     const loadComments = useCallback(async (p: number, append = false) => {
         try {
@@ -296,9 +294,21 @@ export default function CommentsSection({
     }, [resourceId])
 
     useEffect(() => {
-        setLoading(true)
-        loadComments(1).finally(() => setLoading(false))
-    }, [loadComments])
+        let cancelled = false
+        fetchComments(resourceId, 1)
+            .then((res) => {
+                if (cancelled) return
+                setComments(res.data)
+                setLastPage(res.meta.lastPage)
+                setTotal(res.meta.total)
+                setPage(1)
+            })
+            .catch((err) => console.error('Failed to load comments:', err))
+            .finally(() => {
+                if (!cancelled) setLoadedFor(resourceId)
+            })
+        return () => { cancelled = true }
+    }, [resourceId])
 
     async function handleLoadMore() {
         setLoadingMore(true)
@@ -347,19 +357,19 @@ export default function CommentsSection({
 
     return (
         <section className="mt-16">
-            <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                <span className="material-symbols-outlined text-[var(--primary)]">forum</span>
+            <h2 className="font-display text-xl font-bold text-ink mb-6 flex items-center gap-2" style={{ letterSpacing: '-0.02em' }}>
+                <MessageCircle size={20} className="text-accent" aria-hidden="true" />
                 Comentarios
                 {total > 0 && (
-                    <span className="text-base font-normal text-[var(--foreground-muted)]">({total})</span>
+                    <span className="font-mono text-base font-normal text-muted">({total})</span>
                 )}
             </h2>
 
             {/* New comment form */}
             <div className="mb-8">
                 {disabled ? (
-                    <div className="px-4 py-4 text-sm text-center text-[var(--foreground-muted)] border border-dashed border-[var(--border)] rounded-xl flex items-center justify-center gap-2">
-                        <span className="material-symbols-outlined text-base">lock</span>
+                    <div className="px-4 py-4 text-sm text-center text-muted border border-dashed border-line-strong rounded-[var(--radius-lg)] flex items-center justify-center gap-2">
+                        <Lock size={15} aria-hidden="true" />
                         {disabledReason || 'Esta publicación no acepta nuevos comentarios.'}
                     </div>
                 ) : (
@@ -372,21 +382,21 @@ export default function CommentsSection({
                 <div className="space-y-4">
                     {[1, 2, 3].map((i) => (
                         <div key={i} className="flex gap-3 animate-pulse">
-                            <div className="w-8 h-8 rounded-full bg-[var(--surface-mid)]" />
+                            <div className="w-8 h-8 rounded-full bg-sunken" />
                             <div className="flex-1 space-y-2">
-                                <div className="h-3 w-24 bg-[var(--surface-mid)] rounded" />
-                                <div className="h-3 w-full bg-[var(--surface-mid)] rounded" />
+                                <div className="h-3 w-24 bg-sunken rounded" />
+                                <div className="h-3 w-full bg-sunken rounded" />
                             </div>
                         </div>
                     ))}
                 </div>
             ) : comments.length === 0 ? (
-                <div className="text-center py-10 text-[var(--foreground-muted)]">
-                    <span className="material-symbols-outlined text-4xl mb-2 block">chat_bubble_outline</span>
+                <div className="text-center py-10 text-muted">
+                    <MessageCircle size={28} className="mx-auto mb-2 block text-faint" aria-hidden="true" />
                     <p className="text-sm">Sé el primero en comentar</p>
                 </div>
             ) : (
-                <div className="divide-y divide-[var(--border)]">
+                <div className="divide-y divide-hairline">
                     {comments.map((comment) => (
                         <CommentItem
                             key={comment.id}
@@ -403,13 +413,9 @@ export default function CommentsSection({
             {/* Load more */}
             {page < lastPage && (
                 <div className="text-center mt-6">
-                    <button
-                        onClick={handleLoadMore}
-                        disabled={loadingMore}
-                        className="px-6 py-2 text-sm font-medium rounded-lg border border-[var(--border)] hover:border-[var(--primary)] hover:text-[var(--primary)] transition-colors"
-                    >
-                        {loadingMore ? 'Cargando...' : 'Cargar más comentarios'}
-                    </button>
+                    <Button variant="secondary" size="sm" onClick={handleLoadMore} loading={loadingMore}>
+                        Cargar más comentarios
+                    </Button>
                 </div>
             )}
         </section>

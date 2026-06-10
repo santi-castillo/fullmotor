@@ -1,6 +1,8 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Button } from './ui/Button';
 
 interface PaginationProps {
     currentPage: number;
@@ -28,29 +30,26 @@ export default function Pagination({ currentPage, totalPages, total, basePath = 
     if (totalPages <= 1) return null;
 
     return (
-        <div className="flex items-center justify-center gap-6 mt-8 py-4">
-            {/* Previous */}
-            <button
+        <div className="flex items-center justify-center gap-5 mt-8 py-4">
+            <Button
+                variant="secondary"
+                iconOnly
+                aria-label="Página anterior"
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="w-11 h-11 rounded-full flex items-center justify-center bg-[var(--surface-high)] border border-[var(--glass-border)] hover:border-[var(--primary)] hover:bg-[var(--primary)] hover:text-[#0b1326] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-            >
-                <span className="material-symbols-outlined text-xl">chevron_left</span>
-            </button>
-
-            {/* Page info */}
-            <span className="text-xs font-black tracking-[0.15em] uppercase text-[var(--foreground-muted)]">
-                P&aacute;gina {currentPage} de {totalPages}
+                iconLeft={<ChevronLeft size={17} aria-hidden="true" />}
+            />
+            <span className="font-mono text-xs uppercase tracking-[0.08em] text-muted">
+                Página {currentPage} de {totalPages}
             </span>
-
-            {/* Next */}
-            <button
+            <Button
+                variant="secondary"
+                iconOnly
+                aria-label="Página siguiente"
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className="w-11 h-11 rounded-full flex items-center justify-center bg-[var(--surface-high)] border border-[var(--glass-border)] hover:border-[var(--primary)] hover:bg-[var(--primary)] hover:text-[#0b1326] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-            >
-                <span className="material-symbols-outlined text-xl">chevron_right</span>
-            </button>
+                iconLeft={<ChevronRight size={17} aria-hidden="true" />}
+            />
         </div>
     );
 }

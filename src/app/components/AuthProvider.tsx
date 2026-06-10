@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import {
     User,
     getStoredToken,
@@ -74,7 +74,8 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
 
         const existing = document.querySelector('script[src="https://accounts.google.com/gsi/client"]')
         if (existing) {
-            if (window.google?.accounts) setGsiReady(true)
+            // Defer so the state update isn't synchronous within the effect body
+            if (window.google?.accounts) queueMicrotask(() => setGsiReady(true))
             return
         }
 
@@ -107,7 +108,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
         window.google.accounts.id.renderButton(node, {
             type: 'standard',
             size: 'large',
-            theme: 'filled_black',
+            theme: 'outline',
             text: 'signin_with',
             shape: 'pill',
             width: 280,
@@ -118,7 +119,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     useEffect(() => {
         const stored = getStoredToken()
         if (!stored) {
-            setLoading(false)
+            queueMicrotask(() => setLoading(false))
             return
         }
 
@@ -150,22 +151,22 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
             {/* Login modal with real Google button */}
             {showLoginModal && (
                 <div
-                    className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+                    className="fixed inset-0 z-[1100] flex items-center justify-center bg-[rgba(8,21,46,0.45)] backdrop-blur-sm"
                     onClick={(e) => {
                         if (e.target === e.currentTarget) setShowLoginModal(false)
                     }}
                 >
-                    <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-8 mx-4 max-w-sm w-full shadow-2xl text-center">
-                        <h3 className="text-lg font-bold mb-2">Iniciar sesión</h3>
-                        <p className="text-sm text-[var(--foreground-muted)] mb-6">
-                            Usá tu cuenta de Google para comentar
+                    <div className="bg-surface border border-line rounded-[var(--radius-xl)] p-8 mx-4 max-w-sm w-full shadow-pop text-center">
+                        <h3 className="font-display text-lg font-bold text-ink mb-2">Iniciá sesión para continuar</h3>
+                        <p className="text-sm text-muted mb-6">
+                            Usá tu cuenta de Google para comentar y publicar
                         </p>
                         <div className="flex justify-center mb-4">
                             <div ref={googleBtnRef} />
                         </div>
                         <button
                             onClick={() => setShowLoginModal(false)}
-                            className="text-xs text-[var(--foreground-muted)] hover:text-[var(--foreground)] transition-colors mt-2"
+                            className="text-xs text-muted hover:text-ink transition-colors mt-2 cursor-pointer"
                         >
                             Cancelar
                         </button>
