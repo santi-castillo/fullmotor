@@ -4,21 +4,35 @@
    mobile rules are a project addition — the prototype is
    desktop-only).
    ============================================================ */
+/* ---- Header: mobile-first (base = phone, desktop layered on via min-width) ---- */
 .k-header { position: sticky; top: 0; z-index: var(--z-sticky); background: color-mix(in srgb, var(--surface) 88%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); }
-.k-header__in { max-width: var(--container-wide); margin: 0 auto; height: 64px; display: flex; align-items: center; gap: 28px; padding: 0 24px; }
-.k-nav { display: flex; align-items: center; gap: 4px; }
+.k-header__in { max-width: var(--container-wide); margin: 0 auto; height: 56px; display: flex; align-items: center; gap: 8px; padding: 0 12px; }
+.k-logo { flex-shrink: 0; min-width: 0; }
+
+/* Inline nav is desktop-only; on phones it lives in the hamburger menu. */
+.k-nav { display: none; align-items: center; gap: 4px; }
 .k-nav a { font-family: var(--font-sans); font-size: var(--text-base); font-weight: 600; color: var(--text-body); padding: 8px 12px; border-radius: var(--radius-md); cursor: pointer; }
 .k-nav a:hover { background: var(--surface-sunken); color: var(--text-strong); }
 .k-nav a.is-active { color: var(--accent); }
-.k-search { flex: 1; max-width: 360px; position: relative; display: flex; align-items: center; }
+
+.k-search { display: none; flex: 1; min-width: 0; max-width: 360px; position: relative; align-items: center; }
 .k-search > svg, .k-search > .k-search__ico { position: absolute; left: 13px; color: var(--text-muted); pointer-events: none; }
 .k-search input { width: 100%; height: 40px; border: 1px solid var(--border-strong); border-radius: var(--radius-pill); background: var(--surface); padding: 0 16px 0 38px; font-family: var(--font-sans); font-size: var(--text-base); color: var(--text-strong); }
 .k-search input::placeholder { color: var(--text-faint); }
 .k-search input:focus { outline: none; border-color: var(--accent); box-shadow: var(--focus-ring); }
-.k-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
-.k-icbtn { height: 40px; min-width: 40px; padding: 0 12px; border-radius: var(--radius-md); border: 1px solid var(--border-strong); background: var(--surface); color: var(--text-body); display: inline-flex; align-items: center; gap: 7px; cursor: pointer; font-family: var(--font-sans); font-size: var(--text-sm); font-weight: 600; text-decoration: none; }
+
+.k-actions { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+.k-icbtn { height: 40px; min-width: 40px; padding: 0 10px; border-radius: var(--radius-md); border: 1px solid var(--border-strong); background: var(--surface); color: var(--text-body); display: inline-flex; align-items: center; justify-content: center; gap: 7px; cursor: pointer; font-family: var(--font-sans); font-size: var(--text-sm); font-weight: 600; text-decoration: none; flex-shrink: 0; }
 .k-icbtn:hover { background: var(--surface-sunken); color: var(--text-strong); }
 .k-icbtn__count { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--accent); }
+.k-icbtn__label { display: none; }
+.k-compare { display: none; }
+
+/* Hamburger + dropdown menu (phone only) */
+.k-mobilenav { position: relative; display: flex; }
+.k-menu { position: absolute; top: calc(100% + 8px); right: 0; min-width: 200px; display: flex; flex-direction: column; padding: 6px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-pop); z-index: var(--z-overlay); }
+.k-menu a { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: var(--radius-md); font-family: var(--font-sans); font-size: var(--text-base); font-weight: 600; color: var(--text-body); text-decoration: none; }
+.k-menu a:hover { background: var(--surface-sunken); color: var(--text-strong); }
 
 .k-footer { background: var(--brand-deep); color: var(--text-on-inverse); margin-top: 64px; }
 .k-footer__in { max-width: var(--container-wide); margin: 0 auto; padding: 48px 24px 36px; display: flex; flex-wrap: wrap; gap: 40px; justify-content: space-between; }
@@ -29,15 +43,31 @@
 .k-footer__bottom { border-top: 1px solid var(--border-inverse); }
 .k-footer__bottom .in { max-width: var(--container-wide); margin: 0 auto; padding: 18px 24px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; font-family: var(--font-mono); font-size: var(--text-xs); color: var(--text-inverse-muted); }
 
-/* ---- Responsive (project addition) ---- */
-@media (max-width: 900px) {
-  .k-header__in { gap: 12px; padding: 0 16px; }
-  .k-search { display: none; }
-  .k-actions .k-icbtn__label { display: none; }
-  .k-icbtn { padding: 0 10px; }
+/* ---- Progressive enhancement for wider screens (project addition) ---- */
+/* Tablet+: bring the inline nav back and retire the hamburger. */
+@media (min-width: 768px) {
+  .k-header__in { height: 64px; gap: 16px; padding: 0 20px; }
+  .k-nav { display: flex; }
+  .k-compare { display: inline-flex; }
+  .k-mobilenav { display: none; }
 }
+/* Desktop: room for the search field. */
+@media (min-width: 900px) {
+  .k-header__in { gap: 24px; }
+  .k-search { display: flex; }
+}
+/* Wide: show the action button labels and full padding. */
+@media (min-width: 1100px) {
+  .k-header__in { gap: 28px; padding: 0 24px; }
+  .k-icbtn { padding: 0 12px; }
+  .k-icbtn__label { display: inline; }
+}
+
 @media (max-width: 640px) {
-  .k-nav { gap: 0; }
-  .k-nav a { padding: 8px 8px; font-size: var(--text-sm); }
   .k-footer__cols { gap: 32px; }
+}
+/* Very narrow phones: drop the "UY" badge so the logo + actions never overflow. */
+@media (max-width: 360px) {
+  .k-header .tm-logo__uy { display: none; }
+  .k-header__in { gap: 6px; }
 }
