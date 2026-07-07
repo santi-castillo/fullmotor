@@ -5,12 +5,13 @@ import { Logo } from './ui/Logo'
 import HeaderSearch from './HeaderSearch'
 import SavedHeaderButton from './SavedHeaderButton'
 import UserMenu from './UserMenu'
+import MobileNav from './MobileNav'
 
 export default function SiteHeader() {
   return (
     <header className="k-header">
       <div className="k-header__in">
-        <Logo size={22} />
+        <Logo size={22} className="k-logo" />
         <nav className="k-nav">
           <Link href="/?category=all">Vehículos</Link>
           <Link href="/clasificados">Clasificados</Link>
@@ -20,12 +21,13 @@ export default function SiteHeader() {
           <HeaderSearch />
         </Suspense>
         <div className="k-actions">
-          <Link href="/compare" className="k-icbtn">
+          <Link href="/compare" className="k-icbtn k-compare">
             <GitCompareArrows size={17} aria-hidden="true" />
             <span className="k-icbtn__label">Comparar</span>
           </Link>
           <SavedHeaderButton />
           <UserMenu />
+          <MobileNav />
         </div>
       </div>
     </header>
