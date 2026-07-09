@@ -7,8 +7,7 @@ import { Vehicle } from '@/types/vehicle';
 import { CategoryIcon } from './ui/CategoryIcon';
 import { formatPrice } from '@/lib/format';
 import { CATEGORIES } from '@/types/vehicle';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+import { searchVehiclesAction } from '@/app/actions/search';
 
 export default function SearchBar() {
     const [query, setQuery] = useState('');
@@ -38,17 +37,9 @@ export default function SearchBar() {
 
         setIsLoading(true);
         try {
-            const response = await fetch(`${API_URL}/api/search?q=${encodeURIComponent(searchQuery)}&type=semantic`, {
-                headers: {
-                    'X-Country': 'uy',
-                    'X-Vehicle-Type': 'all'
-                }
-            });
-            if (response.ok) {
-                const data = await response.json();
-                setResults(data.data || []);
-                setIsOpen(true);
-            }
+            const data = await searchVehiclesAction(searchQuery.trim());
+            setResults(data);
+            setIsOpen(true);
         } catch (error) {
             console.error('Search error:', error);
             setResults([]);
