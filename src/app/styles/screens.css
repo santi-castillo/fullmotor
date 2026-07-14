@@ -166,6 +166,22 @@
 .cm__add { padding: 18px !important; }
 .cm__addbox { border: 1.5px dashed var(--border-strong); border-radius: var(--radius-lg); padding: 22px 16px; text-align: center; display: flex; flex-direction: column; gap: 12px; align-items: center; }
 .cm__addbox p { margin: 0; color: var(--text-muted); font-size: var(--text-sm); }
+/* Compare on small screens: drop the 720px min-width so 1–2 vehicles fit
+   without horizontal scroll, narrow the sticky label column, let header
+   text and labels wrap, and tighten padding. 3–4 vehicles still scroll. */
+@media (max-width: 560px){
+  .cm{ padding: 20px 16px 0; }
+  .cm__title{ font-size: var(--text-3xl); }
+  .cm__sub{ font-size: var(--text-base); margin: 6px 0 18px; }
+  .cm__table{ min-width: 0; }
+  .cm__rowlabel{ width: 92px; padding: 12px 10px !important; font-size: 10px; white-space: normal; line-height: 1.25; }
+  .cm__col{ min-width: 132px; }
+  .cm__head{ padding: 12px !important; }
+  .cm__hmodel{ font-size: var(--text-base); }
+  .cm__cell{ padding: 12px 10px !important; font-size: var(--text-xs); }
+  .cm__cell.price{ font-size: var(--text-sm); }
+  .cm__add{ padding: 12px !important; }
+}
 
 /* ================= Blog (blog.jsx BLOG_CSS) ================= */
 .bl { max-width: var(--container-wide); margin: 0 auto; padding: 36px 24px 0; }
