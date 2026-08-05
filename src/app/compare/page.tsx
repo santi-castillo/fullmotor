@@ -5,6 +5,7 @@ import { X, CarFront } from "lucide-react";
 import { getVehicleBySlug } from "@/lib/data";
 import { Vehicle } from "@/types/vehicle";
 import { formatNumber, fuelToTagType } from "@/lib/format";
+import { hasBattery, showsDisplacement, showsFuelTank, showsGearCount } from "@/lib/vehicle-specs";
 import { FuelTag } from "@/app/components/ui/FuelTag";
 import { ButtonLink } from "@/app/components/ui/Button";
 import CompareAdd from "@/app/components/CompareAdd";
@@ -42,12 +43,15 @@ const ROWS: Row[] = [
     { label: 'Combustible', get: (v) => v.fuelType ? <FuelTag type={fuelToTagType(v.fuelType)} plain /> : '–' },
     { label: 'Potencia', get: (v) => v.engineHp ? `${v.engineHp} HP` : '–', val: (v) => v.engineHp, best: 'max' },
     { label: 'Torque', get: (v) => v.engineTorque ? `${v.engineTorque} Nm` : '–', val: (v) => v.engineTorque, best: 'max' },
-    { label: 'Cilindrada', get: (v) => v.engineCc ? `${formatNumber(v.engineCc)} cc` : '–' },
-    { label: 'Caja', get: (v) => v.transmission ? `${transmissionNames[v.transmission] || v.transmission}${v.gears ? ` · ${v.gears}` : ''}` : '–' },
-    { label: 'Batería', get: (v) => v.batteryKwh ? `${v.batteryKwh} kWh` : '–', val: (v) => v.batteryKwh, best: 'max' },
-    { label: 'Autonomía', get: (v) => v.autonomyKm ? `${formatNumber(v.autonomyKm)} km` : '–', val: (v) => v.autonomyKm, best: 'max' },
+    // "–" here means "not applicable", not "missing data": a battery car has no
+    // displacement and an EV has no fuel tank. This page had no powertrain
+    // logic at all, so it printed "Cilindrada –" on every electric vehicle.
+    { label: 'Cilindrada', get: (v) => showsDisplacement(v.fuelType) && v.engineCc ? `${formatNumber(v.engineCc)} cc` : '–' },
+    { label: 'Caja', get: (v) => v.transmission ? `${transmissionNames[v.transmission] || v.transmission}${showsGearCount(v.fuelType, v.gears) ? ` · ${v.gears}` : ''}` : '–' },
+    { label: 'Batería', get: (v) => hasBattery(v.fuelType) && v.batteryKwh ? `${v.batteryKwh} kWh` : '–', val: (v) => hasBattery(v.fuelType) ? v.batteryKwh : undefined, best: 'max' },
+    { label: 'Autonomía', get: (v) => hasBattery(v.fuelType) && v.autonomyKm ? `${formatNumber(v.autonomyKm)} km` : '–', val: (v) => hasBattery(v.fuelType) ? v.autonomyKm : undefined, best: 'max' },
     { label: 'Baúl / Carga', get: (v) => v.trunkCapacity ? `${formatNumber(v.trunkCapacity)} L` : '–', val: (v) => v.trunkCapacity, best: 'max' },
-    { label: 'Tanque', get: (v) => v.fuelTank ? `${v.fuelTank} L` : '–' },
+    { label: 'Tanque', get: (v) => showsFuelTank(v.fuelType) && v.fuelTank ? `${v.fuelTank} L` : '–' },
     { label: 'Largo', get: (v) => v.length ? `${formatNumber(v.length)} mm` : '–' },
     { label: 'Ancho', get: (v) => v.width ? `${formatNumber(v.width)} mm` : '–' },
     { label: 'Alto', get: (v) => v.height ? `${formatNumber(v.height)} mm` : '–' },

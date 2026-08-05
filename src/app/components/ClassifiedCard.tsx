@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { ImageOff, MapPin } from 'lucide-react'
 import { Classified } from '@/types/classified'
 import { formatNumber } from '@/lib/format'
+import { RawImageWithFallback } from './ui/ImageWithFallback'
 import CategoryBadge from './CategoryBadge'
 import TierBadge from './TierBadge'
 import StatusBadge from './StatusBadge'
@@ -21,12 +22,11 @@ export default function ClassifiedCard({ classified, showStatus = false }: Class
   return (
     <Link href={`/clasificados/${classified.id}`} className="tm-vcard h-full">
       <div className="tm-vcard__media">
-        {cover ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={cover} alt={classified.title} loading="lazy" />
-        ) : (
-          <ImageOff size={34} className="text-faint" aria-hidden="true" />
-        )}
+        <RawImageWithFallback
+          src={cover}
+          alt={classified.title}
+          fallback={<ImageOff size={34} className="text-faint" aria-hidden="true" />}
+        />
         <div className="tm-vcard__topl">
           <TierBadge tier={classified.tier} />
         </div>

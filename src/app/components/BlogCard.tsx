@@ -1,6 +1,6 @@
 import Link from 'next/link'
-import Image from 'next/image'
 import { Newspaper } from 'lucide-react'
+import { ImageWithFallback } from './ui/ImageWithFallback'
 import { BlogPost } from '@/types/blog'
 import { formatDate } from '@/lib/format'
 
@@ -15,9 +15,14 @@ export default function BlogCard({ post, featured }: BlogCardProps) {
     return (
       <Link href={`/blog/${post.slug}`} className="bl__feat">
         <div className="bl__featimg">
-          {post.coverImage
-            ? <Image src={post.coverImage} alt={post.title} fill sizes="(max-width: 900px) 100vw, 55vw" style={{ objectFit: 'cover' }} />
-            : <Newspaper size={52} aria-hidden="true" />}
+          <ImageWithFallback
+            src={post.coverImage}
+            alt={post.title}
+            fill
+            sizes="(max-width: 900px) 100vw, 55vw"
+            style={{ objectFit: 'cover' }}
+            fallback={<Newspaper size={52} aria-hidden="true" />}
+          />
         </div>
         <div className="bl__featb">
           <div className="bl__meta">
@@ -34,9 +39,14 @@ export default function BlogCard({ post, featured }: BlogCardProps) {
   return (
     <Link href={`/blog/${post.slug}`} className="bl__card">
       <div className="bl__cardtop">
-        {post.coverImage
-          ? <Image src={post.coverImage} alt={post.title} fill sizes="(max-width: 900px) 100vw, 33vw" style={{ objectFit: 'cover' }} />
-          : <Newspaper size={30} aria-hidden="true" />}
+        <ImageWithFallback
+          src={post.coverImage}
+          alt={post.title}
+          fill
+          sizes="(max-width: 900px) 100vw, 33vw"
+          style={{ objectFit: 'cover' }}
+          fallback={<Newspaper size={30} aria-hidden="true" />}
+        />
       </div>
       <div className="bl__cardb">
         <div className="bl__meta">

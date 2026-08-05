@@ -116,7 +116,9 @@ export async function getAllIndexableClassifieds(): Promise<Classified[]> {
   try {
     const all: Classified[] = []
     let page = 1
-    const limit = 100
+    // The classifieds endpoint caps page size at 50, not the 100 that vehicles
+    // and blog allow. It used to clamp silently; now it returns 400.
+    const limit = 50
 
     while (true) {
       const { data, meta } = await fetchClassifieds({ page, limit })

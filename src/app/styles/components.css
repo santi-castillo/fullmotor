@@ -205,6 +205,15 @@
 .tm-vcard__price .cur { font-size: var(--text-xs); color: var(--text-muted); margin-right: 3px; }
 .tm-vcard__power { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--text-muted); }
 
+/* ---- Version switcher on the card (F4) ---- */
+.tm-vcard__vers { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--hairline); }
+.tm-vcard__vers-l { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-faint); }
+.tm-vcard__vers-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 7px; }
+.tm-vcard__vers-btn { display: inline-flex; align-items: baseline; gap: 5px; font-family: var(--font-sans); font-size: var(--text-xs); color: var(--text-muted); background: var(--surface-sunken); border: 1px solid var(--border); border-radius: var(--radius-pill); padding: 3px 9px; cursor: pointer; transition: border-color var(--dur), color var(--dur); max-width: 100%; }
+.tm-vcard__vers-btn:hover { border-color: var(--accent); color: var(--accent-ink); }
+.tm-vcard__vers-btn .p { font-family: var(--font-mono); font-size: 10px; color: var(--text-faint); }
+.tm-vcard__vers-btn:hover .p { color: var(--accent); }
+
 /* ---- SpecGrid (catalog/SpecGrid.jsx) ---- */
 .tm-specs { font-family: var(--font-sans); }
 .tm-specs__group + .tm-specs__group { margin-top: var(--space-7); }

@@ -12,6 +12,7 @@ import { FuelTag } from "@/app/components/ui/FuelTag";
 import { ButtonLink } from "@/app/components/ui/Button";
 import { SpecGrid, type SpecGroup } from "@/app/components/ui/SpecGrid";
 import { isRecentlyListed } from "@/lib/vehicle-card";
+import { hasBattery, isElectric, showsDisplacement, showsFuelTank, showsGearCount } from "@/lib/vehicle-specs";
 import { absoluteUrl, SITE_URL } from "@/lib/site";
 
 type Params = Promise<{ slug: string }>
@@ -127,31 +128,35 @@ export default async function VehiclePage({ params }: { params: Params }) {
     ],
   };
 
-  const isEV = fuelToTagType(vehicle.fuelType) === 'electrico';
+  const isEV = isElectric(vehicle.fuelType);
+  // Hybrids have both a battery and an engine, so they get both sets of rows.
+  // They used to get neither battery figure, because the old check was
+  // "electric only".
+  const showsBattery = hasBattery(vehicle.fuelType);
 
   // 4 KPI tiles — pick the most relevant available specs
   const kpis: { k: string; v: string }[] = [];
   if (vehicle.engineHp) kpis.push({ k: 'Potencia', v: `${vehicle.engineHp} HP` });
-  if (isEV && vehicle.batteryKwh) kpis.push({ k: 'Batería', v: `${vehicle.batteryKwh} kWh` });
-  else if (vehicle.engineCc) kpis.push({ k: 'Cilindrada', v: `${formatNumber(vehicle.engineCc)} cc` });
+  if (showsBattery && vehicle.batteryKwh) kpis.push({ k: 'Batería', v: `${vehicle.batteryKwh} kWh` });
+  else if (showsDisplacement(vehicle.fuelType) && vehicle.engineCc) kpis.push({ k: 'Cilindrada', v: `${formatNumber(vehicle.engineCc)} cc` });
   if (vehicle.transmission) kpis.push({ k: 'Caja', v: transmissionNames[vehicle.transmission] || vehicle.transmission });
-  if (isEV && vehicle.autonomyKm) kpis.push({ k: 'Autonomía', v: `${formatNumber(vehicle.autonomyKm)} km` });
+  if (showsBattery && vehicle.autonomyKm) kpis.push({ k: 'Autonomía', v: `${formatNumber(vehicle.autonomyKm)} km` });
   else if (vehicle.fuelType) kpis.push({ k: 'Combustible', v: fuelLabel(vehicle.fuelType) });
 
   // Ficha técnica groups
   const motorItems = [
-    !isEV && vehicle.engineCc ? { label: 'Cilindrada', value: `${formatNumber(vehicle.engineCc)} cc` } : null,
+    showsDisplacement(vehicle.fuelType) && vehicle.engineCc ? { label: 'Cilindrada', value: `${formatNumber(vehicle.engineCc)} cc` } : null,
     vehicle.engineHp ? { label: 'Potencia', value: `${vehicle.engineHp} HP`, highlight: true } : null,
     vehicle.engineTorque ? { label: 'Torque', value: `${vehicle.engineTorque} Nm` } : null,
     vehicle.transmission ? { label: 'Caja', value: transmissionNames[vehicle.transmission] || vehicle.transmission } : null,
-    vehicle.gears ? { label: 'Marchas', value: String(vehicle.gears) } : null,
-    isEV && vehicle.batteryKwh ? { label: 'Batería', value: `${vehicle.batteryKwh} kWh` } : null,
-    isEV && vehicle.autonomyKm ? { label: 'Autonomía', value: `${formatNumber(vehicle.autonomyKm)} km` } : null,
+    showsGearCount(vehicle.fuelType, vehicle.gears) ? { label: 'Marchas', value: String(vehicle.gears) } : null,
+    showsBattery && vehicle.batteryKwh ? { label: 'Batería', value: `${vehicle.batteryKwh} kWh` } : null,
+    showsBattery && vehicle.autonomyKm ? { label: 'Autonomía', value: `${formatNumber(vehicle.autonomyKm)} km` } : null,
   ].filter(Boolean) as SpecGroup['items'];
 
   const capacityItems = [
     vehicle.fuelType ? { label: 'Combustible', value: fuelLabel(vehicle.fuelType) } : null,
-    vehicle.fuelTank ? { label: 'Tanque', value: `${vehicle.fuelTank} L` } : null,
+    showsFuelTank(vehicle.fuelType) && vehicle.fuelTank ? { label: 'Tanque', value: `${vehicle.fuelTank} L` } : null,
     vehicle.trunkCapacity ? { label: vehicle.category === 'pickups' ? 'Capacidad de carga' : 'Baúl', value: `${formatNumber(vehicle.trunkCapacity)} L` } : null,
     vehicle.weight ? { label: 'Peso', value: `${formatNumber(vehicle.weight)} kg` } : null,
   ].filter(Boolean) as SpecGroup['items'];

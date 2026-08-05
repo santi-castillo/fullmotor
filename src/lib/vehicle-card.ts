@@ -17,6 +17,8 @@ export interface VehicleCardProps {
   /** Hide the save (heart) button — e.g. inside non-interactive contexts */
   hideSave?: boolean
   sizes?: string
+  /** Sibling trims of the same model family, for the version switcher. */
+  relatedVersions?: { slug: string; version?: string; price?: number; currency?: string }[]
 }
 
 const RECENT_DAYS = 30
@@ -48,5 +50,6 @@ export function vehicleToCardProps(v: Vehicle): VehicleCardProps {
     fuelType: v.fuelType,
     condition: isRecentlyListed(v.publishedAt, v.createdAt) ? 'Nuevo' : undefined,
     image: v.image || v.images?.[0],
+    relatedVersions: v.relatedVersions,
   }
 }
