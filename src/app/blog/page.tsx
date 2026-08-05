@@ -1,26 +1,58 @@
 import { Suspense } from 'react'
 import { Metadata } from 'next'
 import { fetchBlogPosts, fetchBlogTags } from '@/lib/blog'
+import { absoluteUrl, SITE_LOGO, SITE_NAME, SITE_URL } from '@/lib/site'
 import BlogTagFilter from '@/app/components/BlogTagFilter'
 import InfiniteBlogList from '@/app/components/InfiniteBlogList'
 import JsonLd from '@/app/components/JsonLd'
 
-export const metadata: Metadata = {
-  title: 'Blog del Motor',
-  description: 'Las últimas tendencias, lanzamientos y noticias del mundo automotor en Uruguay.',
-  openGraph: {
-    title: 'Blog del Motor | TodoMotor Uruguay',
-    description: 'Las últimas tendencias, lanzamientos y noticias del mundo automotor en Uruguay.',
-    type: 'website',
-    url: 'https://todomotor.uy/blog',
-  },
-  alternates: {
-    canonical: 'https://todomotor.uy/blog',
-  },
-}
+const BLOG_TITLE = 'Noticias del Motor'
+const BLOG_DESCRIPTION =
+  'Las últimas tendencias, lanzamientos y noticias del mundo automotor en Uruguay.'
 
 interface PageProps {
   searchParams: Promise<{ tag?: string }>
+}
+
+export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
+  const { tag } = await searchParams
+
+  if (tag) {
+    const title = `Noticias sobre ${tag}`
+    const description = `Artículos y novedades sobre ${tag} en el mercado automotor uruguayo.`
+    return {
+      title,
+      description,
+      // Tag views are a query-string filter over the same list, not a real
+      // section — index the articles, not the thin filtered listings.
+      robots: { index: false, follow: true },
+      openGraph: {
+        title: `${title} | ${SITE_NAME}`,
+        description,
+        type: 'website',
+        url: absoluteUrl(`/blog?tag=${encodeURIComponent(tag)}`),
+      },
+      twitter: { card: 'summary_large_image', title, description },
+      alternates: { canonical: `/blog?tag=${encodeURIComponent(tag)}` },
+    }
+  }
+
+  return {
+    title: BLOG_TITLE,
+    description: BLOG_DESCRIPTION,
+    openGraph: {
+      title: `${BLOG_TITLE} | ${SITE_NAME}`,
+      description: BLOG_DESCRIPTION,
+      type: 'website',
+      url: absoluteUrl('/blog'),
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${BLOG_TITLE} | ${SITE_NAME}`,
+      description: BLOG_DESCRIPTION,
+    },
+    alternates: { canonical: '/blog' },
+  }
 }
 
 export default async function BlogPage({ searchParams }: PageProps) {
@@ -35,19 +67,41 @@ export default async function BlogPage({ searchParams }: PageProps) {
   const blogJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Blog',
-    name: 'Blog del Motor - TodoMotor Uruguay',
-    url: 'https://todomotor.uy/blog',
-    description: 'Las últimas tendencias, lanzamientos y noticias del mundo automotor en Uruguay.',
+    name: `${BLOG_TITLE} - ${SITE_NAME}`,
+    url: absoluteUrl('/blog'),
+    description: BLOG_DESCRIPTION,
+    inLanguage: 'es-UY',
+    publisher: {
+      '@type': 'Organization',
+      name: SITE_NAME,
+      url: SITE_URL,
+      logo: { '@type': 'ImageObject', url: SITE_LOGO },
+    },
+  }
+
+  const itemListJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    itemListElement: posts.map((post, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      url: absoluteUrl(`/blog/${post.slug}`),
+      name: post.title,
+    })),
   }
 
   return (
     <div className="bl" style={{ paddingBottom: 24 }}>
       <JsonLd data={blogJsonLd} />
+      {posts.length > 0 && <JsonLd data={itemListJsonLd} />}
 
       <div className="bl__head">
         <span className="bl__kicker">Blog del Motor</span>
-        <h1 className="bl__title">Contexto para comprar mejor</h1>
-        <p className="bl__sub">Impuestos, normativa y guías del mercado automotor uruguayo.</p>
+        <h1 className="bl__title">Noticias y novedades del motor en Uruguay</h1>
+        <p className="bl__sub">
+          Contexto para comprar mejor: lanzamientos, impuestos, normativa y guías del mercado
+          automotor uruguayo.
+        </p>
       </div>
 
       <div style={{ marginBottom: 24 }}>

@@ -1,4 +1,5 @@
 import type { MetadataRoute } from 'next'
+import { absoluteUrl, SITE_URL } from '@/lib/site'
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -6,9 +7,20 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/admin', '/api'],
+        // Private or user-specific surfaces. They also send noindex, but
+        // keeping them out of the crawl saves budget for vehicles and articles.
+        disallow: [
+          '/admin',
+          '/api',
+          '/guardados',
+          '/compare',
+          '/clasificados/nuevo',
+          '/clasificados/mis',
+          '/clasificados/*/editar',
+        ],
       },
     ],
-    sitemap: 'https://todomotor.uy/sitemap.xml',
+    sitemap: absoluteUrl('/sitemap.xml'),
+    host: SITE_URL,
   }
 }

@@ -19,7 +19,9 @@ export async function getAllVehicles(): Promise<Vehicle[]> {
 
     return allVehicles
   } catch (error) {
-    console.warn("getAllVehicles failed:", error)
+    // Swallowing this keeps the build green but silently empties the sitemap
+    // and skips every prerendered vehicle — log loudly so it shows up in CI.
+    console.error("[data] getAllVehicles failed — sitemap and prerendered vehicles will be empty:", error)
     return []
   }
 }

@@ -75,7 +75,7 @@ export async function getLatestBlogPosts(limit: number = 3): Promise<BlogPost[]>
     const { posts } = await fetchBlogPosts({ page: 1, limit })
     return posts
   } catch (error) {
-    console.warn('getLatestBlogPosts failed:', error)
+    console.error('[blog] getLatestBlogPosts failed:', error)
     return []
   }
 }
@@ -95,7 +95,9 @@ export async function getAllBlogPosts(): Promise<BlogPost[]> {
 
     return allPosts
   } catch (error) {
-    console.warn('getAllBlogPosts failed:', error)
+    // Swallowing this keeps the build green but silently empties the sitemap
+    // and skips every prerendered article — log loudly so it shows up in CI.
+    console.error('[blog] getAllBlogPosts failed — sitemap and prerendered articles will be empty:', error)
     return []
   }
 }

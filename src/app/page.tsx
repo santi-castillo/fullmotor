@@ -1,9 +1,11 @@
 import { Suspense } from "react";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { fetchVehicles, fetchFilters } from "@/lib/api";
 import { getLatestVehicles, getCountByCategory } from "@/lib/data";
-import { Category } from "@/types/vehicle";
+import { Category, CATEGORIES } from "@/types/vehicle";
+import { absoluteUrl, SITE_LOGO, SITE_NAME, SITE_URL } from "@/lib/site";
 import { formatNumber } from "@/lib/format";
 import HeroSection from "./components/HeroSection";
 import CategoryGrid from "./components/CategoryGrid";
@@ -27,12 +29,68 @@ interface PageProps {
   }>;
 }
 
-const CATEGORY_NAMES: Record<string, string> = {
-  autos: 'Autos',
-  suvs: 'SUVs',
-  pickups: 'Camionetas',
-  motos: 'Motos',
-  utilitarios: 'Utilitarios',
+const CATEGORY_NAMES: Record<string, string> = Object.fromEntries(
+  CATEGORIES.map(c => [c.id, c.name])
+);
+
+/**
+ * `/` doubles as the inventory listing. Without per-category metadata every
+ * `/?category=x` URL in the sitemap inherits the root layout's canonical of
+ * `/`, so Google collapses all five into the home page and drops them.
+ */
+export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
+  const params = await searchParams;
+  const { category } = params;
+
+  // No category selected — the root layout's metadata is already correct.
+  if (!category) return {};
+
+  if (category !== 'all' && !CATEGORY_NAMES[category]) {
+    return { robots: { index: false, follow: true }, alternates: { canonical: '/' } };
+  }
+
+  const categoryName = category === 'all' ? null : CATEGORY_NAMES[category];
+  const title = categoryName
+    ? `${categoryName} en Uruguay — Fichas técnicas y precios`
+    : 'Todos los vehículos en Uruguay — Fichas técnicas y precios';
+  const description = categoryName
+    ? `Fichas técnicas de ${categoryName.toLowerCase()} disponibles en Uruguay: especificaciones, precios y equipamiento actualizados.`
+    : 'Fichas técnicas de autos, SUVs, camionetas, motos y utilitarios disponibles en Uruguay: especificaciones, precios y equipamiento.';
+
+  const canonical = `/?category=${category}`;
+
+  // Brand/fuel/price/page combinations explode into near-duplicate pages.
+  // Point them at the clean category URL and keep them out of the index.
+  const isFacetedView = Boolean(
+    params.brand || params.fuel || params.min_price || params.max_price || (params.page && params.page !== '1')
+  );
+
+  return {
+    title,
+    description,
+    ...(isFacetedView && { robots: { index: false, follow: true } }),
+    openGraph: {
+      title,
+      description,
+      type: 'website',
+      url: absoluteUrl(canonical),
+    },
+    twitter: { card: 'summary_large_image', title, description },
+    alternates: { canonical },
+  };
+}
+
+const organizationJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: SITE_NAME,
+  url: SITE_URL,
+  logo: { '@type': 'ImageObject', url: SITE_LOGO },
+  contactPoint: {
+    '@type': 'ContactPoint',
+    email: 'contacto@todomotor.uy',
+    contactType: 'customer service',
+  },
 };
 
 export default async function Home({ searchParams }: PageProps) {
@@ -70,25 +128,13 @@ export default async function Home({ searchParams }: PageProps) {
     const websiteJsonLd = {
       '@context': 'https://schema.org',
       '@type': 'WebSite',
-      name: 'TodoMotor Uruguay',
-      url: 'https://todomotor.uy',
+      name: SITE_NAME,
+      url: SITE_URL,
+      inLanguage: 'es-UY',
       potentialAction: {
         '@type': 'SearchAction',
-        target: { '@type': 'EntryPoint', urlTemplate: 'https://todomotor.uy/?category=all&brand={search_term_string}' },
+        target: { '@type': 'EntryPoint', urlTemplate: absoluteUrl('/?category=all&brand={search_term_string}') },
         'query-input': 'required name=search_term_string',
-      },
-    };
-
-    const organizationJsonLd = {
-      '@context': 'https://schema.org',
-      '@type': 'Organization',
-      name: 'TodoMotor Uruguay',
-      url: 'https://todomotor.uy',
-      logo: 'https://todomotor.uy/brand/todomotor-mark.svg',
-      contactPoint: {
-        '@type': 'ContactPoint',
-        email: 'contacto@todomotor.uy',
-        contactType: 'customer service',
       },
     };
 
@@ -98,8 +144,8 @@ export default async function Home({ searchParams }: PageProps) {
         <JsonLd data={organizationJsonLd} />
         <HeroSection total={meta.total} brandsCount={brands.length} />
         <CategoryGrid categories={categoryCounts} totalCount={meta.total} />
-        <PremiumListings vehicles={latestVehicles} />
         <BlogPreviewSection posts={latestBlogPosts} />
+        <PremiumListings vehicles={latestVehicles} />
       </div>
     );
   }
@@ -111,8 +157,25 @@ export default async function Home({ searchParams }: PageProps) {
 
   const categoryCounts = await getCountByCategory();
 
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Inicio', item: SITE_URL },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: categoryName || 'Todos los vehículos',
+        item: absoluteUrl(`/?category=${params.category}`),
+      },
+    ],
+  };
+
   return (
     <div className="iv" style={{ paddingBottom: 24 }}>
+      <JsonLd data={organizationJsonLd} />
+      <JsonLd data={breadcrumbJsonLd} />
+
       <div className="iv__crumb">
         <Link href="/">Inicio</Link>
         <ChevronRight size={13} aria-hidden="true" />

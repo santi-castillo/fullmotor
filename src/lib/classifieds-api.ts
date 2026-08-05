@@ -107,6 +107,32 @@ export async function fetchClassifieds(
   return response.json()
 }
 
+/**
+ * Every listing that is safe to expose to crawlers: active, not expired.
+ * Pages through the API the same way getAllBlogPosts/getAllVehicles do.
+ * Used by the sitemap — never call this from a request path.
+ */
+export async function getAllIndexableClassifieds(): Promise<Classified[]> {
+  try {
+    const all: Classified[] = []
+    let page = 1
+    const limit = 100
+
+    while (true) {
+      const { data, meta } = await fetchClassifieds({ page, limit })
+      all.push(...data)
+      if (page >= meta.lastPage) break
+      page++
+    }
+
+    const now = Date.now()
+    return all.filter(c => c.status === 'active' && new Date(c.expiresAt).getTime() > now)
+  } catch (error) {
+    console.error('[classifieds] getAllIndexableClassifieds failed — sitemap will omit classifieds:', error)
+    return []
+  }
+}
+
 export async function fetchClassifiedById(id: string): Promise<Classified | null> {
   const response = await fetch(`${API_URL}/api/classifieds/${id}`, {
     headers: publicHeaders(),

@@ -1,7 +1,10 @@
 import { Suspense } from 'react'
+import type { Metadata } from 'next'
 import { Plus } from 'lucide-react'
 import { fetchClassifieds } from '@/lib/classifieds-api'
-import { ClassifiedCategory } from '@/types/classified'
+import { ClassifiedCategory, CLASSIFIED_CATEGORIES } from '@/types/classified'
+import { absoluteUrl } from '@/lib/site'
+import JsonLd from '../components/JsonLd'
 import { ButtonLink } from '../components/ui/Button'
 import ClassifiedFilters from '../components/ClassifiedFilters'
 import ClassifiedList from '../components/ClassifiedList'
@@ -17,6 +20,43 @@ interface PageProps {
     city?: string
     login?: string
   }>
+}
+
+const BASE_TITLE = 'Clasificados de vehículos, repuestos y accesorios'
+const BASE_DESCRIPTION =
+  'Avisos entre usuarios en Uruguay: autos, motos, camionetas, repuestos y accesorios. Publicá tu aviso gratis.'
+
+export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
+  const { category, city, page } = await searchParams
+  const hasFilters = Boolean(category || city || (page && page !== '1'))
+
+  if (hasFilters) {
+    const categoryLabel = CLASSIFIED_CATEGORIES.find(c => c.id === category)?.label
+    const parts = [categoryLabel, city].filter(Boolean).join(' en ')
+    const title = parts ? `Clasificados de ${parts}` : BASE_TITLE
+
+    return {
+      title,
+      description: BASE_DESCRIPTION,
+      // Filtered and paginated views are query-string facets over one list —
+      // let crawlers follow through to the listings without indexing the facets.
+      robots: { index: false, follow: true },
+      alternates: { canonical: '/clasificados' },
+    }
+  }
+
+  return {
+    title: BASE_TITLE,
+    description: BASE_DESCRIPTION,
+    openGraph: {
+      title: BASE_TITLE,
+      description: BASE_DESCRIPTION,
+      type: 'website',
+      url: absoluteUrl('/clasificados'),
+    },
+    twitter: { card: 'summary_large_image', title: BASE_TITLE, description: BASE_DESCRIPTION },
+    alternates: { canonical: '/clasificados' },
+  }
 }
 
 export default async function ClassifiedsPage({ searchParams }: PageProps) {
@@ -38,8 +78,21 @@ export default async function ClassifiedsPage({ searchParams }: PageProps) {
     data = { data: [], meta: { total: 0, page: 1, lastPage: 1 } }
   }
 
+  const itemListJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    itemListElement: data.data.map((classified, i) => ({
+      '@type': 'ListItem',
+      position: (data.meta.page - 1) * limit + i + 1,
+      url: absoluteUrl(`/clasificados/${classified.id}`),
+      name: classified.title,
+    })),
+  }
+
   return (
     <div className="iv pb-16">
+      {data.data.length > 0 && <JsonLd data={itemListJsonLd} />}
+
       <Suspense fallback={null}>
         <LoginAutoOpener />
       </Suspense>

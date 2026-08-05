@@ -15,8 +15,8 @@ export default function BlogPreviewSection({ posts }: BlogPreviewSectionProps) {
     <section className="h-sect">
       <div className="h-sect__head">
         <div>
-          <h2>Blog del Motor</h2>
-          <p>Contexto, impuestos y guías para comprar mejor</p>
+          <h2>Noticias del Motor</h2>
+          <p>Lanzamientos, precios e impuestos del mercado uruguayo</p>
         </div>
         <Link href="/blog" className="h-link">
           Ver todos <ArrowRight size={16} aria-hidden="true" />

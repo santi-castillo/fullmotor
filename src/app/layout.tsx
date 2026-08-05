@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { SITE_NAME, SITE_URL } from "@/lib/site";
 import { spaceGrotesk, hankenGrotesk, jetbrainsMono } from "./fonts";
 import AuthProvider from "./components/AuthProvider";
 import SavedProvider from "./components/SavedProvider";
@@ -7,7 +8,7 @@ import SiteHeader from "./components/SiteHeader";
 import SiteFooter from "./components/SiteFooter";
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://todomotor.uy'),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "TodoMotor Uruguay | Fichas Técnicas de Vehículos",
     template: "%s | TodoMotor Uruguay",
@@ -18,9 +19,9 @@ export const metadata: Metadata = {
     title: "TodoMotor Uruguay",
     description: "Fichas técnicas de vehículos en Uruguay",
     type: "website",
-    siteName: "TodoMotor Uruguay",
+    siteName: SITE_NAME,
     locale: "es_UY",
-    url: "https://todomotor.uy",
+    url: SITE_URL,
   },
   twitter: {
     card: "summary_large_image",
@@ -33,7 +34,12 @@ export const metadata: Metadata = {
     'max-image-preview': 'large' as const,
   },
   alternates: {
-    canonical: "https://todomotor.uy",
+    canonical: "/",
+    types: {
+      'application/rss+xml': [
+        { url: '/blog/rss.xml', title: 'Noticias del Motor — TodoMotor Uruguay' },
+      ],
+    },
   },
 };
 

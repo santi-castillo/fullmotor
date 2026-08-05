@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { ArrowLeft, Newspaper } from 'lucide-react'
 import { fetchBlogPostBySlug, fetchBlogPosts, getAllBlogPosts } from '@/lib/blog'
+import { absoluteUrl, SITE_LOGO, SITE_NAME, SITE_URL } from '@/lib/site'
 import { formatDate } from '@/lib/format'
 import JsonLd from '@/app/components/JsonLd'
 import CommentsSection from '@/app/components/CommentsSection'
@@ -23,7 +24,7 @@ export async function generateMetadata({ params }: { params: Params }) {
       title: post.title,
       description: post.excerpt,
       type: 'article',
-      url: `https://todomotor.uy/blog/${slug}`,
+      url: absoluteUrl(`/blog/${slug}`),
       images: post.coverImage ? [{ url: post.coverImage }] : [],
       publishedTime: post.publishedAt,
       modifiedTime: post.updatedAt,
@@ -36,7 +37,7 @@ export async function generateMetadata({ params }: { params: Params }) {
       images: post.coverImage ? [post.coverImage] : [],
     },
     alternates: {
-      canonical: `https://todomotor.uy/blog/${slug}`,
+      canonical: `/blog/${slug}`,
     },
   }
 }
@@ -68,27 +69,31 @@ export default async function BlogPostPage({ params }: { params: Params }) {
     '@type': 'Article',
     headline: post.title,
     description: post.excerpt,
-    image: post.coverImage,
+    // Omit the key entirely when there is no cover — an empty string is a
+    // validation error in Google's Article rich result.
+    ...(post.coverImage && { image: [post.coverImage] }),
     author: {
       '@type': 'Person',
       name: post.author.name,
     },
     datePublished: post.publishedAt,
     dateModified: post.updatedAt,
+    inLanguage: 'es-UY',
     publisher: {
       '@type': 'Organization',
-      name: 'TodoMotor Uruguay',
-      url: 'https://todomotor.uy',
+      name: SITE_NAME,
+      url: SITE_URL,
+      logo: { '@type': 'ImageObject', url: SITE_LOGO },
     },
-    mainEntityOfPage: `https://todomotor.uy/blog/${slug}`,
+    mainEntityOfPage: absoluteUrl(`/blog/${slug}`),
   }
 
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Inicio', item: 'https://todomotor.uy' },
-      { '@type': 'ListItem', position: 2, name: 'Blog', item: 'https://todomotor.uy/blog' },
+      { '@type': 'ListItem', position: 1, name: 'Inicio', item: SITE_URL },
+      { '@type': 'ListItem', position: 2, name: 'Noticias', item: absoluteUrl('/blog') },
       { '@type': 'ListItem', position: 3, name: post.title },
     ],
   }

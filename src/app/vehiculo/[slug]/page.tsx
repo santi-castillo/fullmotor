@@ -12,6 +12,7 @@ import { FuelTag } from "@/app/components/ui/FuelTag";
 import { ButtonLink } from "@/app/components/ui/Button";
 import { SpecGrid, type SpecGroup } from "@/app/components/ui/SpecGrid";
 import { isRecentlyListed } from "@/lib/vehicle-card";
+import { absoluteUrl, SITE_URL } from "@/lib/site";
 
 type Params = Promise<{ slug: string }>
 
@@ -31,7 +32,7 @@ export async function generateMetadata({ params }: { params: Params }) {
       title: `${title}${priceText}`,
       description,
       type: 'website',
-      url: `https://todomotor.uy/vehiculo/${slug}`,
+      url: absoluteUrl(`/vehiculo/${slug}`),
       images: vehicle.images?.length > 0
         ? vehicle.images.map((img) => ({ url: img }))
         : vehicle.image ? [{ url: vehicle.image }] : [],
@@ -43,7 +44,7 @@ export async function generateMetadata({ params }: { params: Params }) {
       images: vehicle.image ? [vehicle.image] : [],
     },
     alternates: {
-      canonical: `https://todomotor.uy/vehiculo/${slug}`,
+      canonical: `/vehiculo/${slug}`,
     },
   };
 }
@@ -103,7 +104,7 @@ export default async function VehiclePage({ params }: { params: Params }) {
     vehicleModelDate: String(vehicle.year),
     image: allImages,
     description: vehicle.description || `Ficha técnica del ${vehicle.brand} ${vehicle.model} ${vehicle.year}`,
-    url: `https://todomotor.uy/vehiculo/${vehicle.slug}`,
+    url: absoluteUrl(`/vehiculo/${vehicle.slug}`),
     ...(vehicle.fuelType && { fuelType: vehicle.fuelType }),
     ...(vehicle.transmission && { vehicleTransmission: vehicle.transmission }),
     ...(vehicle.engineCc && { vehicleEngine: { '@type': 'EngineSpecification', engineDisplacement: { '@type': 'QuantitativeValue', value: vehicle.engineCc, unitCode: 'CMQ' } } }),
@@ -112,7 +113,7 @@ export default async function VehiclePage({ params }: { params: Params }) {
       price: vehicle.price,
       priceCurrency: vehicle.currency === 'US$' ? 'USD' : 'UYU',
       availability: 'https://schema.org/InStock',
-      url: `https://todomotor.uy/vehiculo/${vehicle.slug}`,
+      url: absoluteUrl(`/vehiculo/${vehicle.slug}`),
     } : undefined,
   };
 
@@ -120,8 +121,8 @@ export default async function VehiclePage({ params }: { params: Params }) {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Inicio', item: 'https://todomotor.uy' },
-      { '@type': 'ListItem', position: 2, name: categoryNames[vehicle.category], item: `https://todomotor.uy/?category=${vehicle.category}` },
+      { '@type': 'ListItem', position: 1, name: 'Inicio', item: SITE_URL },
+      { '@type': 'ListItem', position: 2, name: categoryNames[vehicle.category], item: absoluteUrl(`/?category=${vehicle.category}`) },
       { '@type': 'ListItem', position: 3, name: `${vehicle.brand} ${vehicle.model}` },
     ],
   };
