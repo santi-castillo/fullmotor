@@ -39,6 +39,8 @@ export interface Vehicle {
   image?: string
   images: string[]
   description?: string
+  /** Editorial publish date. Falls back to createdAt when absent. */
+  publishedAt?: string
   createdAt?: string
   updatedAt?: string
 }

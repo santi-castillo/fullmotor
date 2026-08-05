@@ -80,6 +80,7 @@ interface ApiVehicle {
     images?: string[]
     description?: string
     relatedVersions?: { slug: string; version: string; price: number; currency: string }[]
+    publishedAt?: string
     createdAt?: string
     updatedAt?: string
 }
@@ -124,6 +125,7 @@ interface CarouselItem {
     year: number
     vehicleType: string
     countryCode: string
+    publishedAt?: string
     createdAt?: string
     engineHp?: number
     fuelType?: string
@@ -174,6 +176,7 @@ function transformVehicle(apiVehicle: ApiVehicle): Vehicle {
         image: apiVehicle.images?.[0],
         images: apiVehicle.images || [],
         description: apiVehicle.description,
+        publishedAt: apiVehicle.publishedAt,
         createdAt: apiVehicle.createdAt,
         updatedAt: apiVehicle.updatedAt,
     }
@@ -244,7 +247,11 @@ export async function fetchVehicleBySlug(slug: string, vehicleType?: string): Pr
         throw new Error(`Failed to fetch vehicle: ${response.statusText}`)
     }
 
-    const apiVehicle: ApiVehicle = await response.json()
+    // The detail endpoint now returns { data }, like every other endpoint.
+    // The `?? body` fallback keeps this working against an API that has not
+    // been deployed yet, so the two repos can ship independently.
+    const body = await response.json()
+    const apiVehicle: ApiVehicle = body?.data ?? body
     return transformVehicle(apiVehicle)
 }
 
@@ -290,6 +297,7 @@ export async function fetchCarouselItems(category?: Category): Promise<Vehicle[]
             images: [item.imageUrl],
             safetyFeatures: [],
             equipment: [],
+            publishedAt: item.publishedAt,
             createdAt: item.createdAt,
             engineHp: item.engineHp,
             fuelType: item.fuelType ? fuelTypeToFrontend[item.fuelType] || item.fuelType : undefined,

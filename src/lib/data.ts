@@ -93,13 +93,3 @@ export async function searchVehiclesLocal(query: string, category?: Category): P
     return []
   }
 }
-
-export async function getVehiclesBrands(): Promise<string[]> {
-  try {
-    const { vehicles } = await fetchVehicles({ limit: 1000 })
-    return [...new Set(vehicles.map(v => v.brand))].sort()
-  } catch (error) {
-    console.warn("getVehiclesBrands failed:", error)
-    return []
-  }
-}

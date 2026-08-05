@@ -202,7 +202,7 @@ export default async function VehiclePage({ params }: { params: Params }) {
             <ImageCarousel
               images={allImages}
               altPrefix={`${vehicle.brand} ${vehicle.model} ${vehicle.year}`}
-              badge={isRecentlyListed(vehicle.createdAt) ? `Nuevo · ${vehicle.year}` : undefined}
+              badge={isRecentlyListed(vehicle.publishedAt, vehicle.createdAt) ? `Nuevo · ${vehicle.year}` : undefined}
             />
             {vehicle.description && (
               <p className="dt__desc" style={{ marginTop: 24 }}>
