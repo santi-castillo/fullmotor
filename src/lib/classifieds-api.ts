@@ -36,6 +36,16 @@ function publicHeaders(): HeadersInit {
   }
 }
 
+/**
+ * Public endpoints that reveal a little more to the owner. Sends the token when
+ * there is one and stays anonymous otherwise, so the same call works from a
+ * server component (where there is no localStorage) and from the browser.
+ */
+function optionalAuthHeaders(): HeadersInit {
+  const t = getStoredToken()
+  return t ? { 'X-Country': COUNTRY, Authorization: `Bearer ${t}` } : { 'X-Country': COUNTRY }
+}
+
 function authHeaders(token?: string | null): HeadersInit {
   const t = token ?? getStoredToken()
   if (!t) {
@@ -151,7 +161,10 @@ export async function getAllIndexableClassifieds(): Promise<Classified[]> {
 
 export async function fetchClassifiedById(id: string): Promise<Classified | null> {
   const response = await fetch(`${API_URL}/api/classifieds/${id}`, {
-    headers: publicHeaders(),
+    // Authenticated so the owner reads back their own contactInfo even when it
+    // is hidden from the public. The edit form prefills from here; without the
+    // token it would prefill blank and overwrite the number on save.
+    headers: optionalAuthHeaders(),
     cache: 'no-store',
   })
   if (response.status === 404 || response.status === 400) return null

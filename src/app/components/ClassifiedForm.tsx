@@ -157,8 +157,14 @@ export default function ClassifiedForm({ mode, initial }: ClassifiedFormProps) {
           price: priceNum,
           currency: currency.toUpperCase(),
           city: trimmedCity,
-          contactInfo: contactInfo.trim(),
           showContactInfo,
+        }
+        // Only send the contact when it actually changed. Sending it
+        // unconditionally meant that any listing whose contactInfo failed to
+        // load prefilled blank and then overwrote the seller's real number with
+        // an empty string on the next save of any unrelated field.
+        if (contactInfo.trim() !== (initial.contactInfo ?? '')) {
+          payload.contactInfo = contactInfo.trim()
         }
         setProgress('Guardando cambios…')
         await updateClassified(initial.id, payload)
