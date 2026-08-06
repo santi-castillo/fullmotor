@@ -239,6 +239,20 @@ export async function updateClassified(
   return response.json()
 }
 
+/**
+ * Extends an expiring or expired listing by another 30 days, and brings it back
+ * to active unless it was marked sold. The API only accepts this within a week
+ * of expiry — see RENEW_WINDOW_MS.
+ */
+export async function renewClassified(id: string): Promise<Classified> {
+  const response = await fetch(`${API_URL}/api/classifieds/${id}/renew`, {
+    method: 'POST',
+    headers: jsonHeaders(),
+  })
+  if (!response.ok) await handleApiError(response)
+  return response.json()
+}
+
 export async function deleteClassified(id: string): Promise<void> {
   const response = await fetch(`${API_URL}/api/classifieds/${id}`, {
     method: 'DELETE',

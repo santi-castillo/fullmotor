@@ -93,6 +93,20 @@ export const statusLabels: Record<ClassifiedStatus, string> = {
   paused: 'Pausada',
 }
 
+/**
+ * How close to expiry a listing has to be before it can be renewed. Mirrors the
+ * window the API enforces; kept in sync by hand.
+ */
+export const RENEW_WINDOW_MS = 7 * 24 * 60 * 60 * 1000
+
+export function isExpired(classified: Pick<Classified, 'expiresAt'>, now = Date.now()): boolean {
+  return new Date(classified.expiresAt).getTime() < now
+}
+
+export function isRenewable(classified: Pick<Classified, 'expiresAt'>, now = Date.now()): boolean {
+  return new Date(classified.expiresAt).getTime() - now <= RENEW_WINDOW_MS
+}
+
 export const MAX_CLASSIFIED_IMAGES = 5
 export const MAX_IMAGE_SIZE_BYTES = 10 * 1024 * 1024
 export const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']

@@ -1,7 +1,7 @@
 import Link from 'next/link'
-import { ImageOff, MapPin } from 'lucide-react'
-import { Classified } from '@/types/classified'
-import { formatNumber } from '@/lib/format'
+import { CalendarClock, ImageOff, MapPin } from 'lucide-react'
+import { Classified, isExpired } from '@/types/classified'
+import { formatDate, formatNumber } from '@/lib/format'
 import { RawImageWithFallback } from './ui/ImageWithFallback'
 import CategoryBadge from './CategoryBadge'
 import StatusBadge from './StatusBadge'
@@ -40,6 +40,16 @@ export default function ClassifiedCard({ classified, showStatus = false }: Class
           <MapPin size={13} aria-hidden="true" />
           {classified.city}
         </span>
+        {/* Only on the seller's own dashboard: expiry is the one thing they
+            cannot see anywhere else, and it is what silently removes a listing
+            from the marketplace. */}
+        {showStatus && (
+          <span className="flex items-center gap-1.5 text-xs text-muted mt-1">
+            <CalendarClock size={12} aria-hidden="true" />
+            {isExpired(classified) ? 'Venció el ' : 'Vence el '}
+            <span className="font-mono">{formatDate(classified.expiresAt)}</span>
+          </span>
+        )}
         <div className="tm-vcard__foot">
           <span className="tm-vcard__price">
             <span className="cur">{cur}</span>

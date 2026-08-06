@@ -2,9 +2,10 @@
 
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { CheckCircle, Pause, Pencil, Play, Trash2 } from 'lucide-react'
-import { Classified, ClassifiedStatus } from '@/types/classified'
-import { deleteClassified, updateClassified } from '@/lib/classifieds-api'
+import { CheckCircle, Pause, Pencil, Play, RefreshCw, Trash2 } from 'lucide-react'
+import { Classified, ClassifiedStatus, isExpired, isRenewable } from '@/types/classified'
+import { formatDate } from '@/lib/format'
+import { deleteClassified, renewClassified, updateClassified } from '@/lib/classifieds-api'
 import { translateApiError } from '@/lib/api-error'
 import { useAuth } from './AuthProvider'
 import { Button, ButtonLink } from './ui/Button'
@@ -18,12 +19,32 @@ export default function OwnerActions({ classified }: OwnerActionsProps) {
   const router = useRouter()
   const { user } = useAuth()
   const [status, setStatus] = useState<ClassifiedStatus>(classified.status)
+  const [expiresAt, setExpiresAt] = useState(classified.expiresAt)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   // Only render for the owner
   if (!user || user.id !== classified.userId) {
     return null
+  }
+
+  const current = { expiresAt }
+  const expired = isExpired(current)
+  const renewable = isRenewable(current)
+
+  const handleRenew = async () => {
+    setBusy(true)
+    setError(null)
+    try {
+      const updated = await renewClassified(classified.id)
+      setExpiresAt(updated.expiresAt)
+      setStatus(updated.status)
+      router.refresh()
+    } catch (err) {
+      setError(translateApiError(err, 'Error al renovar'))
+    } finally {
+      setBusy(false)
+    }
   }
 
   const handleStatusChange = async (next: ClassifiedStatus) => {
@@ -60,8 +81,14 @@ export default function OwnerActions({ classified }: OwnerActionsProps) {
     <div className="bg-surface border border-line rounded-[var(--radius-lg)] p-5 space-y-4">
       <div className="flex items-center justify-between gap-3">
         <h3 className="tm-eyebrow">Tus acciones</h3>
-        <StatusBadge status={status} expiresAt={classified.expiresAt} />
+        <StatusBadge status={status} expiresAt={expiresAt} />
       </div>
+
+      <p className="text-xs text-muted">
+        {expired ? 'Venció el ' : 'Vence el '}
+        <span className="font-mono text-ink">{formatDate(expiresAt)}</span>
+        {expired && '. Renovala para que vuelva a aparecer en el listado.'}
+      </p>
 
       <div className="flex flex-wrap gap-2">
         <ButtonLink
@@ -73,7 +100,25 @@ export default function OwnerActions({ classified }: OwnerActionsProps) {
           Editar
         </ButtonLink>
 
-        {status === 'active' && (
+        {/*
+          An expired listing is filtered out of the marketplace by expires_at, so
+          "Reactivá" alone would look like it did nothing — it only writes
+          status. While the listing is expired, renewing is the action that
+          actually brings it back, and it reactivates at the same time.
+        */}
+        {renewable && (
+          <Button
+            variant={expired ? 'primary' : 'secondary'}
+            size="sm"
+            disabled={busy}
+            iconLeft={<RefreshCw size={14} aria-hidden="true" />}
+            onClick={handleRenew}
+          >
+            {expired ? 'Volvé a publicarla' : 'Renovala 30 días'}
+          </Button>
+        )}
+
+        {!expired && status === 'active' && (
           <Button
             variant="secondary"
             size="sm"
@@ -84,7 +129,7 @@ export default function OwnerActions({ classified }: OwnerActionsProps) {
             Pausá
           </Button>
         )}
-        {status !== 'active' && (
+        {!expired && status !== 'active' && (
           <Button
             variant="secondary"
             size="sm"
