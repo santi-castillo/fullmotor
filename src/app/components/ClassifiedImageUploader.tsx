@@ -8,6 +8,7 @@ import {
   MAX_IMAGE_SIZE_BYTES,
 } from '@/types/classified'
 import { deleteClassifiedImage, uploadClassifiedImages } from '@/lib/classifieds-api'
+import { translateApiError } from '@/lib/api-error'
 
 interface ClassifiedImageUploaderProps {
   classifiedId: string
@@ -89,7 +90,7 @@ export default function ClassifiedImageUploader({
           setPending((prev) => prev.filter((p) => p !== item))
           URL.revokeObjectURL(item.preview)
         } catch (err) {
-          const message = err instanceof Error ? err.message : 'Error al subir'
+          const message = translateApiError(err, 'Error al subir')
           setPending((prev) =>
             prev.map((p) => (p === item ? { ...p, status: 'error', error: message } : p))
           )
@@ -107,7 +108,7 @@ export default function ClassifiedImageUploader({
       await deleteClassifiedImage(classifiedId, url)
       updateImages(images.filter((u) => u !== url))
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Error al eliminar'
+      const message = translateApiError(err, 'Error al eliminar')
       setError(message)
     }
   }

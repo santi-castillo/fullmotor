@@ -9,6 +9,7 @@ import {
   UpgradeResponse,
 } from '@/types/classified'
 import { getStoredToken } from './auth'
+import { ApiError } from './api-error'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.todomotor.uy'
 const COUNTRY = process.env.NEXT_PUBLIC_COUNTRY || 'uy'
@@ -26,7 +27,9 @@ async function handleApiError(response: Response): Promise<never> {
   } catch {
     // ignore
   }
-  throw new Error(`API Error (${response.status}): ${detail}`)
+  // The backend's own wording is kept for logs; use translateApiError from
+  // '@/lib/api-error' before putting anything from here on screen.
+  throw new ApiError(detail, response.status)
 }
 
 function publicHeaders(): HeadersInit {
@@ -38,7 +41,7 @@ function publicHeaders(): HeadersInit {
 function authHeaders(token?: string | null): HeadersInit {
   const t = token ?? getStoredToken()
   if (!t) {
-    throw new Error('Authentication required')
+    throw new ApiError('Authentication required', 401)
   }
   return {
     'X-Country': COUNTRY,

@@ -9,6 +9,7 @@ import { useAuth } from '../../../components/AuthProvider'
 import { ButtonLink } from '../../../components/ui/Button'
 import RequireAuth from '../../../components/RequireAuth'
 import ClassifiedForm from '../../../components/ClassifiedForm'
+import { translateApiError } from '@/lib/api-error'
 
 function EditInner() {
   const params = useParams<{ id: string }>()
@@ -35,7 +36,7 @@ function EditInner() {
         }
         setClassified(c)
       } catch (err) {
-        if (!cancelled) setError(err instanceof Error ? err.message : 'Error al cargar')
+        if (!cancelled) setError(translateApiError(err, 'Error al cargar'))
       } finally {
         if (!cancelled) setLoading(false)
       }

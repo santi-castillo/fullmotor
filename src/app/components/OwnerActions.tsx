@@ -9,6 +9,7 @@ import { useAuth } from './AuthProvider'
 import { Button, ButtonLink } from './ui/Button'
 import UpgradeDialog from './UpgradeDialog'
 import StatusBadge from './StatusBadge'
+import { translateApiError } from '@/lib/api-error'
 
 interface OwnerActionsProps {
   classified: Classified
@@ -36,7 +37,7 @@ export default function OwnerActions({ classified }: OwnerActionsProps) {
       setStatus(updated.status)
       router.refresh()
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Error al actualizar estado'
+      const message = translateApiError(err, 'Error al actualizar estado')
       setError(message)
     } finally {
       setBusy(false)
@@ -51,7 +52,7 @@ export default function OwnerActions({ classified }: OwnerActionsProps) {
       await deleteClassified(classified.id)
       router.push('/clasificados/mis')
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Error al eliminar'
+      const message = translateApiError(err, 'Error al eliminar')
       setError(message)
       setBusy(false)
     }

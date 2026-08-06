@@ -22,6 +22,7 @@ import { Button } from './ui/Button'
 import { Input, Textarea } from './ui/Input'
 import { Select } from './ui/Select'
 import ClassifiedImageUploader from './ClassifiedImageUploader'
+import { translateApiError } from '@/lib/api-error'
 
 const COUNTRY = process.env.NEXT_PUBLIC_COUNTRY || 'uy'
 
@@ -138,7 +139,7 @@ export default function ClassifiedForm({ mode, initial }: ClassifiedFormProps) {
             try {
               await uploadClassifiedImages(created.id, [pendingFiles[i]])
             } catch (err) {
-              const m = err instanceof Error ? err.message : 'Error al subir imagen'
+              const m = translateApiError(err, 'Error al subir imagen')
               setError(`Publicación creada, pero falló una imagen: ${m}. Podés reintentar desde Editar.`)
               router.push(`/clasificados/${created.id}/editar`)
               return
@@ -163,7 +164,7 @@ export default function ClassifiedForm({ mode, initial }: ClassifiedFormProps) {
         router.push(`/clasificados/${initial.id}`)
       }
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Error al guardar'
+      const message = translateApiError(err, 'Error al guardar')
       setError(message)
     } finally {
       setSubmitting(false)

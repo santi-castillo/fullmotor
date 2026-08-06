@@ -8,6 +8,7 @@ import { useAuth } from '../../components/AuthProvider'
 import { ButtonLink } from '../../components/ui/Button'
 import RequireAuth from '../../components/RequireAuth'
 import ClassifiedList from '../../components/ClassifiedList'
+import { translateApiError } from '@/lib/api-error'
 
 function MyClassifiedsInner() {
   const { user } = useAuth()
@@ -23,7 +24,7 @@ function MyClassifiedsInner() {
         const res = await fetchMyClassifieds({ limit: 50 })
         if (!cancelled) setClassifieds(res.data)
       } catch (err) {
-        if (!cancelled) setError(err instanceof Error ? err.message : 'Error al cargar')
+        if (!cancelled) setError(translateApiError(err, 'Error al cargar'))
       } finally {
         if (!cancelled) setLoading(false)
       }

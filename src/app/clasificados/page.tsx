@@ -10,6 +10,7 @@ import ClassifiedFilters from '../components/ClassifiedFilters'
 import ClassifiedList from '../components/ClassifiedList'
 import Pagination from '../components/Pagination'
 import LoginAutoOpener from '../components/LoginAutoOpener'
+import { translateApiError } from '@/lib/api-error'
 
 export const dynamic = 'force-dynamic'
 
@@ -74,7 +75,7 @@ export default async function ClassifiedsPage({ searchParams }: PageProps) {
       city: params.city || undefined,
     })
   } catch (err) {
-    errorMessage = err instanceof Error ? err.message : 'Error al cargar clasificados'
+    errorMessage = translateApiError(err, 'Error al cargar clasificados')
     data = { data: [], meta: { total: 0, page: 1, lastPage: 1 } }
   }
 
