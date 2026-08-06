@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react'
 import {
     User,
     getStoredToken,
@@ -53,6 +53,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     const [loading, setLoading] = useState(true)
     const [gsiReady, setGsiReady] = useState(false)
     const [showLoginModal, setShowLoginModal] = useState(false)
+    const googleBtnRef = useRef<HTMLDivElement | null>(null)
 
     // Handle Google credential response
     const handleCredentialResponse = useCallback(async (response: { credential: string }) => {
@@ -74,8 +75,16 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
 
         const existing = document.querySelector('script[src="https://accounts.google.com/gsi/client"]')
         if (existing) {
-            // Defer so the state update isn't synchronous within the effect body
-            if (window.google?.accounts) queueMicrotask(() => setGsiReady(true))
+            if (window.google?.accounts) {
+                // Defer so the state update isn't synchronous within the effect body
+                queueMicrotask(() => setGsiReady(true))
+            } else {
+                // Tag is in the DOM but still in flight — wait for it rather than
+                // giving up, which would leave the modal permanently buttonless.
+                const onLoad = () => setGsiReady(true)
+                existing.addEventListener('load', onLoad)
+                return () => existing.removeEventListener('load', onLoad)
+            }
             return
         }
 
@@ -87,9 +96,27 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
         document.head.appendChild(script)
     }, [])
 
-    // Initialize GSI once script is loaded
+    /**
+     * Initialize GSI and render the button in one effect, in that order.
+     *
+     * The button used to be mounted via a callback ref, which React attaches
+     * during the commit phase — i.e. *before* the separate effect that called
+     * initialize(). Whenever the modal was already mounted at the moment the
+     * GSI script finished loading (the deep-linked `?login=1` path that
+     * RequireAuth sends everyone to), renderButton fired first, Google logged
+     * "Failed to render button before calling initialize()" and drew nothing.
+     * The modal showed only a Cancel button and logging in was impossible.
+     *
+     * Doing both here makes the ordering structural instead of a side effect of
+     * how the effects happen to be declared, and covers either arrival order —
+     * script first, or modal first. Re-initializing on each open is cheap and
+     * supported; nothing else in the app depends on initialize() having run
+     * (One Tap is off: auto_select is false and prompt() is never called).
+     */
     useEffect(() => {
-        if (!gsiReady || !window.google || !GOOGLE_CLIENT_ID) return
+        if (!gsiReady || !showLoginModal || !window.google || !GOOGLE_CLIENT_ID) return
+        const node = googleBtnRef.current
+        if (!node) return
 
         window.google.accounts.id.initialize({
             client_id: GOOGLE_CLIENT_ID,
@@ -97,12 +124,8 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
             ux_mode: 'popup',
             auto_select: false,
             cancel_on_tap_outside: true,
+            locale: 'es',
         })
-    }, [gsiReady, handleCredentialResponse])
-
-    // Callback ref: render Google button as soon as the DOM node mounts
-    const googleBtnRef = useCallback((node: HTMLDivElement | null) => {
-        if (!node || !gsiReady || !window.google) return
 
         node.innerHTML = ''
         window.google.accounts.id.renderButton(node, {
@@ -112,8 +135,26 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
             text: 'signin_with',
             shape: 'pill',
             width: 280,
+            locale: 'es',
         })
-    }, [gsiReady])
+    }, [gsiReady, showLoginModal, handleCredentialResponse])
+
+    // Escape closes the modal, and focus moves into it on open so keyboard
+    // users are not stranded behind the backdrop.
+    useEffect(() => {
+        if (!showLoginModal) return
+
+        const previouslyFocused = document.activeElement as HTMLElement | null
+        const onKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') setShowLoginModal(false)
+        }
+        document.addEventListener('keydown', onKeyDown)
+
+        return () => {
+            document.removeEventListener('keydown', onKeyDown)
+            previouslyFocused?.focus?.()
+        }
+    }, [showLoginModal])
 
     // On mount: validate stored token
     useEffect(() => {
@@ -156,8 +197,17 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
                         if (e.target === e.currentTarget) setShowLoginModal(false)
                     }}
                 >
-                    <div className="bg-surface border border-line rounded-[var(--radius-xl)] p-8 mx-4 max-w-sm w-full shadow-pop text-center">
-                        <h3 className="font-display text-lg font-bold text-ink mb-2">Iniciá sesión para continuar</h3>
+                    <div
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="login-modal-title"
+                        tabIndex={-1}
+                        ref={(node) => node?.focus()}
+                        className="bg-surface border border-line rounded-[var(--radius-xl)] p-8 mx-4 max-w-sm w-full shadow-pop text-center outline-none"
+                    >
+                        <h3 id="login-modal-title" className="font-display text-lg font-bold text-ink mb-2">
+                            Iniciá sesión para continuar
+                        </h3>
                         <p className="text-sm text-muted mb-6">
                             Usá tu cuenta de Google para comentar y publicar
                         </p>
