@@ -102,8 +102,8 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
      * The button used to be mounted via a callback ref, which React attaches
      * during the commit phase — i.e. *before* the separate effect that called
      * initialize(). Whenever the modal was already mounted at the moment the
-     * GSI script finished loading (the deep-linked `?login=1` path that
-     * RequireAuth sends everyone to), renderButton fired first, Google logged
+     * GSI script finished loading — that is, whenever the modal is opened
+     * programmatically on mount — renderButton fired first, Google logged
      * "Failed to render button before calling initialize()" and drew nothing.
      * The modal showed only a Cancel button and logging in was impossible.
      *
