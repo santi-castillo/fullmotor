@@ -247,10 +247,17 @@ export async function deleteClassified(id: string): Promise<void> {
   if (!response.ok) await handleApiError(response)
 }
 
+export interface UploadImagesResult {
+  uploaded: string[]
+  totalImages: number
+  /** One entry per file that failed while others succeeded. Empty on full success. */
+  errors: string[]
+}
+
 export async function uploadClassifiedImages(
   id: string,
   files: File[]
-): Promise<{ images: string[]; totalImages: number }> {
+): Promise<UploadImagesResult> {
   const formData = new FormData()
   for (const file of files) {
     formData.append('images', file)
@@ -262,7 +269,25 @@ export async function uploadClassifiedImages(
     body: formData,
   })
   if (!response.ok) await handleApiError(response)
-  return response.json()
+
+  const body = await response.json()
+
+  // 207 Multi-Status means some files landed and others did not, and it counts
+  // as ok, so a partial failure used to pass for success. It also nests the
+  // payload under `data`, unlike the 201.
+  if (response.status === 207) {
+    return {
+      uploaded: body?.data?.uploaded ?? [],
+      totalImages: body?.data?.totalImages ?? 0,
+      errors: body?.errors ?? [],
+    }
+  }
+
+  return {
+    uploaded: body?.uploaded ?? [],
+    totalImages: body?.totalImages ?? 0,
+    errors: [],
+  }
 }
 
 export async function deleteClassifiedImage(id: string, url: string): Promise<void> {

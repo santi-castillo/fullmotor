@@ -1,8 +1,8 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useRef, useState } from 'react'
-import { AlertCircle, ImagePlus } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { AlertCircle, ImagePlus, Star, X } from 'lucide-react'
 import {
   CLASSIFIED_CATEGORIES,
   Classified,
@@ -46,6 +46,10 @@ export default function ClassifiedForm({ mode, initial }: ClassifiedFormProps) {
   const [showContactInfo, setShowContactInfo] = useState(initial?.showContactInfo ?? true)
   const [pendingFiles, setPendingFiles] = useState<File[]>([])
   const [pendingPreviews, setPendingPreviews] = useState<string[]>([])
+  // Mirrors pendingPreviews so the unmount cleanup can revoke whatever is
+  // current without re-registering the effect on every change.
+  const pendingPreviewsRef = useRef<string[]>([])
+  pendingPreviewsRef.current = pendingPreviews
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [progress, setProgress] = useState<string | null>(null)
@@ -77,9 +81,38 @@ export default function ClassifiedForm({ mode, initial }: ClassifiedFormProps) {
       return
     }
     setError(null)
+    setPendingPreviews((old) => {
+      old.forEach(URL.revokeObjectURL)
+      return files.map((f) => URL.createObjectURL(f))
+    })
     setPendingFiles(files)
-    setPendingPreviews(files.map((f) => URL.createObjectURL(f)))
   }
+
+  /** Reorders both arrays together; index 0 is the cover. */
+  const reorderPending = (from: number, to: number) => {
+    const move = <T,>(arr: T[]) => {
+      const next = [...arr]
+      next.splice(to, 0, ...next.splice(from, 1))
+      return next
+    }
+    setPendingFiles(move)
+    setPendingPreviews(move)
+  }
+
+  const removePending = (index: number) => {
+    setPendingPreviews((old) => {
+      URL.revokeObjectURL(old[index])
+      return old.filter((_, i) => i !== index)
+    })
+    setPendingFiles((old) => old.filter((_, i) => i !== index))
+  }
+
+  // Object URLs stay allocated until revoked, so drop any survivors on unmount.
+  useEffect(() => {
+    return () => {
+      pendingPreviewsRef.current.forEach(URL.revokeObjectURL)
+    }
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -134,16 +167,25 @@ export default function ClassifiedForm({ mode, initial }: ClassifiedFormProps) {
         const created = await createClassified(payload)
 
         if (pendingFiles.length > 0) {
-          for (let i = 0; i < pendingFiles.length; i++) {
-            setProgress(`Subiendo imagen ${i + 1} de ${pendingFiles.length}…`)
-            try {
-              await uploadClassifiedImages(created.id, [pendingFiles[i]])
-            } catch (err) {
-              const m = translateApiError(err, 'Error al subir imagen')
-              setError(`Publicación creada, pero falló una imagen: ${m}. Podés reintentar desde Editar.`)
+          const n = pendingFiles.length
+          setProgress(n === 1 ? 'Subiendo la foto…' : `Subiendo ${n} fotos…`)
+          try {
+            // One request for the whole set. This used to be a loop of one
+            // request per photo, which was slow and could leave a listing
+            // half-published if a later file failed.
+            const result = await uploadClassifiedImages(created.id, pendingFiles)
+            if (result.errors.length > 0) {
+              setError(
+                `Publicamos tu aviso, pero ${result.errors.length} de ${n} fotos no se pudieron subir. Reintentá desde acá.`
+              )
               router.push(`/clasificados/${created.id}/editar`)
               return
             }
+          } catch (err) {
+            const m = translateApiError(err, 'no pudimos subir las fotos')
+            setError(`Publicamos tu aviso, pero ${m}. Reintentá desde acá.`)
+            router.push(`/clasificados/${created.id}/editar`)
+            return
           }
         }
         setProgress('Abriendo tu publicación…')
@@ -282,7 +324,9 @@ export default function ClassifiedForm({ mode, initial }: ClassifiedFormProps) {
             >
               <ImagePlus size={24} aria-hidden="true" />
               <span className="text-sm">
-                Subí hasta {MAX_CLASSIFIED_IMAGES} fotos (JPG, PNG o WebP)
+                {pendingPreviews.length > 0
+                  ? `${pendingPreviews.length} de ${MAX_CLASSIFIED_IMAGES} fotos — tocá para elegir otras`
+                  : `Subí hasta ${MAX_CLASSIFIED_IMAGES} fotos (JPG, PNG o WebP)`}
               </span>
             </button>
             <input
@@ -294,17 +338,43 @@ export default function ClassifiedForm({ mode, initial }: ClassifiedFormProps) {
               className="hidden"
             />
             <p className="text-xs text-muted">
-              Las fotos se suben al crear la publicación.
+              Las fotos se suben al crear la publicación. La primera es la portada.
             </p>
             {pendingPreviews.length > 0 && (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
                 {pendingPreviews.map((src, i) => (
                   <div
-                    key={i}
-                    className="relative aspect-square rounded-[var(--radius-md)] overflow-hidden border border-line bg-sunken"
+                    key={src}
+                    className="relative aspect-square rounded-[var(--radius-md)] overflow-hidden border border-line bg-sunken group"
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={src} alt="" className="w-full h-full object-cover" />
+
+                    {i === 0 ? (
+                      <span className="absolute bottom-1 left-1 px-1.5 py-0.5 rounded-[var(--radius-sm)] bg-accent text-white text-[10px] font-semibold">
+                        Portada
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => reorderPending(i, 0)}
+                        aria-label={`Usar la foto ${i + 1} como portada`}
+                        title="Usar como portada"
+                        className="absolute bottom-1 left-1 w-6 h-6 rounded-full bg-[rgba(8,21,46,0.6)] text-white flex items-center justify-center cursor-pointer hover:bg-accent transition-colors"
+                      >
+                        <Star size={12} aria-hidden="true" />
+                      </button>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={() => removePending(i)}
+                      aria-label={`Quitar la foto ${i + 1}`}
+                      title="Quitar"
+                      className="absolute top-1 right-1 w-6 h-6 rounded-full bg-[rgba(8,21,46,0.6)] text-white flex items-center justify-center cursor-pointer hover:bg-danger transition-colors"
+                    >
+                      <X size={12} aria-hidden="true" />
+                    </button>
                   </div>
                 ))}
               </div>

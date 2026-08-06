@@ -78,24 +78,32 @@ export default function ClassifiedImageUploader({
 
     setPending((prev) => [...prev, ...validated])
     setBusy(true)
+    setPending((prev) =>
+      prev.map((p) => (validated.includes(p) ? { ...p, status: 'uploading' } : p))
+    )
+
     try {
-      // Upload sequentially for clearer progress feedback
-      for (const item of validated) {
-        setPending((prev) =>
-          prev.map((p) => (p === item ? { ...p, status: 'uploading' } : p))
+      // One request for the whole batch. This used to loop file by file and
+      // destructure a field the API never returns (`images`; it sends
+      // `uploaded`), so a successful upload threw and was reported as a failure.
+      const result = await uploadClassifiedImages(
+        classifiedId,
+        validated.map((v) => v.file)
+      )
+      updateImages([...images, ...result.uploaded])
+      validated.forEach((v) => URL.revokeObjectURL(v.preview))
+      setPending((prev) => prev.filter((p) => !validated.includes(p)))
+
+      if (result.errors.length > 0) {
+        setError(
+          `${result.errors.length} de ${validated.length} fotos no se pudieron subir. Probá de nuevo con esas.`
         )
-        try {
-          const { images: nextImages } = await uploadClassifiedImages(classifiedId, [item.file])
-          updateImages(nextImages)
-          setPending((prev) => prev.filter((p) => p !== item))
-          URL.revokeObjectURL(item.preview)
-        } catch (err) {
-          const message = translateApiError(err, 'Error al subir')
-          setPending((prev) =>
-            prev.map((p) => (p === item ? { ...p, status: 'error', error: message } : p))
-          )
-        }
       }
+    } catch (err) {
+      const message = translateApiError(err, 'Error al subir')
+      setPending((prev) =>
+        prev.map((p) => (validated.includes(p) ? { ...p, status: 'error', error: message } : p))
+      )
     } finally {
       setBusy(false)
       if (fileInputRef.current) fileInputRef.current.value = ''
