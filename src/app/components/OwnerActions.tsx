@@ -2,14 +2,13 @@
 
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { CheckCircle, Pause, Pencil, Play, Sparkles, Trash2 } from 'lucide-react'
+import { CheckCircle, Pause, Pencil, Play, Trash2 } from 'lucide-react'
 import { Classified, ClassifiedStatus } from '@/types/classified'
 import { deleteClassified, updateClassified } from '@/lib/classifieds-api'
+import { translateApiError } from '@/lib/api-error'
 import { useAuth } from './AuthProvider'
 import { Button, ButtonLink } from './ui/Button'
-import UpgradeDialog from './UpgradeDialog'
 import StatusBadge from './StatusBadge'
-import { translateApiError } from '@/lib/api-error'
 
 interface OwnerActionsProps {
   classified: Classified
@@ -21,7 +20,6 @@ export default function OwnerActions({ classified }: OwnerActionsProps) {
   const [status, setStatus] = useState<ClassifiedStatus>(classified.status)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [upgradeOpen, setUpgradeOpen] = useState(false)
 
   // Only render for the owner
   if (!user || user.id !== classified.userId) {
@@ -112,14 +110,6 @@ export default function OwnerActions({ classified }: OwnerActionsProps) {
 
       <div className="flex flex-wrap items-center gap-2 pt-1">
         <Button
-          size="sm"
-          disabled={busy}
-          iconLeft={<Sparkles size={14} aria-hidden="true" />}
-          onClick={() => setUpgradeOpen(true)}
-        >
-          Destacá tu aviso
-        </Button>
-        <Button
           variant="ghost"
           size="sm"
           disabled={busy}
@@ -138,12 +128,6 @@ export default function OwnerActions({ classified }: OwnerActionsProps) {
       )}
 
       {error && <p className="text-sm text-danger-ink">{error}</p>}
-
-      <UpgradeDialog
-        open={upgradeOpen}
-        onClose={() => setUpgradeOpen(false)}
-        classifiedId={classified.id}
-      />
     </div>
   )
 }

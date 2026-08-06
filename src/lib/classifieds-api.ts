@@ -3,10 +3,8 @@ import {
   Classified,
   ClassifiedCategory,
   ClassifiedStatus,
-  ClassifiedTier,
   Comment,
   PaginatedClassifieds,
-  UpgradeResponse,
 } from '@/types/classified'
 import { getStoredToken } from './auth'
 import { ApiError } from './api-error'
@@ -261,19 +259,6 @@ export async function deleteClassifiedImage(id: string, url: string): Promise<vo
     body: JSON.stringify({ url }),
   })
   if (!response.ok) await handleApiError(response)
-}
-
-export async function upgradeClassified(
-  id: string,
-  tier: Exclude<ClassifiedTier, 'free'>
-): Promise<UpgradeResponse> {
-  const response = await fetch(`${API_URL}/api/classifieds/${id}/upgrade`, {
-    method: 'POST',
-    headers: jsonHeaders(),
-    body: JSON.stringify({ tier }),
-  })
-  if (!response.ok) await handleApiError(response)
-  return response.json()
 }
 
 // ============================================

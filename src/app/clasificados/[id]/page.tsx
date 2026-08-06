@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { Suspense, cache } from 'react'
+import { cache } from 'react'
 import type { Metadata } from 'next'
 import { MapPin } from 'lucide-react'
 import { fetchClassifiedById } from '@/lib/classifieds-api'
@@ -9,12 +9,10 @@ import { formatPrice } from '@/lib/format'
 import { absoluteUrl, SITE_URL } from '@/lib/site'
 import JsonLd from '../../components/JsonLd'
 import CategoryBadge from '../../components/CategoryBadge'
-import TierBadge from '../../components/TierBadge'
 import StatusBadge from '../../components/StatusBadge'
 import ClassifiedGallery from '../../components/ClassifiedGallery'
 import ContactReveal from '../../components/ContactReveal'
 import OwnerActions from '../../components/OwnerActions'
-import PaymentResultBanner from '../../components/PaymentResultBanner'
 import CommentsSection from '../../components/CommentsSection'
 
 export const dynamic = 'force-dynamic'
@@ -134,10 +132,6 @@ export default async function ClassifiedDetailPage({ params }: PageProps) {
         <span>{categoryLabels[classified.category]}</span>
       </nav>
 
-      <Suspense fallback={null}>
-        <PaymentResultBanner />
-      </Suspense>
-
       <div className="grid lg:grid-cols-3 gap-6 items-start">
         <div className="lg:col-span-2 space-y-6">
           <ClassifiedGallery images={classified.images} title={classified.title} />
@@ -163,7 +157,6 @@ export default async function ClassifiedDetailPage({ params }: PageProps) {
                 </div>
               </div>
               <div className="flex flex-col items-end gap-2">
-                <TierBadge tier={classified.tier} />
                 <StatusBadge status={classified.status} expiresAt={classified.expiresAt} />
               </div>
             </div>

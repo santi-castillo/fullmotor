@@ -18,7 +18,7 @@ export default function NewClassifiedPage() {
             Publicá tu aviso
           </h1>
           <p className="text-sm text-muted mt-2">
-            Tu publicación queda activa 30 días. Podés mejorarla a Premium o Destacado en cualquier momento.
+            Publicar es gratis. Tu aviso queda activo 30 días y lo podés renovar cuando esté por vencer.
           </p>
         </div>
 

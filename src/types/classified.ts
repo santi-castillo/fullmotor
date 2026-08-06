@@ -6,6 +6,11 @@ export type ClassifiedCategory =
   | 'accessories'
   | 'other'
 
+/**
+ * Still returned by the API, but monetization is switched off: every listing is
+ * `free` and lasts 30 days. Kept so the response type stays honest, and because
+ * paid tiers are expected back later.
+ */
 export type ClassifiedTier = 'free' | 'premium' | 'featured'
 
 export type ClassifiedStatus = 'active' | 'sold' | 'paused'
@@ -64,12 +69,6 @@ export interface Comment {
   createdAt: string
 }
 
-export interface UpgradeResponse {
-  paymentId: string
-  preferenceId: string
-  initPoint: string
-}
-
 export const CLASSIFIED_CATEGORIES: { id: ClassifiedCategory; label: string }[] = [
   { id: 'cars', label: 'Autos' },
   { id: 'motorcycles', label: 'Motos' },
@@ -88,21 +87,10 @@ export const categoryLabels: Record<ClassifiedCategory, string> = {
   other: 'Otros',
 }
 
-export const tierLabels: Record<ClassifiedTier, string> = {
-  free: 'Gratis',
-  premium: 'Premium',
-  featured: 'Destacado',
-}
-
 export const statusLabels: Record<ClassifiedStatus, string> = {
   active: 'Activa',
   sold: 'Vendida',
   paused: 'Pausada',
-}
-
-export const TIER_PRICES: Record<Exclude<ClassifiedTier, 'free'>, number> = {
-  premium: 9.99,
-  featured: 19.99,
 }
 
 export const MAX_CLASSIFIED_IMAGES = 5

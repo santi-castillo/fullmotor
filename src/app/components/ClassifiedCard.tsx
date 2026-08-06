@@ -4,7 +4,6 @@ import { Classified } from '@/types/classified'
 import { formatNumber } from '@/lib/format'
 import { RawImageWithFallback } from './ui/ImageWithFallback'
 import CategoryBadge from './CategoryBadge'
-import TierBadge from './TierBadge'
 import StatusBadge from './StatusBadge'
 
 interface ClassifiedCardProps {
@@ -27,9 +26,6 @@ export default function ClassifiedCard({ classified, showStatus = false }: Class
           alt={classified.title}
           fallback={<ImageOff size={34} className="text-faint" aria-hidden="true" />}
         />
-        <div className="tm-vcard__topl">
-          <TierBadge tier={classified.tier} />
-        </div>
         {showStatus && (
           <div className="tm-vcard__topr">
             <StatusBadge status={classified.status} expiresAt={classified.expiresAt} />
