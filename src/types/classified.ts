@@ -78,6 +78,11 @@ export const CLASSIFIED_CATEGORIES: { id: ClassifiedCategory; label: string }[] 
   { id: 'other', label: 'Otros' },
 ]
 
+/** Narrows an untrusted query-string value to a real category. */
+export function isClassifiedCategory(value: string | undefined): value is ClassifiedCategory {
+  return !!value && CLASSIFIED_CATEGORIES.some((c) => c.id === value)
+}
+
 export const categoryLabels: Record<ClassifiedCategory, string> = {
   cars: 'Autos',
   motorcycles: 'Motos',

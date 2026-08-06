@@ -2,7 +2,7 @@ import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import { Plus } from 'lucide-react'
 import { fetchClassifieds } from '@/lib/classifieds-api'
-import { ClassifiedCategory, CLASSIFIED_CATEGORIES } from '@/types/classified'
+import { CLASSIFIED_CATEGORIES, isClassifiedCategory } from '@/types/classified'
 import { absoluteUrl } from '@/lib/site'
 import JsonLd from '../components/JsonLd'
 import { ButtonLink } from '../components/ui/Button'
@@ -19,6 +19,11 @@ interface PageProps {
     page?: string
     category?: string
     city?: string
+    q?: string
+    currency?: string
+    min_price?: string
+    max_price?: string
+    sort?: string
     login?: string
   }>
 }
@@ -64,6 +69,9 @@ export default async function ClassifiedsPage({ searchParams }: PageProps) {
   const params = await searchParams
   const page = parseInt(params.page || '1', 10)
   const limit = 12
+  const hasFilters = Boolean(
+    params.q || params.category || params.city || params.min_price || params.max_price || params.currency
+  )
 
   let data
   let errorMessage: string | null = null
@@ -71,8 +79,16 @@ export default async function ClassifiedsPage({ searchParams }: PageProps) {
     data = await fetchClassifieds({
       page,
       limit,
-      category: (params.category as ClassifiedCategory) || undefined,
+      // An unknown category would otherwise reach the API, come back empty and
+      // read as "there is nothing here" while the category select silently
+      // reset itself to "Todas".
+      category: isClassifiedCategory(params.category) ? params.category : undefined,
       city: params.city || undefined,
+      q: params.q || undefined,
+      currency: params.currency || undefined,
+      minPrice: params.min_price || undefined,
+      maxPrice: params.max_price || undefined,
+      sort: params.sort || undefined,
     })
   } catch (err) {
     errorMessage = translateApiError(err, 'Error al cargar clasificados')
@@ -125,11 +141,22 @@ export default async function ClassifiedsPage({ searchParams }: PageProps) {
         </div>
       )}
 
+      {/* An empty result under filters is a different situation from an empty
+          marketplace, and telling someone to "publicá el primero" when there
+          are hundreds of listings behind their filters reads as broken. */}
       <ClassifiedList
         classifieds={data.data}
-        emptyTitle="Todavía no hay clasificados acá"
-        emptyDescription="Publicá el tuyo y conectá con compradores de todo el país."
-        emptyCta={{ label: 'Publicá el primero', href: '/clasificados/nuevo' }}
+        {...(hasFilters
+          ? {
+              emptyTitle: 'No encontramos avisos con esos filtros',
+              emptyDescription: 'Probá con menos filtros o buscando otra palabra.',
+              emptyCta: { label: 'Ver todos los avisos', href: '/clasificados' },
+            }
+          : {
+              emptyTitle: 'Todavía no hay clasificados acá',
+              emptyDescription: 'Publicá el tuyo y conectá con compradores de todo el país.',
+              emptyCta: { label: 'Publicá el primero', href: '/clasificados/nuevo' },
+            })}
       />
 
       <Suspense fallback={null}>

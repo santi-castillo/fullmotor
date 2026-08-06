@@ -176,25 +176,18 @@ export default async function ClassifiedDetailPage({ params }: PageProps) {
             </div>
           </div>
 
-          {(() => {
-            const reason =
-              classified.status === 'sold'
-                ? 'Esta publicación está marcada como vendida y no acepta más comentarios.'
-                : classified.status === 'paused'
-                  ? 'Esta publicación está pausada por el dueño y no acepta más comentarios.'
-                  : isExpired(classified)
-                    ? 'Esta publicación venció y no acepta más comentarios.'
-                    : undefined
-            return (
-              <CommentsSection
-                resourceId={classified.id}
-                disabled={!!reason}
-                disabledReason={reason}
-              />
-            )
-          })()}
         </div>
 
+        {/*
+          Source order is deliberate. In one column — every phone — grid items
+          stack in source order, so with the comments still inside the left
+          column the seller card landed below the entire thread: the single most
+          important action on the page, under an unbounded list. Splitting the
+          comments into their own grid item puts contact directly under the
+          listing on mobile, and changes nothing on desktop, where auto-placement
+          still fills columns 1-2 with the listing, column 3 with the aside, and
+          the next row with the comments.
+        */}
         <aside className="space-y-4">
           <div className="bg-surface border border-line rounded-[var(--radius-lg)] p-5">
             <div className="flex items-center gap-3 mb-4">
@@ -228,6 +221,26 @@ export default async function ClassifiedDetailPage({ params }: PageProps) {
 
           <OwnerActions classified={classified} />
         </aside>
+
+        <div className="lg:col-span-2">
+          {(() => {
+            const reason =
+              classified.status === 'sold'
+                ? 'Esta publicación está marcada como vendida y no acepta más comentarios.'
+                : classified.status === 'paused'
+                  ? 'Esta publicación está pausada por el dueño y no acepta más comentarios.'
+                  : isExpired(classified)
+                    ? 'Esta publicación venció y no acepta más comentarios.'
+                    : undefined
+            return (
+              <CommentsSection
+                resourceId={classified.id}
+                disabled={!!reason}
+                disabledReason={reason}
+              />
+            )
+          })()}
+        </div>
       </div>
     </div>
   )

@@ -96,6 +96,13 @@ export interface FetchClassifiedsParams {
   limit?: number
   category?: ClassifiedCategory
   city?: string
+  /** Free-text search over title, description and city. */
+  q?: string
+  /** Price filtering only makes sense inside one currency; the API defaults to USD. */
+  currency?: string
+  minPrice?: string
+  maxPrice?: string
+  sort?: string
   signal?: AbortSignal
   /**
    * Seconds to cache for. Omit on request paths — a freshly published listing
@@ -113,6 +120,11 @@ export async function fetchClassifieds(
   if (params.limit) search.set('limit', String(params.limit))
   if (params.category) search.set('category', params.category)
   if (params.city) search.set('city', params.city)
+  if (params.q) search.set('q', params.q)
+  if (params.currency) search.set('currency', params.currency)
+  if (params.minPrice) search.set('min_price', params.minPrice)
+  if (params.maxPrice) search.set('max_price', params.maxPrice)
+  if (params.sort) search.set('sort', params.sort)
 
   const url = `${API_URL}/api/classifieds${search.toString() ? `?${search}` : ''}`
   const response = await fetch(url, {
