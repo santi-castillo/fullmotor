@@ -86,6 +86,12 @@ export interface FetchClassifiedsParams {
   category?: ClassifiedCategory
   city?: string
   signal?: AbortSignal
+  /**
+   * Seconds to cache for. Omit on request paths — a freshly published listing
+   * has to show up immediately. Only the sitemap, which pages through the whole
+   * corpus at build time, opts into caching.
+   */
+  revalidate?: number
 }
 
 export async function fetchClassifieds(
@@ -100,7 +106,12 @@ export async function fetchClassifieds(
   const url = `${API_URL}/api/classifieds${search.toString() ? `?${search}` : ''}`
   const response = await fetch(url, {
     headers: publicHeaders(),
-    next: { revalidate: 30 },
+    // The page is `force-dynamic`, but the fetch cache is what decides here and
+    // it used to win: with `revalidate: 30` the listing served a stale payload,
+    // so someone who had just published still saw "Todavía no hay clasificados".
+    ...(params.revalidate === undefined
+      ? { cache: 'no-store' as const }
+      : { next: { revalidate: params.revalidate } }),
     signal: params.signal,
   })
   if (!response.ok) await handleApiError(response)
@@ -121,7 +132,9 @@ export async function getAllIndexableClassifieds(): Promise<Classified[]> {
     const limit = 50
 
     while (true) {
-      const { data, meta } = await fetchClassifieds({ page, limit })
+      // Cached: this walks the entire corpus, and a sitemap does not need
+      // second-level freshness.
+      const { data, meta } = await fetchClassifieds({ page, limit, revalidate: 30 })
       all.push(...data)
       if (page >= meta.lastPage) break
       page++
