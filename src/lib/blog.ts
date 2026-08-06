@@ -47,8 +47,10 @@ export async function fetchBlogTags(): Promise<string[]> {
     throw new Error(`Failed to fetch blog tags: ${response.statusText}`)
   }
 
-  const data: BlogTagsResponse = await response.json()
-  return data.tags
+  // `data` is the unified envelope; `tags` is the legacy key, still emitted by
+  // the API so the two repos can deploy in either order.
+  const body: BlogTagsResponse & { data?: string[] } = await response.json()
+  return body.data ?? body.tags ?? []
 }
 
 export async function fetchBlogPostBySlug(slug: string): Promise<BlogPostDetail | null> {
@@ -67,7 +69,10 @@ export async function fetchBlogPostBySlug(slug: string): Promise<BlogPostDetail 
     throw new Error(`Failed to fetch blog post: ${response.statusText}`)
   }
 
-  return response.json()
+  // The detail endpoint now returns { data }, like every other endpoint. The
+  // `?? body` fallback tolerates an API that has not been deployed yet.
+  const body = await response.json()
+  return body?.data ?? body
 }
 
 export async function getLatestBlogPosts(limit: number = 3): Promise<BlogPost[]> {
