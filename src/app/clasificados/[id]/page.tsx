@@ -3,9 +3,14 @@ import { notFound } from 'next/navigation'
 import { cache } from 'react'
 import type { Metadata } from 'next'
 import { MapPin } from 'lucide-react'
-import { fetchClassifiedById } from '@/lib/classifieds-api'
-import { categoryLabels, type Classified } from '@/types/classified'
-import { formatPrice } from '@/lib/format'
+import { fetchClassifiedById, fetchClassifiedFacets } from '@/lib/classifieds-api'
+import {
+  categoryLabels,
+  fuelTypeLabels,
+  transmissionLabels,
+  type Classified,
+} from '@/types/classified'
+import { formatNumber, formatPrice } from '@/lib/format'
 import { absoluteUrl, SITE_URL } from '@/lib/site'
 import JsonLd from '../../components/JsonLd'
 import CategoryBadge from '../../components/CategoryBadge'
@@ -91,12 +96,49 @@ export default async function ClassifiedDetailPage({ params }: PageProps) {
   const classified = await getClassified(id)
   if (!classified) notFound()
 
+  // Cached for an hour, so this is effectively free. Only the API can turn
+  // "mercedes-benz" back into "Mercedes-Benz"; the label is not derivable.
+  const facets = await fetchClassifiedFacets().catch(() => null)
+  const brandLabel = (value: string) =>
+    facets?.brands.find((b) => b.value === value)?.label ?? value
+
+  const specs = [
+    classified.brand && { label: 'Marca', value: brandLabel(classified.brand) },
+    classified.model && { label: 'Modelo', value: classified.model },
+    classified.year && { label: 'Año', value: String(classified.year) },
+    classified.mileageKm !== undefined && {
+      label: 'Kilometraje',
+      value: `${formatNumber(classified.mileageKm)} km`,
+    },
+    classified.fuelType && {
+      label: 'Combustible',
+      value: fuelTypeLabels[classified.fuelType] || classified.fuelType,
+    },
+    classified.transmission && {
+      label: 'Transmisión',
+      value: transmissionLabels[classified.transmission] || classified.transmission,
+    },
+  ].filter((s): s is { label: string; value: string } => Boolean(s))
+
   const productJsonLd = {
     '@context': 'https://schema.org',
+    // Kept as Product rather than Vehicle/Car: Google's vehicle listing
+    // structured data has eligibility requirements this data does not meet, and
+    // an ineligible type generates Search Console errors at corpus scale.
     '@type': 'Product',
     name: classified.title,
     description: classified.description,
     category: categoryLabels[classified.category],
+    ...(classified.brand && { brand: { '@type': 'Brand', name: brandLabel(classified.brand) } }),
+    ...(classified.model && { model: classified.model }),
+    ...(classified.year && { productionDate: String(classified.year) }),
+    ...(classified.mileageKm !== undefined && {
+      mileageFromOdometer: { '@type': 'QuantitativeValue', value: classified.mileageKm, unitCode: 'KMT' },
+    }),
+    ...(classified.fuelType && { fuelType: fuelTypeLabels[classified.fuelType] || classified.fuelType }),
+    ...(classified.transmission && {
+      vehicleTransmission: transmissionLabels[classified.transmission] || classified.transmission,
+    }),
     ...(classified.images.length > 0 && { image: classified.images }),
     offers: {
       '@type': 'Offer',
@@ -168,6 +210,20 @@ export default async function ClassifiedDetailPage({ params }: PageProps) {
               </span>
               <CategoryBadge category={classified.category} />
             </div>
+
+            {specs.length > 0 && (
+              <div>
+                <h2 className="font-display text-lg font-bold text-ink mb-3">Ficha</h2>
+                <dl className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-3">
+                  {specs.map(({ label, value }) => (
+                    <div key={label}>
+                      <dt className="tm-eyebrow">{label}</dt>
+                      <dd className="text-sm text-ink font-mono mt-0.5">{value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            )}
 
             <div>
               <h2 className="font-display text-lg font-bold text-ink mb-2">Descripción</h2>

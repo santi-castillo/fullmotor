@@ -7,13 +7,18 @@ import {
   CLASSIFIED_CATEGORIES,
   Classified,
   ClassifiedCategory,
+  ClassifiedFacets,
   ALLOWED_IMAGE_TYPES,
   MAX_CLASSIFIED_IMAGES,
   MAX_IMAGE_SIZE_BYTES,
+  categoryHasVehicleFields,
+  fuelTypeLabels,
+  transmissionLabels,
 } from '@/types/classified'
 import {
   CreateClassifiedPayload,
   UpdateClassifiedPayload,
+  VehicleFieldsPayload,
   createClassified,
   updateClassified,
   uploadClassifiedImages,
@@ -29,9 +34,10 @@ const COUNTRY = process.env.NEXT_PUBLIC_COUNTRY || 'uy'
 interface ClassifiedFormProps {
   mode: 'create' | 'edit'
   initial?: Classified
+  facets: ClassifiedFacets
 }
 
-export default function ClassifiedForm({ mode, initial }: ClassifiedFormProps) {
+export default function ClassifiedForm({ mode, initial, facets }: ClassifiedFormProps) {
   const router = useRouter()
 
   const [title, setTitle] = useState(initial?.title || '')
@@ -44,6 +50,14 @@ export default function ClassifiedForm({ mode, initial }: ClassifiedFormProps) {
   const [city, setCity] = useState(initial?.city || '')
   const [contactInfo, setContactInfo] = useState(initial?.contactInfo || '')
   const [showContactInfo, setShowContactInfo] = useState(initial?.showContactInfo ?? true)
+  const [year, setYear] = useState(initial?.year ? String(initial.year) : '')
+  const [mileageKm, setMileageKm] = useState(
+    initial?.mileageKm !== undefined ? String(initial.mileageKm) : ''
+  )
+  const [brand, setBrand] = useState(initial?.brand || '')
+  const [model, setModel] = useState(initial?.model || '')
+  const [fuelType, setFuelType] = useState(initial?.fuelType || '')
+  const [transmission, setTransmission] = useState(initial?.transmission || '')
   const [pendingFiles, setPendingFiles] = useState<File[]>([])
   const [pendingPreviews, setPendingPreviews] = useState<string[]>([])
   // Mirrors pendingPreviews so the unmount cleanup can revoke whatever is
@@ -114,6 +128,31 @@ export default function ClassifiedForm({ mode, initial }: ClassifiedFormProps) {
     }
   }, [])
 
+  const showsVehicleFields = categoryHasVehicleFields(category)
+
+  /**
+   * Builds the vehicle half of the payload.
+   *
+   * Returns nothing at all for a non-vehicle category, even though the inputs
+   * keep their values in React state — that is deliberate, so switching from
+   * Autos to Repuestos and back restores what was typed. Sending them anyway
+   * would earn a 400 the seller cannot act on, since the field the API names is
+   * one the form no longer shows.
+   */
+  const buildVehicleFields = (): VehicleFieldsPayload => {
+    if (!showsVehicleFields) return {}
+
+    const fields: VehicleFieldsPayload = {}
+    if (year.trim()) fields.year = Number(year)
+    // Not `if (mileageKm)` — 0 km is a real value meaning new.
+    if (mileageKm.trim()) fields.mileageKm = Number(mileageKm)
+    if (brand) fields.brand = brand
+    if (model.trim()) fields.model = model.trim()
+    if (fuelType) fields.fuelType = fuelType
+    if (transmission) fields.transmission = transmission
+    return fields
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
@@ -143,6 +182,27 @@ export default function ClassifiedForm({ mode, initial }: ClassifiedFormProps) {
       setError('La moneda debe ser un código de 3 letras (ej. USD, UYU).')
       return
     }
+    // Required on create only. In edit mode a listing published before these
+    // fields existed has to stay savable without being forced to fill them.
+    if (showsVehicleFields && isCreate && (!year.trim() || !brand || !model.trim())) {
+      setError('Completá año, marca y modelo del vehículo.')
+      return
+    }
+    if (year.trim()) {
+      const y = Number(year)
+      const maxYear = new Date().getFullYear() + 1
+      if (!Number.isInteger(y) || y < 1900 || y > maxYear) {
+        setError(`El año debe estar entre 1900 y ${maxYear}.`)
+        return
+      }
+    }
+    if (mileageKm.trim()) {
+      const km = Number(mileageKm)
+      if (!Number.isInteger(km) || km < 0 || km > 1000000) {
+        setError('El kilometraje debe estar entre 0 y 1.000.000.')
+        return
+      }
+    }
     if (contactInfo.trim().length > 200) {
       setError('El contacto debe tener máximo 200 caracteres.')
       return
@@ -160,6 +220,7 @@ export default function ClassifiedForm({ mode, initial }: ClassifiedFormProps) {
           countryCode: COUNTRY,
           city: trimmedCity,
           showContactInfo,
+          ...buildVehicleFields(),
         }
         if (contactInfo.trim()) payload.contactInfo = contactInfo.trim()
 
@@ -200,6 +261,7 @@ export default function ClassifiedForm({ mode, initial }: ClassifiedFormProps) {
           currency: currency.toUpperCase(),
           city: trimmedCity,
           showContactInfo,
+          ...buildVehicleFields(),
         }
         // Only send the contact when it actually changed. Sending it
         // unconditionally meant that any listing whose contactInfo failed to
@@ -312,6 +374,83 @@ export default function ClassifiedForm({ mode, initial }: ClassifiedFormProps) {
           </label>
         </div>
       </div>
+
+      {/* Only for the categories these describe. A set of tyres has no
+          odometer reading, and the API rejects the fields outright. */}
+      {showsVehicleFields && (
+        <div className="bg-surface border border-line rounded-[var(--radius-lg)] p-6 space-y-4">
+          <div>
+            <h2 className="font-display text-lg font-bold text-ink">Datos del vehículo</h2>
+            <p className="text-xs text-muted mt-1">
+              Con estos datos tu aviso aparece en las búsquedas por marca, año y kilometraje.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Select
+              label="Marca"
+              required={isCreate}
+              value={brand}
+              onChange={(e) => setBrand(e.target.value)}
+              placeholder="Elegí una marca"
+              options={facets.brands}
+            />
+            <Input
+              label="Modelo"
+              required={isCreate}
+              type="text"
+              value={model}
+              onChange={(e) => setModel(e.target.value)}
+              maxLength={60}
+              placeholder="Ej. Corolla XEI"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Input
+              label="Año"
+              required={isCreate}
+              type="number"
+              min="1900"
+              max={new Date().getFullYear() + 1}
+              value={year}
+              onChange={(e) => setYear(e.target.value)}
+              placeholder="2019"
+              className="[&_.tm-input]:font-mono"
+            />
+            <Input
+              label="Kilometraje"
+              type="number"
+              min="0"
+              value={mileageKm}
+              onChange={(e) => setMileageKm(e.target.value)}
+              placeholder="0 si es 0 km"
+              hint="Dejalo vacío si preferís no decirlo"
+              className="[&_.tm-input]:font-mono"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Select
+              label="Combustible"
+              value={fuelType}
+              onChange={(e) => setFuelType(e.target.value)}
+              placeholder="Sin especificar"
+              options={facets.fuelTypes.map((v) => ({ value: v, label: fuelTypeLabels[v] || v }))}
+            />
+            <Select
+              label="Transmisión"
+              value={transmission}
+              onChange={(e) => setTransmission(e.target.value)}
+              placeholder="Sin especificar"
+              options={facets.transmissions.map((v) => ({
+                value: v,
+                label: transmissionLabels[v] || v,
+              }))}
+            />
+          </div>
+        </div>
+      )}
 
       <div className="bg-surface border border-line rounded-[var(--radius-lg)] p-6 space-y-3">
         <h2 className="font-display text-lg font-bold text-ink">Fotos</h2>

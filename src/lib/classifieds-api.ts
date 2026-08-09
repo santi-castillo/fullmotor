@@ -2,6 +2,7 @@ import {
   AuthUser,
   Classified,
   ClassifiedCategory,
+  ClassifiedFacets,
   ClassifiedStatus,
   Comment,
   PaginatedClassifieds,
@@ -96,8 +97,14 @@ export interface FetchClassifiedsParams {
   limit?: number
   category?: ClassifiedCategory
   city?: string
-  /** Free-text search over title, description and city. */
+  /** Free-text search over title, description, city, brand and model. */
   q?: string
+  brand?: string
+  fuel?: string
+  transmission?: string
+  minYear?: string
+  maxYear?: string
+  maxMileage?: string
   /** Price filtering only makes sense inside one currency; the API defaults to USD. */
   currency?: string
   minPrice?: string
@@ -121,6 +128,12 @@ export async function fetchClassifieds(
   if (params.category) search.set('category', params.category)
   if (params.city) search.set('city', params.city)
   if (params.q) search.set('q', params.q)
+  if (params.brand) search.set('brand', params.brand)
+  if (params.fuel) search.set('fuel', params.fuel)
+  if (params.transmission) search.set('transmission', params.transmission)
+  if (params.minYear) search.set('min_year', params.minYear)
+  if (params.maxYear) search.set('max_year', params.maxYear)
+  if (params.maxMileage) search.set('max_mileage', params.maxMileage)
   if (params.currency) search.set('currency', params.currency)
   if (params.minPrice) search.set('min_price', params.minPrice)
   if (params.maxPrice) search.set('max_price', params.maxPrice)
@@ -171,6 +184,23 @@ export async function getAllIndexableClassifieds(): Promise<Classified[]> {
   }
 }
 
+/**
+ * The closed sets for brand, fuel and transmission.
+ *
+ * Fetched rather than hardcoded so the client cannot drift from the whitelist
+ * the API validates against — a brand missing here would be unpickable, and one
+ * missing there would be rejected on submit. Cached for an hour: this changes
+ * when someone edits a Go file, not at runtime.
+ */
+export async function fetchClassifiedFacets(): Promise<ClassifiedFacets> {
+  const response = await fetch(`${API_URL}/api/classifieds/facets`, {
+    headers: publicHeaders(),
+    next: { revalidate: 3600 },
+  })
+  if (!response.ok) await handleApiError(response)
+  return response.json()
+}
+
 export async function fetchClassifiedById(id: string): Promise<Classified | null> {
   const response = await fetch(`${API_URL}/api/classifieds/${id}`, {
     // Authenticated so the owner reads back their own contactInfo even when it
@@ -204,7 +234,17 @@ export async function fetchMyClassifieds(
   return response.json()
 }
 
-export interface CreateClassifiedPayload {
+/** Structured vehicle details, shared by the create and update payloads. */
+export interface VehicleFieldsPayload {
+  year?: number
+  mileageKm?: number
+  brand?: string
+  model?: string
+  fuelType?: string
+  transmission?: string
+}
+
+export interface CreateClassifiedPayload extends VehicleFieldsPayload {
   title: string
   description: string
   category: ClassifiedCategory
@@ -226,7 +266,7 @@ export async function createClassified(payload: CreateClassifiedPayload): Promis
   return response.json()
 }
 
-export interface UpdateClassifiedPayload {
+export interface UpdateClassifiedPayload extends VehicleFieldsPayload {
   title?: string
   description?: string
   category?: ClassifiedCategory

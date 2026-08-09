@@ -38,8 +38,58 @@ export interface Classified {
   tier: ClassifiedTier
   status: ClassifiedStatus
   expiresAt: string
+  /**
+   * Structured vehicle details. Absent on repuestos and accesorios, and on any
+   * listing published before these fields existed — hence optional rather than
+   * nullable, so `mileageKm: 0` (a new vehicle) stays distinguishable from
+   * "not stated".
+   */
+  year?: number
+  mileageKm?: number
+  brand?: string
+  model?: string
+  fuelType?: string
+  transmission?: string
   createdAt: string
   updatedAt: string
+}
+
+/** Categories that carry structured vehicle details. */
+export const VEHICLE_CATEGORIES: ClassifiedCategory[] = ['cars', 'motorcycles', 'trucks']
+
+export function categoryHasVehicleFields(category: ClassifiedCategory): boolean {
+  return VEHICLE_CATEGORIES.includes(category)
+}
+
+export interface BrandOption {
+  value: string
+  label: string
+}
+
+/** Closed sets the API owns, fetched from /api/classifieds/facets. */
+export interface ClassifiedFacets {
+  brands: BrandOption[]
+  fuelTypes: string[]
+  transmissions: string[]
+}
+
+/**
+ * Fuel and transmission labels live here rather than on the API: the values are
+ * language-independent but the labels are not, and the API serves more than one
+ * country.
+ */
+export const fuelTypeLabels: Record<string, string> = {
+  gasoline: 'Nafta',
+  diesel: 'Diésel',
+  hybrid: 'Híbrido',
+  electric: 'Eléctrico',
+  cng: 'GNC',
+  flex: 'Flex',
+}
+
+export const transmissionLabels: Record<string, string> = {
+  manual: 'Manual',
+  automatic: 'Automática',
 }
 
 export interface PaginatedClassifieds {

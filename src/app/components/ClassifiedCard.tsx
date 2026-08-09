@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { CalendarClock, ImageOff, MapPin } from 'lucide-react'
-import { Classified, isExpired } from '@/types/classified'
+import { Classified, fuelTypeLabels, isExpired } from '@/types/classified'
 import { formatDate, formatNumber } from '@/lib/format'
 import { RawImageWithFallback } from './ui/ImageWithFallback'
 import CategoryBadge from './CategoryBadge'
@@ -13,6 +13,11 @@ interface ClassifiedCardProps {
 
 export default function ClassifiedCard({ classified, showStatus = false }: ClassifiedCardProps) {
   const cover = classified.images[0]
+  const specLine = [
+    classified.year ? String(classified.year) : null,
+    classified.mileageKm !== undefined ? `${formatNumber(classified.mileageKm)} km` : null,
+    classified.fuelType ? fuelTypeLabels[classified.fuelType] || classified.fuelType : null,
+  ].filter((v): v is string => v !== null)
   const cur =
     !classified.currency || classified.currency === 'US$' || classified.currency === 'U$S'
       ? 'USD'
@@ -36,6 +41,11 @@ export default function ClassifiedCard({ classified, showStatus = false }: Class
         <h3 className="tm-vcard__model line-clamp-2" style={{ fontSize: 'var(--text-lg)' }}>
           {classified.title}
         </h3>
+        {/* One line, only the parts that exist — a listing with no year and no
+            mileage renders nothing here rather than a row of separators. */}
+        {specLine.length > 0 && (
+          <span className="block text-sm text-muted mt-1 font-mono">{specLine.join(' · ')}</span>
+        )}
         <span className="flex items-center gap-1.5 text-sm text-muted mt-1">
           <MapPin size={13} aria-hidden="true" />
           {classified.city}

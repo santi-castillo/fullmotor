@@ -1,12 +1,13 @@
 import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import { Plus } from 'lucide-react'
-import { fetchClassifieds } from '@/lib/classifieds-api'
+import { fetchClassifieds, fetchClassifiedFacets } from '@/lib/classifieds-api'
 import { CLASSIFIED_CATEGORIES, isClassifiedCategory } from '@/types/classified'
 import { absoluteUrl } from '@/lib/site'
 import JsonLd from '../components/JsonLd'
 import { ButtonLink } from '../components/ui/Button'
 import ClassifiedFilters from '../components/ClassifiedFilters'
+import ClassifiedToolbar from '../components/ClassifiedToolbar'
 import ClassifiedList from '../components/ClassifiedList'
 import Pagination from '../components/Pagination'
 import LoginAutoOpener from '../components/LoginAutoOpener'
@@ -24,6 +25,12 @@ interface PageProps {
     min_price?: string
     max_price?: string
     sort?: string
+    brand?: string
+    fuel?: string
+    transmission?: string
+    min_year?: string
+    max_year?: string
+    max_mileage?: string
     login?: string
   }>
 }
@@ -70,8 +77,27 @@ export default async function ClassifiedsPage({ searchParams }: PageProps) {
   const page = parseInt(params.page || '1', 10)
   const limit = 12
   const hasFilters = Boolean(
-    params.q || params.category || params.city || params.min_price || params.max_price || params.currency
+    params.q ||
+      params.category ||
+      params.city ||
+      params.min_price ||
+      params.max_price ||
+      params.currency ||
+      params.brand ||
+      params.fuel ||
+      params.transmission ||
+      params.min_year ||
+      params.max_year ||
+      params.max_mileage
   )
+
+  // Cached for an hour; a failure here must not take the whole page down, so
+  // the controls degrade to empty rather than 500ing.
+  const facets = await fetchClassifiedFacets().catch(() => ({
+    brands: [],
+    fuelTypes: [],
+    transmissions: [],
+  }))
 
   let data
   let errorMessage: string | null = null
@@ -89,6 +115,12 @@ export default async function ClassifiedsPage({ searchParams }: PageProps) {
       minPrice: params.min_price || undefined,
       maxPrice: params.max_price || undefined,
       sort: params.sort || undefined,
+      brand: params.brand || undefined,
+      fuel: params.fuel || undefined,
+      transmission: params.transmission || undefined,
+      minYear: params.min_year || undefined,
+      maxYear: params.max_year || undefined,
+      maxMileage: params.max_mileage || undefined,
     })
   } catch (err) {
     errorMessage = translateApiError(err, 'Error al cargar clasificados')
@@ -126,47 +158,59 @@ export default async function ClassifiedsPage({ searchParams }: PageProps) {
         </ButtonLink>
       </div>
 
-      <Suspense fallback={<div className="h-12 bg-sunken rounded-[var(--radius-md)] animate-pulse mb-6" />}>
-        <ClassifiedFilters />
-      </Suspense>
+      {/* The catalogue's sidebar layout: eleven filters will not fit across
+          the top, and this one is already sticky above 1000px and stacked
+          below it. */}
+      <div className="iv__body">
+        <Suspense fallback={<div className="h-96 bg-sunken rounded-[var(--radius-md)] animate-pulse" />}>
+          <ClassifiedFilters facets={facets} />
+        </Suspense>
 
-      <div className="mb-4 text-sm text-muted">
-        Mostrando <span className="font-mono text-ink">{data.data.length}</span> de{' '}
-        <span className="font-mono text-ink">{data.meta.total}</span> publicaciones
-      </div>
+        <div>
+          <Suspense fallback={<div className="h-20 bg-sunken rounded-[var(--radius-md)] animate-pulse mb-4" />}>
+            <ClassifiedToolbar facets={facets} />
+          </Suspense>
 
-      {errorMessage && (
-        <div className="p-4 mb-4 rounded-[var(--radius-md)] bg-danger-soft text-danger-ink text-sm">
-          {errorMessage}
+          <div className="mb-4 text-sm text-muted">
+            Mostrando <span className="font-mono text-ink">{data.data.length}</span> de{' '}
+            <span className="font-mono text-ink">{data.meta.total}</span> publicaciones
+          </div>
+
+          {errorMessage && (
+            <div className="p-4 mb-4 rounded-[var(--radius-md)] bg-danger-soft text-danger-ink text-sm">
+              {errorMessage}
+            </div>
+          )}
+
+          {/* An empty result under filters is a different situation from an
+              empty marketplace, and telling someone to "publicá el primero"
+              when there are hundreds of listings behind their filters reads as
+              broken. */}
+          <ClassifiedList
+            classifieds={data.data}
+            {...(hasFilters
+              ? {
+                  emptyTitle: 'No encontramos avisos con esos filtros',
+                  emptyDescription: 'Probá con menos filtros o buscando otra palabra.',
+                  emptyCta: { label: 'Ver todos los avisos', href: '/clasificados' },
+                }
+              : {
+                  emptyTitle: 'Todavía no hay clasificados acá',
+                  emptyDescription: 'Publicá el tuyo y conectá con compradores de todo el país.',
+                  emptyCta: { label: 'Publicá el primero', href: '/clasificados/nuevo' },
+                })}
+          />
+
+          <Suspense fallback={null}>
+            <Pagination
+              currentPage={data.meta.page}
+              totalPages={data.meta.lastPage}
+              total={data.meta.total}
+              basePath="/clasificados"
+            />
+          </Suspense>
         </div>
-      )}
-
-      {/* An empty result under filters is a different situation from an empty
-          marketplace, and telling someone to "publicá el primero" when there
-          are hundreds of listings behind their filters reads as broken. */}
-      <ClassifiedList
-        classifieds={data.data}
-        {...(hasFilters
-          ? {
-              emptyTitle: 'No encontramos avisos con esos filtros',
-              emptyDescription: 'Probá con menos filtros o buscando otra palabra.',
-              emptyCta: { label: 'Ver todos los avisos', href: '/clasificados' },
-            }
-          : {
-              emptyTitle: 'Todavía no hay clasificados acá',
-              emptyDescription: 'Publicá el tuyo y conectá con compradores de todo el país.',
-              emptyCta: { label: 'Publicá el primero', href: '/clasificados/nuevo' },
-            })}
-      />
-
-      <Suspense fallback={null}>
-        <Pagination
-          currentPage={data.meta.page}
-          totalPages={data.meta.lastPage}
-          total={data.meta.total}
-          basePath="/clasificados"
-        />
-      </Suspense>
+      </div>
     </div>
   )
 }
