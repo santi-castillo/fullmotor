@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { LogIn, Lock, MessageCircle, Reply, Trash2 } from 'lucide-react'
 import { useAuth } from './AuthProvider'
 import { Button } from './ui/Button'
+import { Avatar } from './ui/Avatar'
 import {
     Comment,
     fetchComments,
@@ -36,25 +37,6 @@ function timeAgo(dateStr: string): string {
         month: 'short',
         year: 'numeric',
     })
-}
-
-function Avatar({ user }: { user: Comment['user'] }) {
-    if (user.avatarUrl) {
-        return (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-                src={user.avatarUrl}
-                alt={user.name}
-                className="w-8 h-8 rounded-full object-cover flex-shrink-0"
-                referrerPolicy="no-referrer"
-            />
-        )
-    }
-    return (
-        <div className="w-8 h-8 rounded-full bg-sunken flex items-center justify-center text-xs font-bold text-muted flex-shrink-0">
-            {user.name?.charAt(0)?.toUpperCase() || '?'}
-        </div>
-    )
 }
 
 function CommentForm({
@@ -108,7 +90,7 @@ function CommentForm({
     return (
         <form onSubmit={handleSubmit} className="space-y-2">
             <div className="flex gap-3">
-                <Avatar user={{ id: user.id, name: user.name, avatarUrl: user.avatarUrl }} />
+                <Avatar src={user.avatarUrl} name={user.name} />
                 <div className="flex-1">
                     <textarea
                         value={body}
@@ -202,7 +184,7 @@ function CommentItem({
     return (
         <div className={`${isReply ? 'ml-11' : ''}`}>
             <div className="flex gap-3 py-3">
-                <Avatar user={comment.user} />
+                <Avatar src={comment.user.avatarUrl} name={comment.user.name} />
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                         <span className="text-sm font-semibold text-ink">{comment.user.name || 'Usuario'}</span>

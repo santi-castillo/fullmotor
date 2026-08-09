@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { LogOut, User as UserIcon } from 'lucide-react'
 import { useAuth } from './AuthProvider'
+import { Avatar } from './ui/Avatar'
 
 export default function UserMenu() {
     const { user, loading, login, logout } = useAuth()
@@ -42,19 +43,7 @@ export default function UserMenu() {
                 className="flex items-center gap-2 rounded-[var(--radius-md)] hover:bg-sunken transition-colors p-1"
                 aria-label="Menú de usuario"
             >
-                {user.avatarUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                        src={user.avatarUrl}
-                        alt={user.name}
-                        className="w-8 h-8 rounded-full object-cover"
-                        referrerPolicy="no-referrer"
-                    />
-                ) : (
-                    <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-sm font-bold text-white">
-                        {user.name?.charAt(0)?.toUpperCase() || '?'}
-                    </div>
-                )}
+                <Avatar src={user.avatarUrl} name={user.name} tone="accent" />
             </button>
 
             {open && (

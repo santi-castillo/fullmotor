@@ -14,6 +14,7 @@ import ClassifiedGallery from '../../components/ClassifiedGallery'
 import ContactReveal from '../../components/ContactReveal'
 import OwnerActions from '../../components/OwnerActions'
 import CommentsSection from '../../components/CommentsSection'
+import { Avatar } from '../../components/ui/Avatar'
 
 export const dynamic = 'force-dynamic'
 
@@ -191,19 +192,12 @@ export default async function ClassifiedDetailPage({ params }: PageProps) {
         <aside className="space-y-4">
           <div className="bg-surface border border-line rounded-[var(--radius-lg)] p-5">
             <div className="flex items-center gap-3 mb-4">
-              {classified.user.avatarUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={classified.user.avatarUrl}
-                  alt=""
-                  className="w-12 h-12 rounded-full object-cover"
-                  referrerPolicy="no-referrer"
-                />
-              ) : (
-                <div className="w-12 h-12 rounded-full bg-accent-soft text-accent-ink flex items-center justify-center text-lg font-bold">
-                  {classified.user.name.charAt(0).toUpperCase()}
-                </div>
-              )}
+              <Avatar
+                src={classified.user.avatarUrl}
+                name={classified.user.name}
+                size="lg"
+                tone="accent-soft"
+              />
               <div>
                 <p className="tm-eyebrow">Vendedor</p>
                 <p className="font-semibold text-ink">{classified.user.name}</p>
