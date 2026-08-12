@@ -104,3 +104,12 @@
 .blog-content table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: var(--text-base); }
 .blog-content th, .blog-content td { border: 1px solid var(--border); padding: 10px 14px; text-align: left; }
 .blog-content th { font-family: var(--font-mono); font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); background: var(--surface-sunken); }
+/* On a phone a table with more than three columns squeezes each cell down to
+   one word per line. `display: block` makes the table its own scroll container
+   instead — it has to sit on the element, since the API renders a bare <table>
+   with no wrapper and its sanitizer strips class attributes. Desktop keeps the
+   plain full-width table above. */
+@media (max-width: 640px) {
+  .blog-content table { display: block; width: max-content; max-width: 100%; overflow-x: auto; }
+  .blog-content th, .blog-content td { white-space: nowrap; }
+}
