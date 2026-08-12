@@ -3,6 +3,10 @@ import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { ArrowLeft, Newspaper } from 'lucide-react'
 import { fetchBlogPostBySlug, fetchBlogPosts, getAllBlogPosts } from '@/lib/blog'
+import { getAllVehicles } from '@/lib/data'
+import { findMentionedVehicles } from '@/lib/blog-mentions'
+import { vehicleToCardProps } from '@/lib/vehicle-card'
+import { VehicleCard } from '@/app/components/ui/VehicleCard'
 import { absoluteUrl, SITE_LOGO, SITE_NAME, SITE_URL } from '@/lib/site'
 import { formatDate } from '@/lib/format'
 import JsonLd from '@/app/components/JsonLd'
@@ -63,6 +67,12 @@ export default async function BlogPostPage({ params }: { params: Params }) {
   } catch {
     relatedPosts = []
   }
+
+  // Articles name models in plain text while a full spec page for each sits one
+  // route away, so the blog — the site's strongest internal-authority source —
+  // was passing none of it on. getAllVehicles is already paginated and cached,
+  // and this page is prerendered, so the match runs at build time.
+  const mentionedVehicles = findMentionedVehicles(post.contentHtml, await getAllVehicles())
 
   const articleJsonLd = {
     '@context': 'https://schema.org',
@@ -146,6 +156,17 @@ export default async function BlogPostPage({ params }: { params: Params }) {
           className="blog-content"
           dangerouslySetInnerHTML={{ __html: post.contentHtml }}
         />
+
+        {mentionedVehicles.length > 0 && (
+          <section className="art__mentions">
+            <h2>Vehículos mencionados en este artículo</h2>
+            <div className="art__mentions-grid">
+              {mentionedVehicles.map((vehicle) => (
+                <VehicleCard key={vehicle.id} {...vehicleToCardProps(vehicle)} hideSave />
+              ))}
+            </div>
+          </section>
+        )}
 
         {post.tags.length > 0 && (
           <div className="flex flex-wrap gap-2 mt-8 pt-6 border-t border-hairline">

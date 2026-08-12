@@ -261,4 +261,10 @@
 .art__hero img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
 .art__author { display: flex; align-items: center; gap: 10px; margin-top: 18px; font-size: var(--text-sm); color: var(--text-muted); }
 .art__author img { width: 32px; height: 32px; border-radius: 50%; }
+/* Catalogue links for the models an article names. Two columns inside the
+   720px article measure — three would squeeze the cards below their photos. */
+.art__mentions { margin-top: 44px; padding-top: 28px; border-top: 1px solid var(--border); }
+.art__mentions h2 { font-family: var(--font-display); font-weight: var(--weight-bold); font-size: var(--text-xl); letter-spacing: var(--tracking-tight); color: var(--text-strong); margin: 0 0 18px; }
+.art__mentions-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
 @media (max-width: 900px){ .bl__feat{ grid-template-columns: 1fr; } .bl__grid{ grid-template-columns: 1fr; } }
+@media (max-width: 560px){ .art__mentions-grid{ grid-template-columns: 1fr; } }
