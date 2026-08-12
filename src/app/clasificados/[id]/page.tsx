@@ -10,7 +10,7 @@ import {
   transmissionLabels,
   type Classified,
 } from '@/types/classified'
-import { formatNumber, formatPrice } from '@/lib/format'
+import { formatNumber, formatPrice, normalizeCurrency } from '@/lib/format'
 import { absoluteUrl, SITE_URL } from '@/lib/site'
 import JsonLd from '../../components/JsonLd'
 import CategoryBadge from '../../components/CategoryBadge'
@@ -143,7 +143,7 @@ export default async function ClassifiedDetailPage({ params }: PageProps) {
     offers: {
       '@type': 'Offer',
       price: classified.price,
-      priceCurrency: classified.currency === 'US$' ? 'USD' : 'UYU',
+      priceCurrency: normalizeCurrency(classified.currency),
       availability: AVAILABILITY[classified.status],
       url: absoluteUrl(`/clasificados/${classified.id}`),
       availableAtOrFrom: {

@@ -113,8 +113,12 @@
 @media (max-width: 640px){ .cl__gallery .dt__stage { max-height: 34vh; } }
 
 .dt__panel { position: sticky; top: 84px; }
-.dt__ey { font-family: var(--font-sans); font-weight: 600; color: var(--text-muted); font-size: var(--text-base); display: flex; align-items: center; gap: 8px; }
-.dt__model { font-family: var(--font-display); font-weight: 700; font-size: var(--text-4xl); letter-spacing: -0.03em; line-height: 1; color: var(--text-strong); margin: 10px 0 6px; }
+/* Both live inside the h1 so the heading text reads "Toyota RAV4 PHEV 2026".
+   They opt out of the display face and tracking they would otherwise inherit
+   from .dt__model, which is what keeps the panel looking unchanged. */
+.dt__ey { display: block; font-family: var(--font-sans); font-weight: 600; color: var(--text-muted); font-size: var(--text-base); letter-spacing: normal; margin-bottom: 10px; }
+.dt__model { font-family: var(--font-display); font-weight: 700; font-size: var(--text-4xl); letter-spacing: -0.03em; line-height: 1; color: var(--text-strong); margin: 0 0 6px; }
+.dt__year { color: var(--text-muted); font-weight: 600; }
 .dt__trim { color: var(--text-muted); font-size: var(--text-lg); }
 .dt__tags { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
 .dt__price { font-family: var(--font-mono); font-weight: 500; font-size: var(--text-4xl); color: var(--price); letter-spacing: -0.02em; margin: 22px 0 4px; font-feature-settings: "tnum"; }

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Check, ChevronRight, GitCompareArrows } from "lucide-react";
 import { getVehicleBySlug, getAllVehicles } from "@/lib/data";
-import { formatNumber, fuelLabel, fuelToTagType } from "@/lib/format";
+import { formatNumber, formatPrice, fuelLabel, fuelToTagType, normalizeCurrency } from "@/lib/format";
 import ImageCarousel from "@/app/components/ImageCarousel";
 import JsonLd from "@/app/components/JsonLd";
 import CommentsSection from "@/app/components/CommentsSection";
@@ -14,8 +14,36 @@ import { SpecGrid, type SpecGroup } from "@/app/components/ui/SpecGrid";
 import { isRecentlyListed } from "@/lib/vehicle-card";
 import { hasBattery, isElectric, showsDisplacement, showsFuelTank, showsGearCount } from "@/lib/vehicle-specs";
 import { absoluteUrl, SITE_URL } from "@/lib/site";
+import type { Vehicle } from "@/types/vehicle";
 
 type Params = Promise<{ slug: string }>
+
+/**
+ * Google truncates the snippet around 155 characters. Using vehicle.description
+ * meant shipping the whole editorial paragraph — 454 characters on average and
+ * 1.359 at worst — so every figure worth showing sat past the cut. Build the
+ * snippet from the specs instead; the long copy still runs in the page body,
+ * where it earns its keep.
+ */
+function buildMetaDescription(vehicle: Vehicle): string {
+  const specs = [
+    vehicle.engineHp && `${vehicle.engineHp} HP`,
+    vehicle.fuelType && fuelLabel(vehicle.fuelType),
+    vehicle.transmission && (transmissionNames[vehicle.transmission] || vehicle.transmission),
+  ].filter(Boolean).join(', ');
+
+  const description = [
+    `${vehicle.brand} ${vehicle.model} ${vehicle.year} en Uruguay`,
+    specs ? `: ${specs}` : '',
+    vehicle.price ? `. Precio ${formatPrice(vehicle.currency, vehicle.price)}` : '',
+    '. Ficha técnica completa.',
+  ].join('');
+
+  // A long brand and model can still overrun on their own. Cut on a word
+  // boundary so the snippet never ends mid-word.
+  if (description.length <= 155) return description;
+  return description.slice(0, 152).replace(/[\s,.:]+\S*$/, '') + '…';
+}
 
 export async function generateMetadata({ params }: { params: Params }) {
   const { slug } = await params;
@@ -23,8 +51,8 @@ export async function generateMetadata({ params }: { params: Params }) {
   if (!vehicle) return { title: 'Vehiculo no encontrado' };
 
   const title = `${vehicle.brand} ${vehicle.model} ${vehicle.year}`;
-  const priceText = vehicle.price ? ` - ${vehicle.currency} ${vehicle.price.toLocaleString('es-UY')}` : '';
-  const description = vehicle.description || `Ficha técnica del ${vehicle.brand} ${vehicle.model} ${vehicle.year}${priceText}. Especificaciones, precios y equipamiento en Uruguay.`;
+  const priceText = vehicle.price ? ` - ${formatPrice(vehicle.currency, vehicle.price)}` : '';
+  const description = buildMetaDescription(vehicle);
 
   return {
     title,
@@ -112,7 +140,7 @@ export default async function VehiclePage({ params }: { params: Params }) {
     offers: vehicle.price ? {
       '@type': 'Offer',
       price: vehicle.price,
-      priceCurrency: vehicle.currency === 'US$' ? 'USD' : 'UYU',
+      priceCurrency: normalizeCurrency(vehicle.currency),
       availability: 'https://schema.org/InStock',
       url: absoluteUrl(`/vehiculo/${vehicle.slug}`),
     } : undefined,
@@ -217,8 +245,14 @@ export default async function VehiclePage({ params }: { params: Params }) {
           </div>
 
           <div className="dt__panel">
-            <div className="dt__ey"><span>{vehicle.brand}</span><span>·</span><span>{vehicle.year}</span></div>
-            <h1 className="dt__model">{vehicle.model}</h1>
+            {/* Brand and year live inside the h1 rather than in a sibling
+                eyebrow. On their own, model names like "Han", "#1", "911" or
+                "bZ4X" told a search result nothing about what the page is. The
+                eyebrow styling is kept, so the panel reads as it did before. */}
+            <h1 className="dt__model">
+              <span className="dt__ey">{vehicle.brand}</span>
+              {vehicle.model} <span className="dt__year">{vehicle.year}</span>
+            </h1>
             {vehicle.version && <div className="dt__trim">{vehicle.version}</div>}
 
             <div className="dt__tags">
@@ -230,7 +264,7 @@ export default async function VehiclePage({ params }: { params: Params }) {
             {vehicle.price ? (
               <>
                 <div className="dt__price">
-                  <span className="cur">{vehicle.currency === 'US$' || vehicle.currency === 'U$S' ? 'USD' : vehicle.currency}</span>
+                  <span className="cur">{normalizeCurrency(vehicle.currency)}</span>
                   {formatNumber(vehicle.price)}
                 </div>
                 <div className="dt__pricenote">Precio de referencia · no incluye gastos de gestoría</div>
@@ -266,7 +300,7 @@ export default async function VehiclePage({ params }: { params: Params }) {
                       <span>{v.version || vehicle.model}</span>
                       {v.price != null && (
                         <span className="p">
-                          {(v.currency === 'US$' || v.currency === 'U$S' ? 'USD' : v.currency) || 'USD'} {formatNumber(v.price)}
+                          {formatPrice(v.currency, v.price)}
                         </span>
                       )}
                     </Link>

@@ -10,11 +10,25 @@ export function formatNumber(n: number): string {
   return n.toLocaleString('es-UY')
 }
 
+/**
+ * Currency to an ISO 4217 code. The catalogue stores "USD", the classifieds
+ * form once wrote "US$" and older imports wrote "U$S", so all three are alive
+ * in the data and every one of them means dollars.
+ *
+ * Use this anywhere the currency reaches structured data: a ternary that tests
+ * one alias and falls back to UYU silently relabels every dollar price as
+ * pesos, which is how the vehicle JSON-LD came to advertise "UYU 84.990" for a
+ * page reading "USD 84.990".
+ */
+export function normalizeCurrency(currency: string | undefined): string {
+  if (!currency || currency === 'US$' || currency === 'U$S') return 'USD'
+  return currency
+}
+
 /** "USD 42.390" — normalizes currency aliases (US$ → USD). */
 export function formatPrice(currency: string | undefined, price: number | undefined): string {
   if (price == null) return 'Consultar'
-  const cur = !currency || currency === 'US$' || currency === 'U$S' ? 'USD' : currency
-  return `${cur} ${formatNumber(price)}`
+  return `${normalizeCurrency(currency)} ${formatNumber(price)}`
 }
 
 /** Maps backend/display fuel values (accented, english, mild-hybrid…) to FuelTag keys. */

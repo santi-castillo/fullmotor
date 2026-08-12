@@ -57,7 +57,11 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
     ? `Fichas técnicas de ${categoryName.toLowerCase()} disponibles en Uruguay: especificaciones, precios y equipamiento actualizados.`
     : 'Fichas técnicas de autos, SUVs, camionetas, motos y utilitarios disponibles en Uruguay: especificaciones, precios y equipamiento.';
 
-  const canonical = `/?category=${category}`;
+  // `?category=all` serves what `/` serves, and it is not in the sitemap, so it
+  // self-canonicalised its way into being a duplicate of the home page. Point
+  // it at the root; the five real categories keep their own canonical. Faceted
+  // views fall out of this too, since they reuse the same value below.
+  const canonical = category === 'all' ? '/' : `/?category=${category}`;
 
   // Brand/fuel/price/page combinations explode into near-duplicate pages.
   // Point them at the clean category URL and keep them out of the index.
