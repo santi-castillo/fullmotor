@@ -143,9 +143,12 @@ export default async function Home({ searchParams }: PageProps) {
         <JsonLd data={websiteJsonLd} />
         <JsonLd data={organizationJsonLd} />
         <HeroSection total={meta.total} brandsCount={brands.length} />
-        <CategoryGrid categories={categoryCounts} totalCount={meta.total} />
+        {/* Editorial first: the news is the reason to come back, and it is the
+            only section that changes between visits. The category grid is
+            navigation the header already offers, so it closes the page. */}
         <BlogPreviewSection posts={latestBlogPosts} />
         <PremiumListings vehicles={latestVehicles} />
+        <CategoryGrid categories={categoryCounts} totalCount={meta.total} />
       </div>
     );
   }
