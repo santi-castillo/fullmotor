@@ -3,7 +3,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { BadgeCheck, Search, ArrowRight, Compass } from 'lucide-react';
+import { BadgeCheck, Search, ArrowRight, Compass, GitCompareArrows } from 'lucide-react';
 import { Vehicle } from '@/types/vehicle';
 import { formatNumber, formatPrice } from '@/lib/format';
 
@@ -91,7 +91,10 @@ export default function HeroSection({ total, brandsCount }: HeroSectionProps) {
                     {total ? `${formatNumber(total)} fichas técnicas en Uruguay` : 'Fichas técnicas en Uruguay'}
                 </span>
                 <h1 className="h-title">Encontrá tu <em>próximo</em> vehículo</h1>
-                <p className="h-sub">Fichas técnicas completas, precios de referencia y comparativas. Sin vueltas, con datos.</p>
+                <p className="h-sub">
+                    ¿No sabés por dónde empezar? Respondé seis preguntas en la <Link href="/guia-de-compra">guía de compra</Link> y te decimos qué auto te conviene,
+                    o enfrentá hasta cuatro modelos en el <Link href="/compare">comparador</Link>. Siempre con datos de fichas técnicas y precios de referencia.
+                </p>
 
                 <div className="h-searchbar" ref={searchRef}>
                     <div className="field">
@@ -153,11 +156,18 @@ export default function HeroSection({ total, brandsCount }: HeroSectionProps) {
                     </button>
                 </div>
 
-                <Link href="/guia-de-compra" className="h-guide-link">
-                    <Compass size={16} aria-hidden="true" />
-                    ¿No sabés por dónde empezar? Probá la guía de compra
-                    <ArrowRight size={14} aria-hidden="true" />
-                </Link>
+                <div className="h-quick" aria-label="Accesos rápidos">
+                    <Link href="/guia-de-compra" className="h-quick__btn h-quick__btn--primary">
+                        <Compass size={18} aria-hidden="true" />
+                        <span><strong>¿Qué auto me compro?</strong><small>Guía de compra en 6 preguntas</small></span>
+                        <ArrowRight size={16} aria-hidden="true" />
+                    </Link>
+                    <Link href="/compare" className="h-quick__btn">
+                        <GitCompareArrows size={18} aria-hidden="true" />
+                        <span><strong>Comparador</strong><small>Hasta 4 modelos lado a lado</small></span>
+                        <ArrowRight size={16} aria-hidden="true" />
+                    </Link>
+                </div>
 
                 <div className="h-stats">
                     {total != null && total > 0 && (
