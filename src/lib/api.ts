@@ -1,4 +1,4 @@
-import { Vehicle, Category } from '@/types/vehicle'
+import { Vehicle, Category, PriceHistoryEntry } from '@/types/vehicle'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'
 const COUNTRY = process.env.NEXT_PUBLIC_COUNTRY || 'uy'
@@ -83,6 +83,7 @@ interface ApiVehicle {
     publishedAt?: string
     createdAt?: string
     updatedAt?: string
+    priceHistory?: PriceHistoryEntry[]
 }
 
 interface VehiclesResponse {
@@ -179,6 +180,7 @@ function transformVehicle(apiVehicle: ApiVehicle): Vehicle {
         publishedAt: apiVehicle.publishedAt,
         createdAt: apiVehicle.createdAt,
         updatedAt: apiVehicle.updatedAt,
+        priceHistory: apiVehicle.priceHistory ?? [],
     }
 }
 
