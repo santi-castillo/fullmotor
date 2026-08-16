@@ -14,6 +14,7 @@ export default function SiteHeader() {
         <Logo size={22} className="k-logo" />
         <nav className="k-nav">
           <Link href="/?category=all">Vehículos</Link>
+          <Link href="/guia-de-compra">Guía de compra</Link>
           <Link href="/clasificados">Clasificados</Link>
           <Link href="/blog">Blog</Link>
         </nav>

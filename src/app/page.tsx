@@ -8,6 +8,7 @@ import { Category, CATEGORIES } from "@/types/vehicle";
 import { absoluteUrl, SITE_LOGO, SITE_NAME, SITE_URL } from "@/lib/site";
 import { formatNumber } from "@/lib/format";
 import HeroSection from "./components/HeroSection";
+import GuideCta from "./components/GuideCta";
 import CategoryGrid from "./components/CategoryGrid";
 import PremiumListings from "./components/PremiumListings";
 import VehicleFilters from "./components/VehicleFilters";
@@ -152,6 +153,7 @@ export default async function Home({ searchParams }: PageProps) {
             navigation the header already offers, so it closes the page. */}
         <BlogPreviewSection posts={latestBlogPosts} />
         <PremiumListings vehicles={latestVehicles} />
+        <GuideCta />
         <CategoryGrid categories={categoryCounts} totalCount={meta.total} />
       </div>
     );

@@ -32,6 +32,7 @@ export default function MobileNav() {
       {open && (
         <nav className="k-menu" onClick={() => setOpen(false)}>
           <Link href="/?category=all">Vehículos</Link>
+          <Link href="/guia-de-compra">Guía de compra</Link>
           <Link href="/clasificados">Clasificados</Link>
           <Link href="/blog">Blog</Link>
           <Link href="/compare" className="k-menu__with-icon">

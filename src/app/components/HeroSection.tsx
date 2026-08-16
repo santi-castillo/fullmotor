@@ -3,7 +3,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { BadgeCheck, Search, ArrowRight } from 'lucide-react';
+import { BadgeCheck, Search, ArrowRight, Compass } from 'lucide-react';
 import { Vehicle } from '@/types/vehicle';
 import { formatNumber, formatPrice } from '@/lib/format';
 
@@ -152,6 +152,12 @@ export default function HeroSection({ total, brandsCount }: HeroSectionProps) {
                         <ArrowRight size={18} aria-hidden="true" />
                     </button>
                 </div>
+
+                <Link href="/guia-de-compra" className="h-guide-link">
+                    <Compass size={16} aria-hidden="true" />
+                    ¿No sabés por dónde empezar? Probá la guía de compra
+                    <ArrowRight size={14} aria-hidden="true" />
+                </Link>
 
                 <div className="h-stats">
                     {total != null && total > 0 && (
