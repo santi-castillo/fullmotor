@@ -10,7 +10,7 @@
 
 import type { CuratedNode } from '@/lib/buying-guide/types'
 
-export const PICKS_UPDATED_AT = '2026-08-15'
+export const PICKS_UPDATED_AT = '2026-08-17'
 
 export const CURATED_PICKS: CuratedNode[] = [
   // ───────────────────────────── FAMILIA ─────────────────────────────
@@ -79,7 +79,7 @@ export const CURATED_PICKS: CuratedNode[] = [
     use: 'ciudad', band: '20-30k',
     picks: [
       { slug: 'uy-suzuki-swift-hybrid-2025-1-2-glx-cvt', why: ['Híbrido liviano de 3,86 m: consumo mínimo en ciudad', '6 airbags con AEB, carril y crucero adaptativo', 'Caja automática CVT y climatizador'] },
-      { slug: 'uy-toyota-yaris-hatch-2025-xls-cvt', why: ['7 airbags, el máximo del segmento', 'Confiabilidad y reventa Toyota', '1.5 de 107 hp con CVT'] },
+      { slug: 'uy-byd-yuan-pro-dm-i-2026-gl-785-kwh', why: ['SUV compacto híbrido de 166 hp y 300 Nm', 'Frenado autónomo, asistente de carril y crucero adaptativo', 'Baúl de 425 L, climatizador y cámara de retroceso', 'N.º 1 en ventas de SUV 2026 en Uruguay (ACAU)'] },
       { slug: 'uy-ora-03-2025-skin-47-8-kwh', why: ['Eléctrico con 400 km de autonomía', '7 airbags y ADAS completo', 'Cámara 360 y 171 hp'] },
       { slug: 'uy-chevrolet-onix-2025-premier-1-0-turbo-a-t', why: ['1.0 turbo de 116 hp con caja automática', '6 airbags y acceso sin llave', 'Red Chevrolet y repuestos accesibles'] },
       { slug: 'uy-mg-mg3-2026-hybrid-plus-e-at', why: ['Híbrido completo de 191 hp: rápido y ahorrador', '7 airbags, AEB y asistente de carril', 'Caja automática y 4,12 m'] },
@@ -143,7 +143,7 @@ export const CURATED_PICKS: CuratedNode[] = [
       { slug: 'uy-nissan-frontier-2025-se-4x4-2-3-tdi-m-t', why: ['Diésel 2.3 biturbo de 190 hp y 450 Nm', 'Tracción 4x4 y 6 airbags', 'Climatizador, cámara y control crucero'] },
       { slug: 'uy-toyota-hilux-2025-2-7-vvt-i-sr-4x2', why: ['La pickup más vendida: reventa y repuestos garantizados', '7 airbags y asistente de carril', '2.7 nafta de 164 hp'], note: 'Entrada a Hilux; las diésel arrancan en 52.490.' },
       { slug: 'uy-chery-himla-2025-23-4x4-mt', why: ['Diésel 2.3 de 360 Nm con 4x4 por 35.990', '7 airbags y caja de 1.500 L', 'Cámara 360 y climatizador'] },
-      { slug: 'uy-gwm-poer-2025-2-0-tdi-family-luxury-4x4-a-t', why: ['Diésel 2.0 de 163 hp y 420 Nm con caja automática', 'Tracción 4x4 y 5,42 m de largo', 'Asientos calefaccionados y climatizador'] },
+      { slug: 'uy-riddara-rd6-eco-4wd-2025-rd6-eco-4wd', why: ['Eléctrico: 375 hp y 485 Nm con tracción 4x4', '390 km de autonomía y frenado autónomo de emergencia', 'Caja de carga de 1.200 L, cámara y acceso sin llave', 'Entre los 10 utilitarios más vendidos 2026 en Uruguay (ACAU)'] },
       { slug: 'uy-mitsubishi-l200-2025-glx-24-mpi-mt-2wd', why: ['7 airbags, AEB y detector de punto ciego', 'Caja de 1.500 L y 2.4 de 155 hp', 'Robustez L200 con red Mitsubishi'] },
     ],
   },
@@ -192,7 +192,7 @@ export const CURATED_PICKS: CuratedNode[] = [
     use: 'ruta', band: '30-45k',
     picks: [
       { slug: 'uy-toyota-corolla-2025-hybrid-xei', why: ['Híbrido Toyota: consumo mínimo en ruta', '7 airbags, AEB, carril y crucero adaptativo', 'Baúl de 471 L y reventa asegurada'] },
-      { slug: 'uy-nissan-qashqai-2025-advance-1-3-dig-t-cvt', why: ['1.3 turbo de 158 hp y 260 Nm', 'Baúl de 504 L y 6 airbags', 'Interior en cuero, climatizador y crucero'] },
+      { slug: 'uy-omoda-and-jaecoo-omoda-5-2025-shs-premium-15t-dht', why: ['Híbrido de 150 hp con 750 km de autonomía total', 'Baúl de 510 L y techo panorámico', 'Cámara 360°, audio premium y asientos eléctricos', 'Entre los 10 SUV más vendidos 2026 en Uruguay (ACAU)'] },
       { slug: 'uy-renault-boreal-2026-iconic', why: ['SUV nuevo de 4,56 m con baúl de 586 L', '6 airbags, AEB, carril, punto ciego y tráfico cruzado', '1.3 turbo de 156 hp y 270 Nm'] },
       { slug: 'uy-jeep-compass-2025-longitude-1-3-t270-at6-fwd', why: ['1.3 turbo de 180 hp y 270 Nm', '6 airbags, AEB y asistente de carril', 'Uno de los SUV más vendidos de Uruguay'] },
       { slug: 'uy-volkswagen-tiguan-2025-1-5-tsi-life-dsg', why: ['1.5 TSI de 150 hp con caja DSG', 'Baúl de 521 L y crucero adaptativo', '6 airbags y aplomo en ruta'] },
