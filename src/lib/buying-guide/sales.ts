@@ -99,8 +99,11 @@ export function catalogueRoot(model: string): string[] {
  *  Add entries from the "sin familia" report printed by `npm run acau:import`. */
 export const SALES_ALIASES: Record<string, string | string[]> = {
   'dongfeng|nammi': ['nammi 330', 'nammi 430'],
-  'foton|tunland v 7': ['tunland'],
-  'foton|tunland v 9': ['tunland'],
+  'foton|tunland v 7': ['tunland v 7'],
+  'foton|tunland v 9': ['tunland v 9'],
+  'jac|ytterby': ['es 3 ytterby'],
+  'toyota|yaris hatch': ['yaris hb'],
+  'geely|ex 5 max': ['ex 5 max', 'ex 5 pro'],
 }
 
 /** Trailing tokens that are trims rather than model identity ("EX5 Max" → "ex 5"). */
