@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { LogOut, User as UserIcon } from 'lucide-react'
+import Link from 'next/link'
+import { LayoutList, LogOut, ShieldCheck, Store, User as UserIcon } from 'lucide-react'
 import { useAuth } from './AuthProvider'
 import { Avatar } from './ui/Avatar'
 
@@ -52,6 +53,47 @@ export default function UserMenu() {
                         <p className="text-sm font-semibold text-ink truncate">{user.name}</p>
                         <p className="text-xs text-muted truncate">{user.email}</p>
                     </div>
+
+                    {/* This menu used to link nowhere at all, so every private
+                        surface — including the operator queue — was reachable
+                        only by typing its URL. */}
+                    <Link
+                        href="/clasificados/mis"
+                        onClick={() => setOpen(false)}
+                        className="w-full px-4 py-3 text-left text-sm text-body hover:bg-sunken transition-colors flex items-center gap-2"
+                    >
+                        <LayoutList size={15} aria-hidden="true" />
+                        Mis clasificados
+                    </Link>
+
+                    {user.dealership && (
+                        <Link
+                            href={
+                                user.dealership.status === 'approved'
+                                    ? '/automotoras/panel'
+                                    : '/clasificados/mis'
+                            }
+                            onClick={() => setOpen(false)}
+                            className="w-full px-4 py-3 text-left text-sm text-body hover:bg-sunken transition-colors flex items-center gap-2"
+                        >
+                            <Store size={15} aria-hidden="true" />
+                            {user.dealership.status === 'approved'
+                                ? 'Mi automotora'
+                                : 'Mi solicitud'}
+                        </Link>
+                    )}
+
+                    {user.role === 'admin' && (
+                        <Link
+                            href="/admin/automotoras"
+                            onClick={() => setOpen(false)}
+                            className="w-full px-4 py-3 text-left text-sm text-body hover:bg-sunken transition-colors flex items-center gap-2 border-t border-hairline"
+                        >
+                            <ShieldCheck size={15} aria-hidden="true" />
+                            Revisar automotoras
+                        </Link>
+                    )}
+
                     <button
                         onClick={() => {
                             setOpen(false)
