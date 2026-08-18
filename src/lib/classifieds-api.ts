@@ -219,11 +219,19 @@ export async function fetchClassifiedById(id: string): Promise<Classified | null
 // ============================================
 
 export async function fetchMyClassifieds(
-  params: { page?: number; limit?: number } = {}
+  params: {
+    page?: number
+    limit?: number
+    /** active | paused | sold | expired. `expired` is derived from the date. */
+    status?: string
+    q?: string
+  } = {}
 ): Promise<PaginatedClassifieds> {
   const search = new URLSearchParams()
   if (params.page) search.set('page', String(params.page))
   if (params.limit) search.set('limit', String(params.limit))
+  if (params.status) search.set('status', params.status)
+  if (params.q) search.set('q', params.q)
 
   const url = `${API_URL}/api/classifieds/mine${search.toString() ? `?${search}` : ''}`
   const response = await fetch(url, {

@@ -5,6 +5,7 @@ import { formatDate, formatNumber } from '@/lib/format'
 import { RawImageWithFallback } from './ui/ImageWithFallback'
 import CategoryBadge from './CategoryBadge'
 import StatusBadge from './StatusBadge'
+import DealershipBadge from './DealershipBadge'
 
 interface ClassifiedCardProps {
   classified: Classified
@@ -33,7 +34,7 @@ export default function ClassifiedCard({ classified, showStatus = false }: Class
         />
         {showStatus && (
           <div className="tm-vcard__topr">
-            <StatusBadge status={classified.status} expiresAt={classified.expiresAt} />
+            <StatusBadge status={classified.status} expiresAt={classified.expiresAt} neverExpires={classified.neverExpires} />
           </div>
         )}
       </div>
@@ -50,6 +51,13 @@ export default function ClassifiedCard({ classified, showStatus = false }: Class
           <MapPin size={13} aria-hidden="true" />
           {classified.city}
         </span>
+        {/* Not a link: this card is already wrapped in one, and nesting
+            anchors would split it. The detail page links through instead. */}
+        {classified.user.dealership && (
+          <span className="block mt-1.5">
+            <DealershipBadge dealership={classified.user.dealership} />
+          </span>
+        )}
         {/* Only on the seller's own dashboard: expiry is the one thing they
             cannot see anywhere else, and it is what silently removes a listing
             from the marketplace. */}

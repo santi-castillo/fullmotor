@@ -4,10 +4,12 @@ import { Badge } from './ui/Badge'
 interface StatusBadgeProps {
   status: ClassifiedStatus
   expiresAt?: string
+  /** Dealership listings carry a sentinel date; never read it directly. */
+  neverExpires?: boolean
 }
 
-export default function StatusBadge({ status, expiresAt }: StatusBadgeProps) {
-  const isExpired = expiresAt ? new Date(expiresAt) < new Date() : false
+export default function StatusBadge({ status, expiresAt, neverExpires }: StatusBadgeProps) {
+  const isExpired = !neverExpires && expiresAt ? new Date(expiresAt) < new Date() : false
 
   if (isExpired && status === 'active') {
     return (

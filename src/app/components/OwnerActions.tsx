@@ -28,7 +28,7 @@ export default function OwnerActions({ classified }: OwnerActionsProps) {
     return null
   }
 
-  const current = { expiresAt }
+  const current = { expiresAt, neverExpires: classified.neverExpires }
   const expired = isExpired(current)
   const renewable = isRenewable(current)
 
@@ -81,13 +81,19 @@ export default function OwnerActions({ classified }: OwnerActionsProps) {
     <div className="bg-surface border border-line rounded-[var(--radius-lg)] p-5 space-y-4">
       <div className="flex items-center justify-between gap-3">
         <h3 className="tm-eyebrow">Tus acciones</h3>
-        <StatusBadge status={status} expiresAt={expiresAt} />
+        <StatusBadge status={status} expiresAt={expiresAt} neverExpires={classified.neverExpires} />
       </div>
 
       <p className="text-xs text-muted">
-        {expired ? 'Venció el ' : 'Vence el '}
-        <span className="font-mono text-ink">{formatDate(expiresAt)}</span>
-        {expired && '. Renovala para que vuelva a aparecer en el listado.'}
+        {classified.neverExpires ? (
+          'Tu aviso no vence: como automotora, queda publicado mientras lo dejes activo.'
+        ) : (
+          <>
+            {expired ? 'Venció el ' : 'Vence el '}
+            <span className="font-mono text-ink">{formatDate(expiresAt)}</span>
+            {expired && '. Renovala para que vuelva a aparecer en el listado.'}
+          </>
+        )}
       </p>
 
       <div className="flex flex-wrap gap-2">

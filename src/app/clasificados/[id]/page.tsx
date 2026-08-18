@@ -20,6 +20,7 @@ import ContactReveal from '../../components/ContactReveal'
 import OwnerActions from '../../components/OwnerActions'
 import CommentsSection from '../../components/CommentsSection'
 import { Avatar } from '../../components/ui/Avatar'
+import DealershipBadge from '../../components/DealershipBadge'
 
 export const dynamic = 'force-dynamic'
 
@@ -34,6 +35,9 @@ interface PageProps {
 const getClassified = cache(fetchClassifiedById)
 
 function isExpired(classified: Classified) {
+  // A dealership listing carries a far-future sentinel and reports itself as
+  // never expiring; comparing its date would work today but only by accident.
+  if (classified.neverExpires) return false
   return new Date(classified.expiresAt) < new Date()
 }
 
@@ -200,7 +204,7 @@ export default async function ClassifiedDetailPage({ params }: PageProps) {
                 </div>
               </div>
               <div className="flex flex-col items-end gap-2">
-                <StatusBadge status={classified.status} expiresAt={classified.expiresAt} />
+                <StatusBadge status={classified.status} expiresAt={classified.expiresAt} neverExpires={classified.neverExpires} />
               </div>
             </div>
 
@@ -254,9 +258,15 @@ export default async function ClassifiedDetailPage({ params }: PageProps) {
                 size="lg"
                 tone="accent-soft"
               />
-              <div>
+              <div className="min-w-0">
                 <p className="tm-eyebrow">Vendedor</p>
-                <p className="font-semibold text-ink">{classified.user.name}</p>
+                <p className="font-semibold text-ink truncate">{classified.user.name}</p>
+                {/* Here it IS a link — nothing wraps this card. */}
+                {classified.user.dealership && (
+                  <span className="block mt-1">
+                    <DealershipBadge dealership={classified.user.dealership} asLink />
+                  </span>
+                )}
               </div>
             </div>
 

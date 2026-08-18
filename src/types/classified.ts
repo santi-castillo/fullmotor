@@ -192,11 +192,20 @@ export const statusLabels: Record<ClassifiedStatus, string> = {
  */
 export const RENEW_WINDOW_MS = 7 * 24 * 60 * 60 * 1000
 
-export function isExpired(classified: Pick<Classified, 'expiresAt'>, now = Date.now()): boolean {
+type Expiry = Pick<Classified, 'expiresAt'> & { neverExpires?: boolean }
+
+export function isExpired(classified: Expiry, now = Date.now()): boolean {
+  if (classified.neverExpires) return false
   return new Date(classified.expiresAt).getTime() < now
 }
 
-export function isRenewable(classified: Pick<Classified, 'expiresAt'>, now = Date.now()): boolean {
+/**
+ * A dealership listing never expires, so it is never renewable — which is what
+ * removes the renew button for them without anything here knowing what the
+ * backend's sentinel date is.
+ */
+export function isRenewable(classified: Expiry, now = Date.now()): boolean {
+  if (classified.neverExpires) return false
   return new Date(classified.expiresAt).getTime() - now <= RENEW_WINDOW_MS
 }
 
