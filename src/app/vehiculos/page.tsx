@@ -75,9 +75,14 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
   // pages are NOT faceted: each one holds vehicles no other page holds, so it
   // self-canonicalises and stays indexable.
   const isFaceted = Boolean(params.brand || params.fuel || params.min_price || params.max_price);
+
+  // `?category=all` serves exactly what the bare listing serves. Dropping it
+  // from the canonical is what keeps the two from competing as duplicates —
+  // the same trap the old `/?category=all` fell into.
+  const canonicalCategory = category === 'all' ? undefined : category;
   const canonical = isFaceted
-    ? catalogHref({ category }, 1)
-    : catalogHref({ category }, page);
+    ? catalogHref({ category: canonicalCategory }, 1)
+    : catalogHref({ category: canonicalCategory }, page);
 
   return {
     title,
@@ -123,7 +128,7 @@ export default async function VehiclesPage({ searchParams }: PageProps) {
         '@type': 'ListItem',
         position: 2,
         name: categoryName || 'Todos los vehículos',
-        item: absoluteUrl(catalogHref({ category: params.category }, 1)),
+        item: absoluteUrl(catalogHref({ category: params.category === 'all' ? undefined : params.category }, 1)),
       },
     ],
   };

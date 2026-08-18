@@ -8,7 +8,8 @@ export interface VehicleCardProps {
   model: string
   version?: string
   year: number
-  price: number
+  /** Absent on vehicles with no published price. */
+  price?: number
   currency?: string
   power?: number
   fuelType?: string

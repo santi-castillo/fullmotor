@@ -203,6 +203,9 @@
 .tm-vcard__foot { display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--hairline); }
 .tm-vcard__price { font-family: var(--font-mono); font-weight: 500; font-size: var(--text-lg); color: var(--price); letter-spacing: -0.01em; font-feature-settings: "tnum"; }
 .tm-vcard__price .cur { font-size: var(--text-xs); color: var(--text-muted); margin-right: 3px; }
+/* No published price. Muted so a card without a figure does not read as the
+   cheapest one in the grid. */
+.tm-vcard__price--ask { color: var(--text-muted); font-size: var(--text-base); }
 .tm-vcard__power { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--text-muted); }
 
 /* ---- Version switcher on the card (F4) ---- */

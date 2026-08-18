@@ -45,7 +45,7 @@ export default function InventoryToolbar() {
         params.delete('page');
         if (!params.has('category')) params.set('category', 'all');
         router.push(`${pathname}?${params.toString()}`);
-    }, [router, searchParams]);
+    }, [router, pathname, searchParams]);
 
     const hasActiveFilters = (category !== 'all') || brand || fuel || minPrice || maxPrice;
     const categoryName = CATEGORIES.find((c) => c.id === category)?.name;

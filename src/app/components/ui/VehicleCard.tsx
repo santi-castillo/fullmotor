@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Heart } from 'lucide-react'
-import { formatNumber, fuelToTagType } from '@/lib/format'
+import { formatNumber, fuelToTagType, normalizeCurrency } from '@/lib/format'
 import type { VehicleCardProps } from '@/lib/vehicle-card'
 import { FuelTag } from './FuelTag'
 import { ImageWithFallback } from './ImageWithFallback'
@@ -32,7 +32,7 @@ export function VehicleCard({
   const { has, toggle, hydrated } = useSaved()
   const saved = hydrated && has(slug)
   const used = String(condition).toLowerCase().startsWith('us')
-  const cur = !currency || currency === 'US$' || currency === 'U$S' ? 'USD' : currency
+  const cur = normalizeCurrency(currency)
 
   return (
     <Link href={`/vehiculo/${slug}`} className="tm-vcard">
@@ -75,7 +75,12 @@ export function VehicleCard({
         <h3 className="tm-vcard__model">{model}</h3>
         {version && <p className="tm-vcard__trim">{version}</p>}
         <div className="tm-vcard__foot">
-          <span className="tm-vcard__price"><span className="cur">{cur}</span>{formatNumber(price)}</span>
+          {/* Not every vehicle carries a price — the SxS quads do not. The
+              detail page already says "a consultar"; the card said NaN, or
+              crashed the render when the value was null. */}
+          {price != null
+            ? <span className="tm-vcard__price"><span className="cur">{cur}</span>{formatNumber(price)}</span>
+            : <span className="tm-vcard__price tm-vcard__price--ask">Consultar</span>}
           {power != null && <span className="tm-vcard__power">{power} HP</span>}
         </div>
         {relatedVersions && relatedVersions.length > 0 && (

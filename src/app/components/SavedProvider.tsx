@@ -10,7 +10,8 @@ export interface SavedVehicle {
   model: string
   version?: string
   year: number
-  price: number
+  /** Absent on vehicles with no published price. */
+  price?: number
   currency: string
   fuelType?: string
   engineHp?: number

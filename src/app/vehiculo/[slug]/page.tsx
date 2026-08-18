@@ -16,6 +16,7 @@ import { isRecentlyListed } from "@/lib/vehicle-card";
 import { hasRecentPriceDrop } from "@/lib/price-history";
 import { hasBattery, isElectric, showsDisplacement, showsFuelTank, showsGearCount } from "@/lib/vehicle-specs";
 import { absoluteUrl, SITE_URL } from "@/lib/site";
+import { brandSlug } from "@/lib/catalog";
 import type { Vehicle } from "@/types/vehicle";
 
 type Params = Promise<{ slug: string }>
@@ -154,7 +155,8 @@ export default async function VehiclePage({ params }: { params: Params }) {
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Inicio', item: SITE_URL },
       { '@type': 'ListItem', position: 2, name: categoryNames[vehicle.category], item: absoluteUrl(`/vehiculos?category=${vehicle.category}`) },
-      { '@type': 'ListItem', position: 3, name: `${vehicle.brand} ${vehicle.model}` },
+      { '@type': 'ListItem', position: 3, name: vehicle.brand, item: absoluteUrl(`/marcas/${brandSlug(vehicle.brand)}`) },
+      { '@type': 'ListItem', position: 4, name: vehicle.model },
     ],
   };
 
@@ -229,7 +231,9 @@ export default async function VehiclePage({ params }: { params: Params }) {
           <ChevronRight size={13} aria-hidden="true" />
           <Link href={`/vehiculos?category=${vehicle.category}`}>{categoryNames[vehicle.category]}</Link>
           <ChevronRight size={13} aria-hidden="true" />
-          <span style={{ color: 'var(--text-strong)' }}>{vehicle.brand} {vehicle.model}</span>
+          <Link href={`/marcas/${brandSlug(vehicle.brand)}`}>{vehicle.brand}</Link>
+          <ChevronRight size={13} aria-hidden="true" />
+          <span style={{ color: 'var(--text-strong)' }}>{vehicle.model}</span>
         </div>
 
         <div className="dt__top">

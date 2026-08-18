@@ -19,6 +19,9 @@ export default function SiteFooter() {
             <Link href="/vehiculos?category=pickups">Camionetas</Link>
             <Link href="/vehiculos?category=motos">Motos</Link>
             <Link href="/vehiculos?category=utilitarios">Utilitarios</Link>
+            {/* The only site-wide link into the brand pages. Without it they
+                are reachable from a vehicle breadcrumb and the sitemap only. */}
+            <Link href="/marcas">Todas las marcas</Link>
           </div>
           <div className="k-footer__col">
             <h5>TodoMotor</h5>

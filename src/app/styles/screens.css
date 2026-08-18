@@ -438,3 +438,26 @@
 }
 .gd__src--sales { background: var(--positive-soft); color: var(--positive-ink); }
 .gd__source { margin: 14px 0 0; font-size: var(--text-xs); color: var(--text-faint); max-width: 80ch; }
+
+/* ================= Marcas (.mk) + paginación del catálogo (.pg) ================= */
+.mk__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 24px; list-style: none; padding: 0; }
+.mk__card { display: flex; flex-direction: column; gap: 4px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px; color: inherit; transition: transform var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out), border-color var(--dur); }
+.mk__card:hover { transform: translateY(-3px); box-shadow: var(--shadow-card); border-color: var(--accent); color: inherit; }
+.mk__name { font-family: var(--font-display); font-weight: 700; font-size: var(--text-lg); color: var(--text-strong); letter-spacing: -0.01em; }
+.mk__meta { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--text-muted); }
+
+/* Real anchors, so the numbers a crawler follows are the ones a reader clicks. */
+.pg { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 32px 0 8px; flex-wrap: wrap; }
+.pg__list { display: flex; align-items: center; gap: 6px; list-style: none; margin: 0; padding: 0; }
+.pg__n { display: grid; place-items: center; min-width: 38px; height: 38px; padding: 0 10px; border-radius: var(--radius-md); border: 1px solid var(--border); background: var(--surface); font-family: var(--font-mono); font-size: var(--text-sm); color: var(--text-body); }
+.pg__n:hover { border-color: var(--accent); color: var(--accent-ink); }
+.pg__n--on { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+.pg__n--on:hover { color: #fff; }
+.pg__arrow { display: grid; place-items: center; width: 38px; height: 38px; border-radius: var(--radius-md); border: 1px solid var(--border); background: var(--surface); color: var(--text-body); }
+.pg__arrow:hover { border-color: var(--accent); color: var(--accent-ink); }
+.pg__arrow--off { opacity: 0.35; pointer-events: none; }
+.pg__gap { font-family: var(--font-mono); color: var(--text-faint); padding: 0 2px; }
+
+@media (max-width: 1000px){ .mk__grid{ grid-template-columns: repeat(3,1fr); } }
+@media (max-width: 700px){ .mk__grid{ grid-template-columns: repeat(2,1fr); } }
+@media (max-width: 420px){ .mk__grid{ grid-template-columns: 1fr; } }

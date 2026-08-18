@@ -4,6 +4,7 @@ import { getAllBlogPosts } from '@/lib/blog'
 import { getAllIndexableClassifieds } from '@/lib/classifieds-api'
 import { CATEGORIES } from '@/types/vehicle'
 import { absoluteUrl, SITE_URL } from '@/lib/site'
+import { CATALOG_PER_PAGE, catalogHref, groupByBrand } from '@/lib/catalog'
 
 // Refresh the sitemap without a rebuild — new articles and listings show up
 // within the hour instead of waiting for the next deploy.
@@ -28,11 +29,33 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const now = new Date()
 
-  const categoryEntries: MetadataRoute.Sitemap = CATEGORIES.map((cat) => ({
-    url: absoluteUrl(`/vehiculos?category=${cat.id}`),
+  /**
+   * Every page of every category, not just page 1.
+   *
+   * The catalogue rendered 9 of 1.239 vehicles into its server HTML, so the
+   * sitemap was the only route a crawler had to the other 1.230. Listing the
+   * paginated pages gives those vehicles a linked path as well as a listed one.
+   * Counts come from the vehicles already loaded above — no extra requests.
+   */
+  const countFor = (categoryId?: string) =>
+    categoryId ? vehicles.filter((v) => v.category === categoryId).length : vehicles.length
+
+  const listingEntries: MetadataRoute.Sitemap = [undefined, ...CATEGORIES.map((c) => c.id)].flatMap((categoryId) => {
+    const pages = Math.max(1, Math.ceil(countFor(categoryId) / CATALOG_PER_PAGE))
+    return Array.from({ length: pages }, (_, i) => ({
+      url: absoluteUrl(catalogHref({ category: categoryId }, i + 1)),
+      lastModified: now,
+      changeFrequency: 'daily' as const,
+      // Page 1 of a listing is the entry point; deeper pages matter less.
+      priority: i === 0 ? (categoryId ? 0.8 : 0.9) : 0.5,
+    }))
+  })
+
+  const brandEntries: MetadataRoute.Sitemap = groupByBrand(vehicles).map((brand) => ({
+    url: absoluteUrl(`/marcas/${brand.slug}`),
     lastModified: now,
-    changeFrequency: 'daily',
-    priority: 0.8,
+    changeFrequency: 'weekly',
+    priority: 0.7,
   }))
 
   const vehicleEntries: MetadataRoute.Sitemap = vehicles.map((vehicle) => ({
@@ -81,7 +104,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly',
       priority: 0.8,
     },
-    ...categoryEntries,
+    {
+      url: absoluteUrl('/marcas'),
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    ...listingEntries,
+    ...brandEntries,
     ...blogEntries,
     ...vehicleEntries,
     ...classifiedEntries,
