@@ -151,7 +151,7 @@ export default async function VehiclePage({ params }: { params: Params }) {
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Inicio', item: SITE_URL },
-      { '@type': 'ListItem', position: 2, name: categoryNames[vehicle.category], item: absoluteUrl(`/?category=${vehicle.category}`) },
+      { '@type': 'ListItem', position: 2, name: categoryNames[vehicle.category], item: absoluteUrl(`/vehiculos?category=${vehicle.category}`) },
       { '@type': 'ListItem', position: 3, name: `${vehicle.brand} ${vehicle.model}` },
     ],
   };
@@ -225,7 +225,7 @@ export default async function VehiclePage({ params }: { params: Params }) {
         <div className="dt__crumb">
           <Link href="/">Inicio</Link>
           <ChevronRight size={13} aria-hidden="true" />
-          <Link href={`/?category=${vehicle.category}`}>{categoryNames[vehicle.category]}</Link>
+          <Link href={`/vehiculos?category=${vehicle.category}`}>{categoryNames[vehicle.category]}</Link>
           <ChevronRight size={13} aria-hidden="true" />
           <span style={{ color: 'var(--text-strong)' }}>{vehicle.brand} {vehicle.model}</span>
         </div>

@@ -20,7 +20,7 @@ export default function NotFound() {
         <p className="text-sm text-muted mb-4">O explorá por categoría:</p>
         <div className="flex flex-wrap justify-center gap-3">
           {CATEGORIES.map((cat) => (
-            <Link key={cat.id} href={`/?category=${cat.id}`} className="tm-chip">
+            <Link key={cat.id} href={`/vehiculos?category=${cat.id}`} className="tm-chip">
               {cat.name}
             </Link>
           ))}

@@ -18,7 +18,7 @@ export default function PremiumListings({ vehicles }: PremiumListingsProps) {
                     <h2>Destacados</h2>
                     <p>Novedades y lanzamientos del momento</p>
                 </div>
-                <Link href="/?category=all" className="h-link">
+                <Link href="/vehiculos" className="h-link">
                     Ver todo el inventario <ArrowRight size={16} aria-hidden="true" />
                 </Link>
             </div>

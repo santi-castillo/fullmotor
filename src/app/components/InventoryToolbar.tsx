@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback } from 'react';
 import { X } from 'lucide-react';
 import { FilterChip } from './ui/FilterChip';
@@ -26,6 +26,7 @@ const FUEL_PARAM_LABELS: Record<string, string> = {
 
 export default function InventoryToolbar() {
     const router = useRouter();
+    const pathname = usePathname();
     const searchParams = useSearchParams();
 
     const brand = searchParams.get('brand');
@@ -43,7 +44,7 @@ export default function InventoryToolbar() {
         });
         params.delete('page');
         if (!params.has('category')) params.set('category', 'all');
-        router.push(`/?${params.toString()}`);
+        router.push(`${pathname}?${params.toString()}`);
     }, [router, searchParams]);
 
     const hasActiveFilters = (category !== 'all') || brand || fuel || minPrice || maxPrice;
@@ -62,7 +63,7 @@ export default function InventoryToolbar() {
             <div className="iv__chips">
                 <FilterChip
                     active={!hasActiveFilters}
-                    onClick={() => router.push('/?category=all')}
+                    onClick={() => router.push(pathname)}
                 >
                     Todos
                 </FilterChip>

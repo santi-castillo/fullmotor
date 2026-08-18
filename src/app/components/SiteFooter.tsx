@@ -14,11 +14,11 @@ export default function SiteFooter() {
         <div className="k-footer__cols">
           <div className="k-footer__col">
             <h5>Catálogo</h5>
-            <Link href="/?category=autos">Autos</Link>
-            <Link href="/?category=suvs">SUVs</Link>
-            <Link href="/?category=pickups">Camionetas</Link>
-            <Link href="/?category=motos">Motos</Link>
-            <Link href="/?category=utilitarios">Utilitarios</Link>
+            <Link href="/vehiculos?category=autos">Autos</Link>
+            <Link href="/vehiculos?category=suvs">SUVs</Link>
+            <Link href="/vehiculos?category=pickups">Camionetas</Link>
+            <Link href="/vehiculos?category=motos">Motos</Link>
+            <Link href="/vehiculos?category=utilitarios">Utilitarios</Link>
           </div>
           <div className="k-footer__col">
             <h5>TodoMotor</h5>

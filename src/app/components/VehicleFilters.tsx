@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useState, useEffect, useRef } from 'react';
 import { CategoryIcon } from './ui/CategoryIcon';
 import { FuelTag } from './ui/FuelTag';
@@ -31,6 +31,7 @@ const FUELS: { value: string; tag: FuelTagType }[] = [
 
 export default function VehicleFilters({ brands, categories }: VehicleFiltersProps) {
     const router = useRouter();
+    const pathname = usePathname();
     const searchParams = useSearchParams();
 
     const currentBrand = searchParams.get('brand') || 'all';
@@ -73,7 +74,7 @@ export default function VehicleFilters({ brands, categories }: VehicleFiltersPro
                 }
                 params.delete('page');
                 if (!params.has('category')) params.set('category', 'all');
-                router.push(`/?${params.toString()}`);
+                router.push(`${pathname}?${params.toString()}`);
             }
         }, 1000);
 
@@ -108,7 +109,7 @@ export default function VehicleFilters({ brands, categories }: VehicleFiltersPro
 
     const handleFilterChange = (key: string, value: string) => {
         const query = createQueryString({ [key]: value });
-        router.push(`/?${query}`);
+        router.push(`${pathname}?${query}`);
     };
 
     const allCategories: CategoryCount[] = [

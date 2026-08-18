@@ -13,7 +13,7 @@ export default function SiteHeader() {
       <div className="k-header__in">
         <Logo size={22} className="k-logo" />
         <nav className="k-nav">
-          <Link href="/?category=all">Vehículos</Link>
+          <Link href="/vehiculos">Vehículos</Link>
           <Link href="/clasificados">Clasificados</Link>
           <Link href="/blog">Blog</Link>
         </nav>

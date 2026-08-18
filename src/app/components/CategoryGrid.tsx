@@ -26,7 +26,7 @@ export default function CategoryGrid({ categories }: CategoryGridProps) {
             </div>
             <div className="h-cats">
                 {categories.map((cat) => (
-                    <Link key={cat.id} href={`/?category=${cat.id}`} className="h-cat">
+                    <Link key={cat.id} href={`/vehiculos?category=${cat.id}`} className="h-cat">
                         <div className="h-cat__ic">
                             <CategoryIcon name={cat.icon as CategoryIconName} size={22} />
                         </div>

@@ -80,7 +80,7 @@ export default function HeroSection({ total, brandsCount }: HeroSectionProps) {
     };
 
     const goToInventory = () => {
-        router.push(query ? `/?category=all&brand=${encodeURIComponent(query)}` : '/?category=all');
+        router.push(query ? `/vehiculos?brand=${encodeURIComponent(query)}` : '/vehiculos');
     };
 
     return (

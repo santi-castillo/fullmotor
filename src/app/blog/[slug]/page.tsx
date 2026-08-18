@@ -137,7 +137,7 @@ export default async function BlogPostPage({ params }: { params: Params }) {
           <span>{post.author.name}</span>
         </div>
 
-        <div className="art__hero">
+        <div className={`art__hero${post.coverImage ? '' : ' art__hero--empty'}`}>
           {post.coverImage ? (
             <Image
               src={post.coverImage}
@@ -148,7 +148,7 @@ export default async function BlogPostPage({ params }: { params: Params }) {
               style={{ objectFit: 'cover' }}
             />
           ) : (
-            <Newspaper size={44} aria-hidden="true" />
+            <Newspaper size={22} aria-hidden="true" />
           )}
         </div>
 

@@ -259,6 +259,11 @@
 .art__title { font-size: clamp(32px, 4.5vw, 52px); letter-spacing: -0.03em; line-height: 1.04; }
 .art__hero { aspect-ratio: 16/8; border-radius: var(--radius-xl); background: linear-gradient(135deg, var(--accent-faint), var(--surface-sunken)); display: grid; place-items: center; color: var(--accent); margin: 28px 0; position: relative; overflow: hidden; }
 .art__hero img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+/* No cover image. The 16:8 block earns its size in the blog grid, where it
+   keeps every card the same height — inside an article it is a screenful of
+   gradient carrying nothing, sitting between the headline and the first
+   paragraph. Collapsed to a band that just separates the two. */
+.art__hero--empty { aspect-ratio: auto; height: 64px; border-radius: var(--radius-md); margin: 22px 0 4px; }
 .art__author { display: flex; align-items: center; gap: 10px; margin-top: 18px; font-size: var(--text-sm); color: var(--text-muted); }
 .art__author img { width: 32px; height: 32px; border-radius: 50%; }
 /* Catalogue links for the models an article names. Two columns inside the

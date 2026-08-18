@@ -29,7 +29,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date()
 
   const categoryEntries: MetadataRoute.Sitemap = CATEGORIES.map((cat) => ({
-    url: absoluteUrl(`/?category=${cat.id}`),
+    url: absoluteUrl(`/vehiculos?category=${cat.id}`),
     lastModified: now,
     changeFrequency: 'daily',
     priority: 0.8,
