@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: { params: Params }) {
       images: post.coverImage ? [{ url: post.coverImage }] : [],
       publishedTime: post.publishedAt,
       modifiedTime: post.updatedAt,
-      authors: [post.author.name],
+      authors: [SITE_NAME],
     },
     twitter: {
       card: 'summary_large_image' as const,
@@ -82,9 +82,11 @@ export default async function BlogPostPage({ params }: { params: Params }) {
     // Omit the key entirely when there is no cover — an empty string is a
     // validation error in Google's Article rich result.
     ...(post.coverImage && { image: [post.coverImage] }),
+    // Posts are published under the site's name, not an individual byline.
     author: {
-      '@type': 'Person',
-      name: post.author.name,
+      '@type': 'Organization',
+      name: SITE_NAME,
+      url: SITE_URL,
     },
     datePublished: post.publishedAt,
     dateModified: post.updatedAt,
@@ -124,18 +126,6 @@ export default async function BlogPostPage({ params }: { params: Params }) {
         </div>
 
         <h1 className="art__title">{post.title}</h1>
-
-        <div className="art__author">
-          {post.author.avatarUrl && (
-            <Image
-              src={post.author.avatarUrl}
-              alt={post.author.name}
-              width={32}
-              height={32}
-            />
-          )}
-          <span>{post.author.name}</span>
-        </div>
 
         <div className={`art__hero${post.coverImage ? '' : ' art__hero--empty'}`}>
           {post.coverImage ? (

@@ -1,3 +1,18 @@
+/**
+ * One row of a vehicle's public price log. `oldPrice` is undefined on
+ * baseline rows (source `create` / `backfill`), which mean "price known since
+ * changedAt" rather than an actual change.
+ */
+export interface PriceHistoryEntry {
+  oldPrice?: number
+  newPrice?: number
+  oldCurrency?: string
+  currency: string
+  source: 'create' | 'admin_update' | 'backfill' | string
+  note?: string
+  changedAt: string
+}
+
 export interface Vehicle {
   id: string
   slug: string
@@ -43,6 +58,8 @@ export interface Vehicle {
   publishedAt?: string
   createdAt?: string
   updatedAt?: string
+  /** Price log, newest first. Only populated by the detail endpoint. */
+  priceHistory?: PriceHistoryEntry[]
 }
 
 export type Category = 'autos' | 'suvs' | 'pickups' | 'motos' | 'utilitarios'

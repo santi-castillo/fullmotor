@@ -37,7 +37,7 @@ export async function GET() {
       <guid isPermaLink="true">${escapeXml(url)}</guid>
       <description>${escapeXml(post.excerpt || '')}</description>
       <pubDate>${toRfc822(post.publishedAt)}</pubDate>
-      <author>${escapeXml(post.author?.name || SITE_NAME)}</author>
+      <author>${escapeXml(SITE_NAME)}</author>
 ${post.tags.map((tag) => `      <category>${escapeXml(tag)}</category>`).join('\n')}
     </item>`
     })

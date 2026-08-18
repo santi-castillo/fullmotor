@@ -7,11 +7,13 @@ import ImageCarousel from "@/app/components/ImageCarousel";
 import JsonLd from "@/app/components/JsonLd";
 import CommentsSection from "@/app/components/CommentsSection";
 import SaveVehicleButton from "@/app/components/SaveVehicleButton";
+import PriceHistory from "@/app/components/PriceHistory";
 import { Badge } from "@/app/components/ui/Badge";
 import { FuelTag } from "@/app/components/ui/FuelTag";
 import { ButtonLink } from "@/app/components/ui/Button";
 import { SpecGrid, type SpecGroup } from "@/app/components/ui/SpecGrid";
 import { isRecentlyListed } from "@/lib/vehicle-card";
+import { hasRecentPriceDrop } from "@/lib/price-history";
 import { hasBattery, isElectric, showsDisplacement, showsFuelTank, showsGearCount } from "@/lib/vehicle-specs";
 import { absoluteUrl, SITE_URL } from "@/lib/site";
 import type { Vehicle } from "@/types/vehicle";
@@ -259,6 +261,7 @@ export default async function VehiclePage({ params }: { params: Params }) {
               {vehicle.fuelType && <FuelTag type={fuelToTagType(vehicle.fuelType)} />}
               <Badge tone="neutral" variant="outline">{categorySingular[vehicle.category]}</Badge>
               <Badge tone="positive" dot>Disponible</Badge>
+              {hasRecentPriceDrop(vehicle.priceHistory) && <Badge tone="positive" variant="solid" dot>Bajó de precio</Badge>}
             </div>
 
             {vehicle.price ? (
@@ -308,6 +311,8 @@ export default async function VehiclePage({ params }: { params: Params }) {
                 </div>
               </div>
             )}
+
+            <PriceHistory history={vehicle.priceHistory ?? []} />
 
             <p style={{ marginTop: 24, fontSize: 'var(--text-xs)', color: 'var(--text-faint)' }}>
               ¿Encontraste un error? Escribinos a <a href="mailto:contacto@todomotor.uy">contacto@todomotor.uy</a>

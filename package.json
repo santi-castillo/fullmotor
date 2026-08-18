@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "guide:check": "tsx scripts/guide-check.ts",
+    "acau:import": "tsx scripts/acau-import.ts"
   },
   "dependencies": {
     "@vercel/blob": "^2.0.1",

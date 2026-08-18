@@ -2,6 +2,7 @@ import { fetchVehicles, fetchFilters } from "@/lib/api";
 import { getLatestVehicles, getCountByCategory } from "@/lib/data";
 import { absoluteUrl, SITE_LOGO, SITE_NAME, SITE_URL } from "@/lib/site";
 import HeroSection from "./components/HeroSection";
+import GuideCta from "./components/GuideCta";
 import CategoryGrid from "./components/CategoryGrid";
 import PremiumListings from "./components/PremiumListings";
 import JsonLd from "./components/JsonLd";
@@ -69,6 +70,7 @@ export default async function Home() {
           navigation the header already offers, so it closes the page. */}
       <BlogPreviewSection posts={latestBlogPosts} />
       <PremiumListings vehicles={latestVehicles} />
+      <GuideCta />
       <CategoryGrid categories={categoryCounts} totalCount={meta.total} />
     </div>
   );

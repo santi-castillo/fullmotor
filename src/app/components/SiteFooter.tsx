@@ -23,6 +23,7 @@ export default function SiteFooter() {
           <div className="k-footer__col">
             <h5>TodoMotor</h5>
             <Link href="/blog">Blog del Motor</Link>
+            <Link href="/guia-de-compra">Guía de compra</Link>
             <Link href="/compare">Comparador</Link>
             <Link href="/clasificados">Clasificados</Link>
             <a href="mailto:contacto@todomotor.uy">Escribinos</a>
