@@ -2,6 +2,7 @@ import type { MetadataRoute } from 'next'
 import { getAllVehicles } from '@/lib/data'
 import { getAllBlogPosts } from '@/lib/blog'
 import { getAllIndexableClassifieds } from '@/lib/classifieds-api'
+import { getAllDealerships } from '@/lib/dealerships-api'
 import { CATEGORIES } from '@/types/vehicle'
 import { absoluteUrl, SITE_URL } from '@/lib/site'
 import { CATALOG_PER_PAGE, catalogHref, groupByBrand } from '@/lib/catalog'
@@ -17,15 +18,17 @@ function warnIfEmpty(label: string, count: number) {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [vehicles, posts, classifieds] = await Promise.all([
+  const [vehicles, posts, classifieds, dealerships] = await Promise.all([
     getAllVehicles(),
     getAllBlogPosts(),
     getAllIndexableClassifieds(),
+    getAllDealerships(),
   ])
 
   warnIfEmpty('vehicles', vehicles.length)
   warnIfEmpty('blog posts', posts.length)
   warnIfEmpty('classifieds', classifieds.length)
+  // Not warned on: zero dealerships is a normal state, not a symptom.
 
   const now = new Date()
 
@@ -98,6 +101,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'daily',
       priority: 0.8,
     },
+    {
+      url: absoluteUrl('/automotoras'),
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    // Storefronts outrank individual listings: they are stable pages that
+    // aggregate inventory, where a listing comes and goes.
+    ...dealerships.map((d) => ({
+      url: absoluteUrl(`/automotoras/${d.slug}`),
+      lastModified: now,
+      changeFrequency: 'daily' as const,
+      priority: 0.7,
+    })),
     {
       url: absoluteUrl('/guia-de-compra'),
       lastModified: now,

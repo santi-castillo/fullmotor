@@ -1,0 +1,87 @@
+import Link from 'next/link'
+import type { Metadata } from 'next'
+import { MapPin } from 'lucide-react'
+import { fetchDealerships } from '@/lib/dealerships-api'
+import { absoluteUrl } from '@/lib/site'
+import JsonLd from '../components/JsonLd'
+import { Avatar } from '../components/ui/Avatar'
+
+export const revalidate = 300
+
+const TITLE = 'Automotoras en Uruguay'
+const DESCRIPTION =
+  'Concesionarias y automotoras con vidriera en TodoMotor. Mirá su inventario completo y contactalas directo.'
+
+export const metadata: Metadata = {
+  title: TITLE,
+  description: DESCRIPTION,
+  openGraph: { title: TITLE, description: DESCRIPTION, type: 'website', url: absoluteUrl('/automotoras') },
+  alternates: { canonical: '/automotoras' },
+}
+
+export default async function DealershipsPage() {
+  const data = await fetchDealerships({ limit: 50, revalidate: 300 }).catch(() => ({
+    data: [],
+    meta: { total: 0, page: 1, limit: 50, lastPage: 1 },
+  }))
+
+  const itemListJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    itemListElement: data.data.map((d, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      url: absoluteUrl(`/automotoras/${d.slug}`),
+      name: d.name,
+    })),
+  }
+
+  return (
+    <div className="iv pb-16">
+      {data.data.length > 0 && <JsonLd data={itemListJsonLd} />}
+
+      <div className="mb-6">
+        <h1 className="iv__title">Automotoras</h1>
+        <p className="iv__count">
+          <span className="font-mono">{data.meta.total}</span> con vidriera en TodoMotor
+        </p>
+      </div>
+
+      {data.data.length === 0 ? (
+        <div className="iv__empty">
+          <h3 className="font-display text-lg font-bold text-ink mb-2">Todavía no hay automotoras</h3>
+          <p className="text-sm text-muted mb-6">
+            Si tenés una, registrala y publicá tu inventario con vidriera propia.
+          </p>
+          <Link href="/automotoras/solicitar" className="tm-btn tm-btn--md">
+            Registrá tu automotora
+          </Link>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {data.data.map((d) => (
+            <Link
+              key={d.id}
+              href={`/automotoras/${d.slug}`}
+              className="bg-surface border border-line rounded-[var(--radius-lg)] p-5 flex items-start gap-3 hover:border-accent transition-colors"
+            >
+              <Avatar src={d.logoUrl} name={d.name} size="md" tone="accent-soft" />
+              <div className="min-w-0">
+                <h2 className="font-display font-bold text-ink truncate">{d.name}</h2>
+                {d.city && (
+                  <p className="text-sm text-muted inline-flex items-center gap-1.5 mt-0.5">
+                    <MapPin size={12} aria-hidden="true" />
+                    {d.city}
+                  </p>
+                )}
+                {d.description && (
+                  <p className="text-sm text-muted mt-2 line-clamp-2">{d.description}</p>
+                )}
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}

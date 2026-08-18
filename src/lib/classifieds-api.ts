@@ -105,6 +105,8 @@ export interface FetchClassifiedsParams {
   minYear?: string
   maxYear?: string
   maxMileage?: string
+  /** Restricts the list to one approved storefront's inventory. */
+  dealership?: string
   /** Price filtering only makes sense inside one currency; the API defaults to USD. */
   currency?: string
   minPrice?: string
@@ -134,6 +136,7 @@ export async function fetchClassifieds(
   if (params.minYear) search.set('min_year', params.minYear)
   if (params.maxYear) search.set('max_year', params.maxYear)
   if (params.maxMileage) search.set('max_mileage', params.maxMileage)
+  if (params.dealership) search.set('dealership', params.dealership)
   if (params.currency) search.set('currency', params.currency)
   if (params.minPrice) search.set('min_price', params.minPrice)
   if (params.maxPrice) search.set('max_price', params.maxPrice)
