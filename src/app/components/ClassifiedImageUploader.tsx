@@ -14,6 +14,8 @@ interface ClassifiedImageUploaderProps {
   classifiedId: string
   initialImages?: string[]
   onChange?: (images: string[]) => void
+  /** From the listing itself — higher for an approved business. */
+  maxImages?: number
 }
 
 interface PendingUpload {
@@ -27,6 +29,7 @@ export default function ClassifiedImageUploader({
   classifiedId,
   initialImages = [],
   onChange,
+  maxImages = MAX_CLASSIFIED_IMAGES,
 }: ClassifiedImageUploaderProps) {
   const [images, setImages] = useState<string[]>(initialImages)
   const [pending, setPending] = useState<PendingUpload[]>([])
@@ -35,7 +38,7 @@ export default function ClassifiedImageUploader({
   const fileInputRef = useRef<HTMLInputElement | null>(null)
 
   const totalCount = images.length + pending.length
-  const remaining = Math.max(0, MAX_CLASSIFIED_IMAGES - totalCount)
+  const remaining = Math.max(0, maxImages - totalCount)
 
   const updateImages = (next: string[]) => {
     setImages(next)
@@ -58,7 +61,7 @@ export default function ClassifiedImageUploader({
 
     const files = Array.from(fileList)
     if (files.length > remaining) {
-      setError(`Solo podés subir ${remaining} imagen(es) más (máx ${MAX_CLASSIFIED_IMAGES} en total).`)
+      setError(`Solo podés subir ${remaining} imagen(es) más (máx ${maxImages} en total).`)
       return
     }
 
@@ -184,9 +187,9 @@ export default function ClassifiedImageUploader({
         onChange={(e) => handleFiles(e.target.files)}
       />
       <p className="text-xs text-muted">
-        Subí hasta {MAX_CLASSIFIED_IMAGES} fotos (JPG, PNG o WebP) ·{' '}
+        Subí hasta {maxImages} fotos (JPG, PNG o WebP) ·{' '}
         <span className="font-mono">
-          {totalCount}/{MAX_CLASSIFIED_IMAGES}
+          {totalCount}/{maxImages}
         </span>{' '}
         · Máx 10 MB cada una
       </p>

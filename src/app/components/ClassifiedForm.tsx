@@ -23,6 +23,7 @@ import {
   updateClassified,
   uploadClassifiedImages,
 } from '@/lib/classifieds-api'
+import { useAuth } from './AuthProvider'
 import { Button } from './ui/Button'
 import { Input, Textarea } from './ui/Input'
 import { Select } from './ui/Select'
@@ -39,6 +40,7 @@ interface ClassifiedFormProps {
 
 export default function ClassifiedForm({ mode, initial, facets }: ClassifiedFormProps) {
   const router = useRouter()
+  const { user } = useAuth()
 
   const [title, setTitle] = useState(initial?.title || '')
   const [description, setDescription] = useState(initial?.description || '')
@@ -71,9 +73,14 @@ export default function ClassifiedForm({ mode, initial, facets }: ClassifiedForm
 
   const isCreate = mode === 'create'
 
+  // The API decides the cap — it is higher for an approved business. Read it
+  // off the listing when editing, off the session when publishing, and only
+  // fall back to the private-seller constant when neither has loaded yet.
+  const maxImages = initial?.maxImages ?? user?.limits?.maxImages ?? MAX_CLASSIFIED_IMAGES
+
   const validateFiles = (files: File[]): string | null => {
-    if (files.length > MAX_CLASSIFIED_IMAGES) {
-      return `Máximo ${MAX_CLASSIFIED_IMAGES} imágenes.`
+    if (files.length > maxImages) {
+      return `Máximo ${maxImages} imágenes.`
     }
     for (const f of files) {
       if (!ALLOWED_IMAGE_TYPES.includes(f.type)) {
@@ -464,8 +471,8 @@ export default function ClassifiedForm({ mode, initial, facets }: ClassifiedForm
               <ImagePlus size={24} aria-hidden="true" />
               <span className="text-sm">
                 {pendingPreviews.length > 0
-                  ? `${pendingPreviews.length} de ${MAX_CLASSIFIED_IMAGES} fotos — tocá para elegir otras`
-                  : `Subí hasta ${MAX_CLASSIFIED_IMAGES} fotos (JPG, PNG o WebP)`}
+                  ? `${pendingPreviews.length} de ${maxImages} fotos — tocá para elegir otras`
+                  : `Subí hasta ${maxImages} fotos (JPG, PNG o WebP)`}
               </span>
             </button>
             <input
@@ -524,6 +531,7 @@ export default function ClassifiedForm({ mode, initial, facets }: ClassifiedForm
             <ClassifiedImageUploader
               classifiedId={initial.id}
               initialImages={initial.images}
+              maxImages={maxImages}
             />
           )
         )}

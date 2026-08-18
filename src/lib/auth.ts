@@ -1,3 +1,5 @@
+import type { Dealership } from '@/types/classified'
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'
 const TOKEN_KEY = 'todomotor_token'
 
@@ -6,6 +8,14 @@ export interface User {
     email: string
     name: string
     avatarUrl: string | null
+    role?: string
+    /** The caller's own business account, whatever its review state. */
+    dealership?: Dealership
+    /**
+     * Per-account limits, resolved server-side. An object rather than a bare
+     * number so future limits have somewhere to live.
+     */
+    limits?: { maxImages: number }
     createdAt: string
     updatedAt: string
 }

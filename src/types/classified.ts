@@ -15,10 +15,40 @@ export type ClassifiedTier = 'free' | 'premium' | 'featured'
 
 export type ClassifiedStatus = 'active' | 'sold' | 'paused'
 
+/** The seller badge. Only present when the account is an approved business. */
+export interface ClassifiedDealership {
+  slug: string
+  name: string
+  logoUrl?: string | null
+}
+
 export interface ClassifiedUser {
   id: string
   name: string
   avatarUrl?: string | null
+  dealership?: ClassifiedDealership
+}
+
+export type DealershipStatus = 'pending' | 'approved' | 'rejected' | 'suspended'
+
+/** The signed-in user's own business account, as returned by /auth/me. */
+export interface Dealership {
+  id: string
+  slug: string
+  name: string
+  description?: string | null
+  city?: string | null
+  address?: string | null
+  phone?: string | null
+  whatsapp?: string | null
+  website?: string | null
+  hours?: string | null
+  logoUrl?: string | null
+  countryCode: string
+  status: DealershipStatus
+  /** What the applicant is shown when turned down. Never the internal note. */
+  rejectionReason?: string | null
+  createdAt: string
 }
 
 export interface Classified {
@@ -38,6 +68,14 @@ export interface Classified {
   tier: ClassifiedTier
   status: ClassifiedStatus
   expiresAt: string
+  /**
+   * Derived by the API. Never compare expiresAt against a magic date here —
+   * dealership listings carry a far-future sentinel and only the backend knows
+   * what it is.
+   */
+  neverExpires?: boolean
+  /** How many photos this listing's owner may upload. */
+  maxImages?: number
   /**
    * Structured vehicle details. Absent on repuestos and accesorios, and on any
    * listing published before these fields existed — hence optional rather than
