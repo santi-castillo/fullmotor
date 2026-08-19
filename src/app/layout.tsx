@@ -6,6 +6,7 @@ import AuthProvider from "./components/AuthProvider";
 import SavedProvider from "./components/SavedProvider";
 import SiteHeader from "./components/SiteHeader";
 import SiteFooter from "./components/SiteFooter";
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -60,6 +61,7 @@ export default function RootLayout({
             <SiteFooter />
           </SavedProvider>
         </AuthProvider>
+        <Analytics />
       </body>
     </html>
   );
