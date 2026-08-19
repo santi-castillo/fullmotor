@@ -11,6 +11,7 @@
     "acau:import": "tsx scripts/acau-import.ts"
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "@vercel/blob": "^2.0.1",
     "lucide-react": "^1.17.0",
     "next": "16.1.6",
