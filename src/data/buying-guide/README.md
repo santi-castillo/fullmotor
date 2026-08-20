@@ -38,6 +38,20 @@ Los picks inválidos **no rompen la página**: en runtime se descartan y se logu
 
 Para explorar candidatos: `npm run guide:check -- --dump /ruta/index.json` vuelca el índice slim (1 registro por versión, con precio, carrocería, HP, baúl, airbags, ADAS, equipamiento, autonomía) para filtrar y comparar.
 
+## Fichas sin imagen
+
+La guía muestra tarjetas con foto: el podio (`GuidePodiumCard`) y "otros que también encajan" usan `image` (primera imagen de la ficha). Una ficha sin imagen sale con el placeholder, y eso pega sobre todo en el podio.
+
+`npm run guide:images` audita eso contra el catálogo vivo: arma el índice de la guía, simula el wizard sobre **todo** el espacio de respuestas (uso × presupuesto × personas × motor × caja × prioridad = 15.750 escenarios) y lista las fichas que aparecen como tarjeta y no tienen imagen, agrupadas por `modelFamilyId` y ordenadas por visibilidad:
+
+- `top` — apariciones en el podio curado (Top TodoMotor)
+- `data` — apariciones en el podio completado por el ranking por reglas
+- `otros` — apariciones en "otros que también encajan"
+
+Las familias marcadas `TOP …` son picks curados: son las que más se ven y las primeras a resolver. `--json <archivo>` vuelca el detalle (slug, id, precio por ficha) para trabajar la carga.
+
+Para cargar las imágenes se sigue el paso "Cargar IMÁGENES" de la routine diaria de TodoMotor (una hero 3/4 frontal por modelo, reutilizada en todas sus versiones; solo fuentes oficiales —fabricante, importador local o sala de prensa—; nunca autoblog; sin remover el fondo; verificación visual antes de subir; 1280×800; `POST /api/admin/vehicles/{uuid}/images?replace=true`).
+
 ## Señal de ventas ACAU ("los más vendidos")
 
 La guía usa las estadísticas públicas de ACAU (Asociación de Concesionarios, https://www.acau.com.uy → Estadísticas → **Compilado AAAA**, ventas por modelo/versión de los representantes oficiales) como **una señal más**:
