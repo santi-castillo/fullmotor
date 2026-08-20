@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "guide:check": "tsx scripts/guide-check.ts",
+    "guide:images": "tsx scripts/guide-images.ts",
     "acau:import": "tsx scripts/acau-import.ts"
   },
   "dependencies": {
