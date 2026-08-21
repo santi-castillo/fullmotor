@@ -17,6 +17,7 @@
 @import "./styles/chrome.css";
 @import "./styles/screens.css";
 @import "./styles/consent.css";
+@import "./styles/ads.css";
 
 /* Map design-system tokens to Tailwind utilities
    (bg-surface, text-muted, border-line, font-display, …) */

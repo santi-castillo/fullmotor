@@ -1,4 +1,8 @@
 import Link from 'next/link'
+import AdSlot from '@/app/components/ads/AdSlot'
+
+/** Models shown before the ad slot — one full row of the 3-column grid. */
+const ABOVE_AD = 3
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { ChevronRight } from 'lucide-react'
@@ -111,8 +115,21 @@ export default async function BrandPage({ params }: { params: Params }) {
           brand is large enough to need paging, and every vehicle page gains an
           internal link from a page that is about exactly its brand. */}
       <div style={{ marginTop: 24 }}>
-        <VehicleList vehicles={brand.vehicles} />
+        <VehicleList vehicles={brand.vehicles.slice(0, ABOVE_AD)} />
       </div>
+
+      {/* Below the first row rather than straight under the headline.
+          Immediately after the h1 is worth more to the advertiser, but it puts
+          an ad between "Chery en Uruguay" and the first Chery — which is how a
+          catalogue starts reading like a classifieds portal. The brand of the
+          page is the targeting signal; no profile of the visitor is involved. */}
+      <AdSlot placement="brand_top" targeting={{ brand: brand.name }} />
+
+      {brand.vehicles.length > ABOVE_AD && (
+        <div style={{ marginTop: 24 }}>
+          <VehicleList vehicles={brand.vehicles.slice(ABOVE_AD)} />
+        </div>
+      )}
     </div>
   )
 }

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import AdSlot from '@/app/components/ads/AdSlot'
 import { notFound } from "next/navigation";
 import { Check, ChevronRight, GitCompareArrows } from "lucide-react";
 import { getVehicleBySlug, getAllVehicles } from "@/lib/data";
@@ -317,6 +318,15 @@ export default async function VehiclePage({ params }: { params: Params }) {
             )}
 
             <PriceHistory history={vehicle.priceHistory ?? []} />
+
+            {/* Sticky panel, so this slot has the best viewability on the
+                site — which is also why useAdImpression disconnects after the
+                first count instead of billing a scroll. Targeted by the
+                vehicle's own brand and category. */}
+            <AdSlot
+              placement="detail_panel"
+              targeting={{ brand: vehicle.brand, category: vehicle.category }}
+            />
 
             <p style={{ marginTop: 24, fontSize: 'var(--text-xs)', color: 'var(--text-faint)' }}>
               ¿Encontraste un error? Escribinos a <a href="mailto:contacto@todomotor.uy">contacto@todomotor.uy</a>
