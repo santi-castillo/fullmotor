@@ -127,6 +127,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly',
       priority: 0.8,
     },
+    // Low priority but indexable: the advertising policy is a sales asset and
+    // the privacy policy is a legal one. Neither should be hidden from search.
+    {
+      url: absoluteUrl('/politica-publicitaria'),
+      lastModified: now,
+      changeFrequency: 'yearly',
+      priority: 0.3,
+    },
+    {
+      url: absoluteUrl('/privacidad'),
+      lastModified: now,
+      changeFrequency: 'yearly',
+      priority: 0.2,
+    },
     ...listingEntries,
     ...brandEntries,
     ...blogEntries,

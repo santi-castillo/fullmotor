@@ -32,6 +32,16 @@ export default function SiteFooter() {
             <Link href="/automotoras">Automotoras</Link>
             <a href="mailto:contacto@todomotor.uy">Escribinos</a>
           </div>
+          {/* The advertising policy lives in the footer rather than buried in a
+              legal page nobody links to: it is the public promise that the
+              buying guide ranking is not for sale, and it only works as a
+              promise if it is easy to find. */}
+          <div className="k-footer__col">
+            <h5>Legal</h5>
+            <Link href="/privacidad">Privacidad</Link>
+            <Link href="/politica-publicitaria">Política publicitaria</Link>
+            <a href="mailto:contacto@todomotor.uy?subject=Publicidad%20en%20TodoMotor">Anunciá acá</a>
+          </div>
         </div>
       </div>
       <div className="k-footer__bottom">

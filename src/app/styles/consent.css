@@ -1,0 +1,64 @@
+/* ============================================================
+   TodoMotor — Consent banner
+   Component-scoped, so it uses the `tm-` prefix rather than a
+   screen prefix. Tokens only, never hard-coded hex.
+   ============================================================ */
+
+.tm-consent {
+  position: fixed;
+  inset: auto 0 0 0;
+  z-index: var(--z-toast);
+  background: var(--surface);
+  border-top: var(--border-w) solid var(--border);
+  box-shadow: var(--shadow-pop);
+  padding: var(--space-4) var(--gutter);
+  animation: tm-consent-in var(--dur) var(--ease-out);
+}
+
+@keyframes tm-consent-in {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tm-consent { animation: none; }
+}
+
+.tm-consent__in {
+  max-width: var(--container);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+.tm-consent__text {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  color: var(--text-body);
+}
+
+.tm-consent__text strong { color: var(--text-strong); }
+
+.tm-consent__text a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.tm-consent__text a:hover { color: var(--accent-hover); }
+
+/* Both actions keep their natural button size and sit side by side. Shrinking
+   "Rechazar" into a text link is the dark pattern that would void the consent
+   this banner exists to collect. */
+.tm-consent__actions {
+  display: flex;
+  gap: var(--space-3);
+  flex-shrink: 0;
+}
+
+@media (max-width: 720px) {
+  .tm-consent__in { flex-direction: column; align-items: stretch; gap: var(--space-4); }
+  .tm-consent__actions > .tm-btn { flex: 1; }
+}

@@ -32,6 +32,9 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# ...but the template is documentation, not a secret: it is the only record
+# of which variables the app reads, including NEXT_PUBLIC_GA_ID.
+!.env.example
 
 # vercel
 .vercel

@@ -9,10 +9,14 @@
     "lint": "eslint",
     "guide:check": "tsx scripts/guide-check.ts",
     "guide:images": "tsx scripts/guide-images.ts",
+    "ads:check": "tsx scripts/ads-check.ts",
     "acau:import": "tsx scripts/acau-import.ts"
   },
   "dependencies": {
+    "@next/third-parties": "^16.3.2",
+    "@vercel/analytics": "^2.0.1",
     "@vercel/blob": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
     "lucide-react": "^1.17.0",
     "next": "16.1.6",
     "react": "19.2.3",
