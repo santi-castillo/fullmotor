@@ -26,6 +26,10 @@ export default function BlogCard({ post, featured }: BlogCardProps) {
         </div>
         <div className="bl__featb">
           <div className="bl__meta">
+            {/* The card is where the reader decides whether to click, so the
+                sponsorship has to be visible here too. Labelling it only
+                inside the article means they clicked without knowing. */}
+            {post.sponsored && <span className="bl__tag bl__tag--sponsored">Patrocinado</span>}
             {post.tags[0] && <span className="bl__tag">{post.tags[0]}</span>}
             <span className="bl__date">{formatDate(post.publishedAt)}</span>
           </div>
@@ -50,6 +54,7 @@ export default function BlogCard({ post, featured }: BlogCardProps) {
       </div>
       <div className="bl__cardb">
         <div className="bl__meta">
+          {post.sponsored && <span className="bl__tag bl__tag--sponsored">Patrocinado</span>}
           {post.tags[0] && <span className="bl__tag">{post.tags[0]}</span>}
           <span className="bl__date">{formatDate(post.publishedAt)}</span>
         </div>

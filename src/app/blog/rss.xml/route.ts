@@ -32,7 +32,7 @@ export async function GET() {
     .map((post) => {
       const url = absoluteUrl(`/blog/${post.slug}`)
       return `    <item>
-      <title>${escapeXml(post.title)}</title>
+      <title>${escapeXml(post.sponsored ? `[Patrocinado] ${post.title}` : post.title)}</title>
       <link>${escapeXml(url)}</link>
       <guid isPermaLink="true">${escapeXml(url)}</guid>
       <description>${escapeXml(post.excerpt || '')}</description>

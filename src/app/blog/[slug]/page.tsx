@@ -1,4 +1,15 @@
 import Link from 'next/link'
+import AdSlot from '@/app/components/ads/AdSlot'
+
+/**
+ * Roughly 500 words of rendered HTML. Measured on the markup rather than the
+ * markdown because that is what the reader actually scrolls through.
+ */
+const LONG_ARTICLE_CHARS = 3500
+
+function isLongArticle(html: string): boolean {
+  return html.replace(/<[^>]+>/g, '').trim().length >= LONG_ARTICLE_CHARS
+}
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { ArrowLeft, Newspaper } from 'lucide-react'
@@ -79,6 +90,16 @@ export default async function BlogPostPage({ params }: { params: Params }) {
     '@type': 'Article',
     headline: post.title,
     description: post.excerpt,
+    // Structured disclosure of the sponsor. Google does not rank on it, but it
+    // is the correct machine-readable signal for branded content, and stating
+    // it here costs nothing while omitting it looks like concealment.
+    ...(post.sponsored && post.sponsorName && {
+      sponsor: {
+        '@type': 'Organization',
+        name: post.sponsorName,
+        ...(post.sponsorUrl && { url: post.sponsorUrl }),
+      },
+    }),
     // Omit the key entirely when there is no cover — an empty string is a
     // validation error in Google's Article rich result.
     ...(post.coverImage && { image: [post.coverImage] }),
@@ -121,11 +142,26 @@ export default async function BlogPostPage({ params }: { params: Params }) {
         </Link>
 
         <div className="art__meta">
+          {/* Above the headline on purpose. A disclosure at the foot of the
+              article arrives after the reader has already read it, which is
+              not disclosure — it is a receipt. */}
+          {post.sponsored && (
+            <Badge tone="warning">
+              Contenido patrocinado{post.sponsorName ? ` por ${post.sponsorName}` : ''}
+            </Badge>
+          )}
           {post.tags[0] && <Badge tone="accent">{post.tags[0]}</Badge>}
           <span className="bl__date">{formatDate(post.publishedAt)}</span>
         </div>
 
         <h1 className="art__title">{post.title}</h1>
+
+        {post.sponsored && (
+          <p className="art__disclosure">
+            {post.sponsorDisclosure ??
+              'Este artículo fue financiado por un anunciante. Lo escribió nuestra redacción con criterio editorial propio; el anunciante no decide el enfoque.'}
+          </p>
+        )}
 
         <div className={`art__hero${post.coverImage ? '' : ' art__hero--empty'}`}>
           {post.coverImage ? (
@@ -142,10 +178,20 @@ export default async function BlogPostPage({ params }: { params: Params }) {
           )}
         </div>
 
+        <AdSlot placement="article_top" targeting={{ tags: post.tags }} />
+
         <div
           className="blog-content"
           dangerouslySetInnerHTML={{ __html: post.contentHtml }}
         />
+
+        {/* The closing slot only on articles long enough to earn it. A daily
+            "Radar" post is three short paragraphs, and bracketing it with two
+            leaderboards leaves more ad than article on screen — which costs
+            more in readers than it earns in impressions. */}
+        {isLongArticle(post.contentHtml) && (
+          <AdSlot placement="article_bottom" targeting={{ tags: post.tags }} />
+        )}
 
         {mentionedVehicles.length > 0 && (
           <section className="art__mentions">
