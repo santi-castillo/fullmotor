@@ -1,5 +1,8 @@
 'use client'
 
+import AdSlot from '@/app/components/ads/AdSlot'
+import { bandFor } from '@/app/components/ads/guide-band'
+
 import { type RefObject } from 'react'
 import { GitCompareArrows, RotateCcw, SlidersHorizontal, AlertTriangle, LayoutGrid } from 'lucide-react'
 import type { Answers, GuideResult, GuideVehicle, SalesMeta } from '@/lib/buying-guide/types'
@@ -103,6 +106,22 @@ export default function GuideResults({ result, answers, salesMeta, headingRef, o
             </ButtonLink>
             <Button variant="ghost" onClick={onAdjust} iconLeft={<SlidersHorizontal size={16} aria-hidden="true" />}>Ajustar respuestas</Button>
             <Button variant="ghost" onClick={onRestart} iconLeft={<RotateCcw size={16} aria-hidden="true" />}>Empezar de nuevo</Button>
+          </div>
+
+          {/* The one place a paid space touches the buying guide.
+              It sits *after* the recommendations and their CTAs, never among
+              them, it is native-only so we control the markup, and it carries
+              its own disclosure. Nothing here feeds scoring.ts: the ad module
+              does not import from @/lib/buying-guide and never will. That
+              separation is the product — a ranking that cannot be bought is
+              only worth something if buying it is impossible rather than
+              merely against policy. */}
+          <div className="tm-promo-guide">
+            <AdSlot
+              placement="guide_sponsor"
+              targeting={{ use: answers.uso, band: bandFor(answers.max), vehicleType: types[0] }}
+              disclosure="Espacio publicitario. No participa del ranking ni del puntaje de afinidad."
+            />
           </div>
 
           {others.length > 0 && (

@@ -6,6 +6,7 @@ import GuideCta from "./components/GuideCta";
 import CategoryGrid from "./components/CategoryGrid";
 import PremiumListings from "./components/PremiumListings";
 import JsonLd from "./components/JsonLd";
+import AdSlot from "./components/ads/AdSlot";
 import BlogPreviewSection from "./components/BlogPreviewSection";
 import { getLatestBlogPosts } from "@/lib/blog";
 
@@ -65,11 +66,15 @@ export default async function Home() {
       <JsonLd data={websiteJsonLd} />
       <JsonLd data={organizationJsonLd} />
       <HeroSection total={meta.total} brandsCount={brandsCount} />
+      {/* Below the hero, never above it: the hero image is the LCP element on
+          the home page and an ad ahead of it would trade ranking for a slot. */}
+      <AdSlot placement="home_top" />
       {/* Editorial first: the news is the reason to come back, and it is the
           only section that changes between visits. The category grid is
           navigation the header already offers, so it closes the page. */}
       <BlogPreviewSection posts={latestBlogPosts} />
       <PremiumListings vehicles={latestVehicles} />
+      <AdSlot placement="home_mid" />
       <GuideCta />
       <CategoryGrid categories={categoryCounts} totalCount={meta.total} />
     </div>

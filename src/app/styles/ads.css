@@ -1,0 +1,185 @@
+/* ============================================================
+   TodoMotor — Ad slots
+   Class prefix is `tm-promo`, not `tm-ad`: EasyList carries
+   generic substring rules for `ad-`, `ads`, `adslot` and
+   friends, and a blocked class name hides a paid impression.
+   Tokens only, never hard-coded hex (design system rule).
+   ============================================================ */
+
+/* The reserved height is the single most important line in this file.
+   The creative arrives after hydration, so without a min-height every slot
+   pushes the page down the moment it fills. That is a CLS regression, CLS
+   feeds ranking, ranking feeds the organic traffic — and the organic traffic
+   is the inventory being sold. An ad slot that costs us rankings is worse
+   than no ad slot. */
+.tm-promo {
+  display: block;
+  margin: var(--space-7) auto;
+  max-width: 100%;
+}
+
+.tm-promo__label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: var(--space-2);
+  text-align: center;
+}
+
+.tm-promo__frame {
+  /* --tm-promo-h is set per placement below. */
+  min-height: var(--tm-promo-h, 0px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  /* Hugs the creative instead of stretching to the container. A full-width
+     frame letterboxed a 970px banner inside grey bars, which reads as an ad
+     that failed to load — the worst possible impression of something an
+     advertiser is paying for. */
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+/* The placeholder tint belongs to the waiting state only. Once the creative is
+   in, the frame gets out of its way: the grey stayed behind the ad and made
+   every banner look like it was still loading. */
+.tm-promo:not(.is-filled) .tm-promo__frame {
+  width: 100%;
+  background: var(--surface-sunken);
+}
+
+.tm-promo__frame img,
+.tm-promo__frame iframe {
+  display: block;
+  max-width: 100%;
+}
+
+/* ---- Per-placement height reservation (desktop) ---- */
+.tm-promo--home-top      { --tm-promo-h: 250px; }
+.tm-promo--home-mid      { --tm-promo-h: 250px; }
+.tm-promo--inv-sidebar   { --tm-promo-h: 600px; }
+.tm-promo--inv-infeed    { --tm-promo-h: 250px; }
+.tm-promo--brand-top     { --tm-promo-h: 250px; }
+.tm-promo--brand-infeed  { --tm-promo-h: 250px; }
+.tm-promo--detail-panel  { --tm-promo-h: 250px; }
+.tm-promo--detail-below  { --tm-promo-h: 90px; }
+.tm-promo--blog-infeed   { --tm-promo-h: 250px; }
+.tm-promo--article-top   { --tm-promo-h: 90px; }
+.tm-promo--article-mid   { --tm-promo-h: 280px; }
+.tm-promo--article-bottom{ --tm-promo-h: 90px; }
+.tm-promo--dealer-storefront { --tm-promo-h: 250px; }
+.tm-promo--classifieds-infeed { --tm-promo-h: 250px; }
+
+/* In-feed slots sit in a card grid and should match the cards around them. */
+.tm-promo--inv-infeed,
+.tm-promo--brand-infeed,
+.tm-promo--blog-infeed,
+.tm-promo--classifieds-infeed {
+  margin: 0;
+  align-self: start;
+}
+
+/* The sidebar slot rides along with the sticky filter column. */
+.tm-promo--inv-sidebar { margin-top: var(--space-6); }
+
+/* ---- Mobile ---- */
+@media (max-width: 767px) {
+  .tm-promo--home-top,
+  .tm-promo--brand-top,
+  .tm-promo--article-top,
+  .tm-promo--article-bottom,
+  .tm-promo--detail-below { --tm-promo-h: 100px; }
+
+  .tm-promo--home-mid,
+  .tm-promo--article-mid { --tm-promo-h: 250px; }
+}
+
+/* The filter column collapses below 1000px, taking its slot with it. The
+   component already refuses to request an ad at this width; hiding it here as
+   well means a stale render cannot leave an empty 600px hole behind. */
+@media (max-width: 1000px) {
+  .tm-promo--inv-sidebar { display: none; }
+}
+
+/* ---- Native creative (buying guide) ----
+   Deliberately unlike .gd__pod and .gd__card. A dashed border, no rank badge
+   and no affinity score, because the one thing that must never happen is a
+   paid card being mistaken for an editorial recommendation. */
+.tm-promo--guide-sponsor .tm-promo__frame {
+  min-height: 0;
+  background: var(--surface);
+  border: 1.5px dashed var(--border-strong);
+  border-radius: var(--radius-lg);
+}
+
+.tm-promo__native {
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-start;
+  padding: var(--space-5);
+  width: 100%;
+  color: inherit;
+  text-decoration: none;
+}
+
+.tm-promo__native:hover { background: var(--surface-sunken); }
+
+.tm-promo__native-logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+
+.tm-promo__native-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.tm-promo__native-title {
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-md);
+  color: var(--text-strong);
+  line-height: 1.2;
+}
+
+.tm-promo__native-text {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.tm-promo__native-cta {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--accent);
+  margin-top: var(--space-1);
+}
+
+/* The disclaimer under the guide slot. Kept legible rather than greyed into
+   invisibility: this sentence is the promise the product rests on. */
+.tm-promo__disclosure {
+  display: block;
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: var(--space-2);
+  line-height: 1.4;
+}
+
+/* Wrapper for the guide slot plus its disclosure line, so the two move as one
+   block and the sentence can never drift away from the ad it describes. */
+.tm-promo-guide {
+  margin: var(--space-8) 0 0;
+}
+.tm-promo-guide .tm-promo { margin-bottom: 0; }
