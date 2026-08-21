@@ -7,6 +7,7 @@ import CategoryGrid from "./components/CategoryGrid";
 import PremiumListings from "./components/PremiumListings";
 import JsonLd from "./components/JsonLd";
 import AdSlot from "./components/ads/AdSlot";
+import BrandStrip from "./components/BrandStrip";
 import BlogPreviewSection from "./components/BlogPreviewSection";
 import { getLatestBlogPosts } from "@/lib/blog";
 
@@ -74,6 +75,10 @@ export default async function Home() {
           navigation the header already offers, so it closes the page. */}
       <BlogPreviewSection posts={latestBlogPosts} />
       <PremiumListings vehicles={latestVehicles} />
+      {/* The route into /marcas. Sits between the latest listings and the ad
+          because "which brands are there" is the natural next question after
+          seeing a handful of models. */}
+      <BrandStrip brands={filters.brands || []} />
       <AdSlot placement="home_mid" />
       <GuideCta />
       <CategoryGrid categories={categoryCounts} totalCount={meta.total} />
