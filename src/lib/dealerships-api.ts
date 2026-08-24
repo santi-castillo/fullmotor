@@ -109,6 +109,17 @@ export interface DealershipApplicationPayload {
   whatsapp?: string
   website?: string
   hours?: string
+
+  /**
+   * Alert preferences, accepted by PATCH /mine only.
+   *
+   * Optional so that omitting them leaves the stored values alone — which is
+   * why `notifyOnNewListing` has to travel as a real boolean when present and
+   * be absent otherwise. Sending `false` and sending nothing are different
+   * requests, and conflating them is how an off switch stops working.
+   */
+  notifyOnNewListing?: boolean
+  notifyDepartments?: string[]
 }
 
 export async function applyForDealership(

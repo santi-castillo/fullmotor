@@ -48,6 +48,10 @@ export interface Dealership {
   status: DealershipStatus
   /** What the applicant is shown when turned down. Never the internal note. */
   rejectionReason?: string | null
+  /** Whether this business wants an email when a car is put up to quote. */
+  notifyOnNewListing?: boolean
+  /** Departments it asked about. Empty means all of them. */
+  notifyDepartments?: string[]
   createdAt: string
 }
 

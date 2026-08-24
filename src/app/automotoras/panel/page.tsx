@@ -1,9 +1,11 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
-import { AlertCircle, CheckCircle, ExternalLink } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { AlertCircle, CheckCircle, ExternalLink, Gavel } from 'lucide-react'
 import { updateMyDealership } from '@/lib/dealerships-api'
+import { fetchPendingCount } from '@/lib/private-listings-api'
+import { DEPARTAMENTOS } from '@/lib/uruguay'
 import { translateApiError } from '@/lib/api-error'
 import RequireAuth from '../../components/RequireAuth'
 import { useAuth } from '../../components/AuthProvider'
@@ -25,6 +27,27 @@ function PanelInner() {
   const [error, setError] = useState<string | null>(null)
   const [saved, setSaved] = useState(false)
   const [saving, setSaving] = useState(false)
+
+  // Alerts default to on for a new application, so an undefined value here —
+  // an account created before the column existed — should read as on too.
+  const [notifyOnNewListing, setNotifyOnNewListing] = useState(
+    dealership?.notifyOnNewListing ?? true
+  )
+  const [notifyDepartments, setNotifyDepartments] = useState<string[]>(
+    dealership?.notifyDepartments ?? []
+  )
+
+  // The badge. Null until it loads, so nothing flashes a zero that then jumps.
+  const [pending, setPending] = useState<number | null>(null)
+  const approved = dealership?.status === 'approved'
+
+  useEffect(() => {
+    if (!approved) return
+    fetchPendingCount()
+      .then(setPending)
+      // Non-fatal: the panel is useful without the badge.
+      .catch(() => setPending(null))
+  }, [approved])
 
   if (!dealership) {
     return (
@@ -57,6 +80,8 @@ function PanelInner() {
         whatsapp: whatsapp.trim(),
         website: website.trim(),
         hours: hours.trim(),
+        notifyOnNewListing,
+        notifyDepartments,
       })
       setSaved(true)
     } catch (err) {
@@ -96,6 +121,26 @@ function PanelInner() {
             `Tu solicitud fue rechazada${dealership.rejectionReason ? `: ${dealership.rejectionReason}` : '.'}`}
           {dealership.status === 'suspended' && 'Tu cuenta está suspendida.'}
         </div>
+      )}
+
+      {approved && (
+        <Link
+          href="/automotoras/panel/compras"
+          className="flex items-center gap-3 bg-surface border border-line rounded-[var(--radius-lg)] p-5 hover:border-ink transition-colors"
+        >
+          <Gavel size={20} className="shrink-0 text-accent" aria-hidden="true" />
+          <div className="min-w-0 flex-1">
+            <p className="font-medium text-ink">Autos para tasar</p>
+            <p className="text-sm text-muted">
+              Particulares que pusieron su auto a cotizar. Ofertás a ciegas.
+            </p>
+          </div>
+          {pending !== null && pending > 0 && (
+            <span className="shrink-0 rounded-full bg-accent px-2.5 py-1 text-xs font-semibold text-white tabular-nums">
+              {pending}
+            </span>
+          )}
+        </Link>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -138,6 +183,50 @@ function PanelInner() {
             <Input label="Sitio web" type="text" value={website} onChange={(e) => setWebsite(e.target.value)} maxLength={200} />
             <Input label="Horarios" type="text" value={hours} onChange={(e) => setHours(e.target.value)} maxLength={200} />
           </div>
+        </div>
+
+        <div className="bg-surface border border-line rounded-[var(--radius-lg)] p-6 space-y-4">
+          <div className="space-y-1">
+            <h2 className="font-display text-lg font-bold text-ink">Avisos de autos para tasar</h2>
+            <p className="text-sm text-muted">
+              Las cotizaciones duran 72 horas. Si no te avisamos, se te pasan.
+            </p>
+          </div>
+
+          <label className="flex items-start gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={notifyOnNewListing}
+              onChange={(e) => setNotifyOnNewListing(e.target.checked)}
+              className="mt-1"
+            />
+            <span className="text-sm text-body">
+              Avisame por mail cuando entre un auto para tasar
+            </span>
+          </label>
+
+          <fieldset className="space-y-2" disabled={!notifyOnNewListing}>
+            <legend className="tm-field__label">Departamentos que te interesan</legend>
+            <p className="text-xs text-muted">
+              Si no marcás ninguno, te avisamos de todos.
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {DEPARTAMENTOS.map((d) => (
+                <label key={d} className="flex items-center gap-2 text-sm text-body cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={notifyDepartments.includes(d)}
+                    onChange={(e) =>
+                      setNotifyDepartments((prev) =>
+                        e.target.checked ? [...prev, d] : prev.filter((x) => x !== d)
+                      )
+                    }
+                  />
+                  {d}
+                </label>
+              ))}
+            </div>
+          </fieldset>
         </div>
 
         {error && (
