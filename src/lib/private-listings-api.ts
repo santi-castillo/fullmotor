@@ -6,6 +6,8 @@ import type {
   PaginatedDealerListings,
   PaginatedMyOffers,
   PaginatedPrivateListings,
+  OfferCurrency,
+  PaginationMeta,
   PlaceOfferInput,
   PrivateListing,
 } from '@/types/private-listing'
@@ -289,4 +291,62 @@ export async function fetchMyOffers(
 export async function fetchPendingCount(): Promise<number> {
   const { meta } = await fetchDealerFeed({ onlyPending: true, limit: 1 })
   return meta.total
+}
+
+// ============================================
+// Operator
+// ============================================
+
+export type ReportStatus = 'open' | 'upheld' | 'dismissed'
+
+export interface OfferReportForReview {
+  id: string
+  offerId: string
+  listingId: string
+  dealershipId: string
+  reason: string
+  status: ReportStatus
+  createdAt: string
+  dealership: {
+    id: string
+    slug: string
+    name: string
+    /**
+     * How many reports this business has been upheld against before. The
+     * number the decision actually turns on: one report is an argument, a
+     * pattern is a decision.
+     */
+    upheldCount: number
+    status: string
+  }
+  offer: {
+    amount: number
+    currency: OfferCurrency
+    note?: string | null
+  }
+  vehicle: string
+}
+
+export async function fetchOfferReports(
+  status = 'open'
+): Promise<{ data: OfferReportForReview[]; meta: PaginationMeta }> {
+  const response = await fetch(
+    `${API_URL}/api/ops/offer-reports?status=${encodeURIComponent(status)}&limit=50`,
+    { headers: authHeaders(), cache: 'no-store' }
+  )
+  if (!response.ok) await handleApiError(response)
+  return response.json()
+}
+
+export async function reviewOfferReport(
+  id: string,
+  status: 'upheld' | 'dismissed',
+  note?: string
+): Promise<void> {
+  const response = await fetch(`${API_URL}/api/ops/offer-reports/${id}`, {
+    method: 'PATCH',
+    headers: jsonHeaders(),
+    body: JSON.stringify({ status, note: note?.trim() || undefined }),
+  })
+  if (!response.ok) await handleApiError(response)
 }

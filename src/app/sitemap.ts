@@ -107,6 +107,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly',
       priority: 0.8,
     },
+    // The landing only. Everything behind it — the form, a seller's quotes, the
+    // dealership feed — is noindex by design: those pages hold cars whose
+    // owners asked us not to publish them, so no individual listing is ever
+    // enumerated here the way classifieds are.
+    {
+      url: absoluteUrl('/cotizar'),
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
     // Storefronts outrank individual listings: they are stable pages that
     // aggregate inventory, where a listing comes and goes.
     ...dealerships.map((d) => ({

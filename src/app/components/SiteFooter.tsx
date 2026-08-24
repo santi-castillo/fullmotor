@@ -29,6 +29,7 @@ export default function SiteFooter() {
             <Link href="/guia-de-compra">Guía de compra</Link>
             <Link href="/compare">Comparador</Link>
             <Link href="/clasificados">Clasificados</Link>
+            <Link href="/cotizar">Cotizá tu auto</Link>
             <Link href="/automotoras">Automotoras</Link>
             <a href="mailto:contacto@todomotor.uy">Escribinos</a>
           </div>

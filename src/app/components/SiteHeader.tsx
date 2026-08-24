@@ -16,6 +16,7 @@ export default function SiteHeader() {
           <Link href="/vehiculos">Vehículos</Link>
           <Link href="/guia-de-compra">Guía de compra</Link>
           <Link href="/clasificados">Clasificados</Link>
+          <Link href="/cotizar">Cotizá tu auto</Link>
           <Link href="/automotoras">Automotoras</Link>
           <Link href="/blog">Blog</Link>
         </nav>
