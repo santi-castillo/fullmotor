@@ -82,6 +82,14 @@ export interface PrivateListing {
 
   offerCount: number
   offers: SellerOffer[]
+  /**
+   * True when the offers are not all in one currency.
+   *
+   * When it is, nothing in `offers` is ranked — UYU 987.654 and USD 25.000
+   * cannot be ordered against each other, and the second is worth more. Never
+   * present the first offer as the highest while this is true.
+   */
+  mixedCurrencies: boolean
   maxImages: number
 
   createdAt: string

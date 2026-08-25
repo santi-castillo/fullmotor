@@ -107,11 +107,17 @@ function MisCotizacionesInner() {
                   {l.offerCount === 1 ? '1 oferta' : `${l.offerCount} ofertas`}
                 </p>
                 {/* Offers arrive sorted best first, so the top one is the
-                    headline number the seller is waiting on. */}
-                {l.offers[0] && (
+                    headline number the seller is waiting on — but only when
+                    they share a currency. Across currencies the order is a
+                    grouping, not a ranking, and printing the first as the
+                    headline would advertise the wrong number. */}
+                {l.offers[0] && !l.mixedCurrencies && (
                   <p className="font-display font-bold text-ink tabular-nums">
                     {formatPrice(l.offers[0].currency, l.offers[0].amount)}
                   </p>
+                )}
+                {l.mixedCurrencies && (
+                  <p className="text-xs text-muted">en $ y US$</p>
                 )}
               </div>
             </Link>

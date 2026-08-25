@@ -53,14 +53,25 @@ export default function OfferList({
   }
 
   return (
-    <ul className="space-y-3">
+    <>
+      {/* Across currencies the API sends no ranking, because there is none to
+          send: UYU 987.654 sorts above USD 25.000 and is worth less. Saying so
+          beats quoting a conversion this app has no rate for. */}
+      {listing.mixedCurrencies && (
+        <p className="text-sm text-muted mb-3">
+          Hay ofertas en pesos y en dólares, así que no las ordenamos entre sí: la de arriba no es
+          necesariamente la más alta. Compará con la cotización del día.
+        </p>
+      )}
+      <ul className="space-y-3">
       {listing.offers.map((offer, index) => (
         <OfferRow
           key={offer.id}
           offer={offer}
-          // Only meaningful while nothing has been accepted: once the seller
-          // picks, "the highest" stops being the useful label.
-          isBest={index === 0 && !listing.acceptedOfferId}
+          // Only meaningful while nothing has been accepted, and only when the
+          // offers are comparable at all: across currencies the order is a
+          // grouping, not a ranking, and the top row can be worth less.
+          isBest={index === 0 && !listing.acceptedOfferId && !listing.mixedCurrencies}
           isAccepted={listing.acceptedOfferId === offer.id}
           canAccept={listing.canAccept}
           confirming={confirming === offer.id}
@@ -71,7 +82,8 @@ export default function OfferList({
           onReport={() => onReport(offer.id)}
         />
       ))}
-    </ul>
+      </ul>
+    </>
   )
 }
 
