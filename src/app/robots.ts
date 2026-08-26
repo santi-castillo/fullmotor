@@ -22,11 +22,13 @@ export default function robots(): MetadataRoute.Robots {
           // the buy-side feed nested under it.
           '/automotoras/solicitar',
           '/automotoras/panel',
-          // /cotizar itself stays crawlable: it is the landing that explains
-          // the feature. Everything under it holds cars whose owners asked us
-          // not to publish them, so it must never be reached from a search.
-          '/cotizar/nuevo',
-          '/cotizar/mis',
+          // The trailing slash is load-bearing: it blocks everything under
+          // /cotizar — the form, a seller's own quotes, and every detail page
+          // with its offers — while leaving /cotizar itself crawlable, which is
+          // the landing that explains the feature and the only public page in
+          // it. Those pages send noindex as well; this is the other half of the
+          // pair, as with /clasificados above.
+          '/cotizar/',
         ],
       },
     ],
