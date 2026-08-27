@@ -1,4 +1,12 @@
-"""One-off generator for public/instagram/template-1080x1350.jpg.
+"""One-off generator for the Instagram templates in public/instagram/.
+
+    python scripts/make-instagram-template.py OUT.jpg Inter-Bold.ttf [feed|story]
+
+`feed` is the 1080x1350 post background; `story` is the 1080x1920 one. They
+share the palette and the mark and differ only in layout — the story keeps its
+content inside the vertical safe area, because Instagram's own UI (avatar and
+progress bar on top, the reply box at the foot) covers roughly 250 px at each
+end and would sit on top of the title.
 
 Brand values mirror fullmotor/src/lib/og.tsx (ACCENT, INK, MUTED, PAPER and the
 gauge mark). The routine that publishes to Instagram writes the post title into
@@ -9,13 +17,47 @@ from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
 OUT = sys.argv[1]
 FONT_BOLD = sys.argv[2]
+FORMAT = sys.argv[3] if len(sys.argv) > 3 else "feed"
 
-W, H = 1080, 1350
 ACCENT = (0x1F, 0x4F, 0xE0)
 INK = (0x0E, 0x13, 0x1B)
 MUTED = (0x6B, 0x76, 0x86)
 PAPER = (0xF6, 0xF8, 0xFB)
 GLOW = (0xED, 0xF2, 0xFF)
+
+MARGIN = 80
+
+# Every y coordinate lives here so the two formats stay honestly comparable and
+# the README's text zone can be read off one place. The x zone is the same for
+# both: 80 -> 1000.
+LAYOUTS = {
+    "feed": dict(
+        size=(1080, 1350),
+        mark_y=96, mark_size=112,
+        name_size=46, site_size=26, eyebrow_size=26, footer_size=28,
+        eyebrow_y=318,
+        text_zone=(80, 400, 1000, 1120),
+        footer_y=1176,
+        bar_h=16,
+    ),
+    "story": dict(
+        size=(1080, 1920),
+        # Pushed down past the progress bar and the account header.
+        mark_y=300, mark_size=128,
+        name_size=52, site_size=30, eyebrow_size=30, footer_size=32,
+        eyebrow_y=700,
+        # 640 px of headline room: more than the feed, and it ends at 1440 so
+        # the reply box never lands on the last line.
+        text_zone=(80, 800, 1000, 1440),
+        footer_y=1520,
+        bar_h=20,
+    ),
+}
+
+if FORMAT not in LAYOUTS:
+    sys.exit("format must be 'feed' or 'story', got " + FORMAT)
+L = LAYOUTS[FORMAT]
+W, H = L["size"]
 
 # --- background: paper with a soft radial glow top-right (og.tsx does the same)
 img = Image.new("RGB", (W, H), PAPER)
@@ -56,28 +98,33 @@ def draw_mark(x, y, size):
     d.ellipse((c[0] - r1, c[1] - r1, c[0] + r1, c[1] + r1), fill=ACCENT)
 
 
-MARGIN = 80
-draw_mark(MARGIN, 96, 112)
+draw_mark(MARGIN, L["mark_y"], L["mark_size"])
 
-f_name = ImageFont.truetype(FONT_BOLD, 46)
-f_site = ImageFont.truetype(FONT_BOLD, 26)
-f_eyebrow = ImageFont.truetype(FONT_BOLD, 26)
-f_footer = ImageFont.truetype(FONT_BOLD, 28)
+f_name = ImageFont.truetype(FONT_BOLD, L["name_size"])
+f_site = ImageFont.truetype(FONT_BOLD, L["site_size"])
+f_eyebrow = ImageFont.truetype(FONT_BOLD, L["eyebrow_size"])
+f_footer = ImageFont.truetype(FONT_BOLD, L["footer_size"])
 
-d.text((MARGIN + 112 + 28, 108), "TodoMotor Uruguay", font=f_name, fill=INK)
-d.text((MARGIN + 112 + 28, 108 + 58), "todomotor.uy", font=f_site, fill=MUTED)
+name_x = MARGIN + L["mark_size"] + 28
+name_y = L["mark_y"] + 12
+d.text((name_x, name_y), "TodoMotor Uruguay", font=f_name, fill=INK)
+d.text((name_x, name_y + L["name_size"] + 12), "todomotor.uy", font=f_site, fill=MUTED)
 
 # --- eyebrow above the text zone (letter-spaced by hand; Pillow has no tracking)
-d.rounded_rectangle((MARGIN, 318, MARGIN + 72, 318 + 8), radius=4, fill=ACCENT)
+eb = L["eyebrow_y"]
+d.rounded_rectangle((MARGIN, eb, MARGIN + 72, eb + 8), radius=4, fill=ACCENT)
 xx = MARGIN
 for ch in "NOTICIAS DEL MOTOR":
-    d.text((xx, 338), ch, font=f_eyebrow, fill=ACCENT)
+    d.text((xx, eb + 20), ch, font=f_eyebrow, fill=ACCENT)
     xx += d.textlength(ch, font=f_eyebrow) + 4
 
 # --- footer
-d.line([(MARGIN, 1176), (W - MARGIN, 1176)], fill=(0xD9, 0xDF, 0xEA), width=2)
-d.text((MARGIN, 1200), "Nota completa en todomotor.uy/blog", font=f_footer, fill=MUTED)
-d.rectangle((0, H - 16, W, H), fill=ACCENT)
+fy = L["footer_y"]
+d.line([(MARGIN, fy), (W - MARGIN, fy)], fill=(0xD9, 0xDF, 0xEA), width=2)
+# A story cannot carry a link sticker when it is published through the API, so
+# the URL in the footer is the only way a viewer can reach the article.
+d.text((MARGIN, fy + 24), "Nota completa en todomotor.uy/blog", font=f_footer, fill=MUTED)
+d.rectangle((0, H - L["bar_h"], W, H), fill=ACCENT)
 
 img.save(OUT, "JPEG", quality=90, optimize=True, subsampling=0)
-print("wrote", OUT, img.size)
+print("wrote", OUT, img.size, FORMAT)
