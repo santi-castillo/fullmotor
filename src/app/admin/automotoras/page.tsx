@@ -8,8 +8,6 @@ import {
   reviewDealership,
 } from '@/lib/dealerships-api'
 import { translateApiError } from '@/lib/api-error'
-import RequireAuth from '../../components/RequireAuth'
-import { useAuth } from '../../components/AuthProvider'
 import { Button } from '../../components/ui/Button'
 import { Input } from '../../components/ui/Input'
 import { FilterChip } from '../../components/ui/FilterChip'
@@ -22,7 +20,6 @@ const TABS = [
 ]
 
 function ReviewInner() {
-  const { user } = useAuth()
   const [status, setStatus] = useState('pending')
   const [items, setItems] = useState<DealershipForReview[]>([])
   const [loading, setLoading] = useState(true)
@@ -46,18 +43,6 @@ function ReviewInner() {
   useEffect(() => {
     void load()
   }, [load])
-
-  // Client-side gate only, and deliberately so: the API is the real boundary
-  // and answers 403 regardless. This just avoids showing an empty screen with
-  // an error to someone who was never meant to be here.
-  if (user && user.role !== 'admin') {
-    return (
-      <div className="max-w-2xl mx-auto px-4 py-20 text-center">
-        <h1 className="font-display text-2xl font-bold text-ink mb-2">No tenés acceso</h1>
-        <p className="text-sm text-muted">Esta sección es para operadores de TodoMotor.</p>
-      </div>
-    )
-  }
 
   const act = async (
     id: string,
@@ -200,10 +185,7 @@ function ReviewInner() {
   )
 }
 
+// The session and the operator check live in the /admin layout now.
 export default function ReviewDealershipsPage() {
-  return (
-    <RequireAuth>
-      <ReviewInner />
-    </RequireAuth>
-  )
+  return <ReviewInner />
 }
