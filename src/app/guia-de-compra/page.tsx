@@ -76,8 +76,8 @@ export default async function GuiaDeCompraPage() {
               to sign up, and to a crawler. */}
           <RequireAuth
             headingLevel={2}
-            title="Creá tu cuenta para usar la guía"
-            description="Iniciá sesión con Google y respondé las seis preguntas. Volvés justo a esta página."
+            title="Creá tu cuenta gratis para usar la guía"
+            description="Registrarte no tiene costo. Iniciá sesión con Google, respondé las seis preguntas y volvés justo a esta página."
           >
             <GuideWizard index={index} curated={curated} salesMeta={salesMeta} />
           </RequireAuth>

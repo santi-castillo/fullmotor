@@ -208,8 +208,13 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
                         <h3 id="login-modal-title" className="font-display text-lg font-bold text-ink mb-2">
                             Iniciá sesión para continuar
                         </h3>
-                        <p className="text-sm text-muted mb-6">
+                        <p className="text-sm text-muted mb-2">
                             Usá tu cuenta de Google para comentar y publicar
+                        </p>
+                        {/* Said out loud because the Google button reads as a
+                            paywall to people who have not met one before. */}
+                        <p className="text-sm font-semibold text-ink mb-6">
+                            Crear tu cuenta es gratis.
                         </p>
                         <div className="flex justify-center mb-4">
                             <div ref={googleBtnRef} />
