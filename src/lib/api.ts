@@ -322,11 +322,15 @@ export async function fetchFilters(vehicleType?: string): Promise<FiltersRespons
     return response.json()
 }
 
-export async function searchVehicles(query: string, type: 'text' | 'semantic' = 'semantic', vehicleType?: string): Promise<Vehicle[]> {
+export async function searchVehicles(query: string, type: 'text' | 'semantic' = 'semantic', vehicleType?: string, limit?: number): Promise<Vehicle[]> {
     const searchParams = new URLSearchParams({ q: query, type })
+    if (limit) searchParams.set('limit', String(limit))
     const url = `${API_URL}/api/search?${searchParams}`
 
     const response = await fetch(url, {
+        // no-store because the only caller that passes a limit is the admin
+        // picker, which has to see a vehicle that was edited seconds ago.
+        cache: 'no-store',
         headers: getHeaders(vehicleType)
     })
 
