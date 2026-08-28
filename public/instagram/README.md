@@ -16,8 +16,10 @@ above and below — the story template exists so that never happens.
 
 | File | Purpose |
 |---|---|
-| `template-1080x1350.jpg` | 4:5 feed background (paper + gauge mark + eyebrow + footer), 61 KB |
-| `template-story-1080x1920.jpg` | 9:16 story background, same design in the story safe area, 73 KB |
+| `template-1080x1350.jpg` | 4:5 feed background (paper + gauge mark + eyebrow + footer) |
+| `template-story-1080x1920.jpg` | 9:16 story background, same design in the story safe area |
+| `template-radar-story-1080x1920.jpg` | 9:16 story for the "Radar del día" — see below |
+| `template-radar-photo-story-1080x1920.jpg` | the same with the top 920px free for the vehicle photo |
 | `Inter-Bold.ttf` | Font for the title (Inter, SIL OFL — see `Inter-LICENSE.txt`) |
 
 Palette and mark mirror `src/lib/og.tsx` (`ACCENT #1F4FE0`, `INK #0E131B`,
@@ -41,6 +43,37 @@ header at 300 and the footer at 1520 all sit inside that safe area.
 Do **not** bottom-anchor the story title to fill the space under it: the
 eyebrow stays put and a short title drifts away from it. The empty band below
 the footer is where the reply box lands.
+
+## The "Radar del día" templates
+
+`Radar del día — 27 de agosto de 2026` is a title that says nothing to somebody
+looking at a story. These two templates exist so the routine can put the actual
+news there instead: it writes a headline at publish time from the post's
+`excerpt`, and the date is demoted to a line under the eyebrow, where a date
+belongs.
+
+Pick by whether the post has a cover: **`radar-photo` when it does** (that is
+the vehicle hero the daily routine already uploaded, and a photo is what stops
+the scroll), **`radar` when it does not**. Never publish `radar-photo` with the
+photo band empty.
+
+The text always sits **below** the photo, never over it. A vehicle hero can
+come back light or dark and overlaid type breaks on half of them.
+
+Everything the template can hold is baked in — brand furniture, the `RADAR DEL
+DÍA` eyebrow, the rules. The routine draws only what it decided:
+
+| | `radar` | `radar-photo` |
+|---|---|---|
+| photo | — | paste into 0,0 → 1080,920, cropped to fill |
+| date (26 px, `#6B7686`) | x 80, y 742 | x 80, y 1172 |
+| headline (INK) | 80,820 → 1000,1160 · 76→52 · max 4 lines | 80,1250 → 1000,1540 · 72→52 · max 3 lines |
+| bullets (38 px, accent dot at x 80, text at x 118) | from y 1254, max 2 | — |
+
+The divider above the bullets is part of the `radar` template and sits at a
+fixed y, so a one-line headline and a four-line one both look deliberate. That
+also means **`radar` should always get at least one bullet** — otherwise the
+rule hangs there with nothing under it.
 
 ## Snippet the routine uses (Pillow)
 
@@ -86,6 +119,81 @@ def compose(title, fmt="feed", out=None):
     return out
 ```
 
+And for the radar, which draws its own pieces on top of a baked template:
+
+```python
+RADAR = {
+    "radar": dict(
+        tpl="template-radar-story-1080x1920.jpg",
+        date_y=742, headline=(80, 820, 1000, 1160), h_sizes=(76, 51), h_lines=4,
+        bullets_y=1254,
+    ),
+    "radar-photo": dict(
+        tpl="template-radar-photo-story-1080x1920.jpg", photo_h=920,
+        date_y=1172, headline=(80, 1250, 1000, 1540), h_sizes=(72, 51), h_lines=3,
+    ),
+}
+INK, MUTED, ACCENT = (0x0E, 0x13, 0x1B), (0x6B, 0x76, 0x86), (0x1F, 0x4F, 0xE0)
+
+
+def compose_radar(titular, fecha, bullets=(), photo=None, fmt="radar",
+                  out="/tmp/instagram-radar.jpg"):
+    """`photo` is a local path to the post's cover, already downloaded."""
+    L = RADAR[fmt]
+    urllib.request.urlretrieve(BASE + L["tpl"], "/tmp/" + L["tpl"])
+    img = Image.open("/tmp/" + L["tpl"]).convert("RGB")
+    font = lambda sz: ImageFont.truetype("/tmp/Inter-Bold.ttf", sz)
+
+    if L.get("photo_h"):
+        if not photo:
+            raise ValueError("radar-photo needs a photo; without one use fmt='radar'")
+        ph_h = L["photo_h"]
+        cov = Image.open(photo).convert("RGB")
+        s = max(1080 / cov.width, ph_h / cov.height)          # crop to fill
+        cov = cov.resize((int(cov.width * s), int(cov.height * s)), Image.LANCZOS)
+        left, top = (cov.width - 1080) // 2, (cov.height - ph_h) // 2
+        img.paste(cov.crop((left, top, left + 1080, top + ph_h)), (0, 0))
+
+    d = ImageDraw.Draw(img)
+    d.text((80, L["date_y"]), fecha, font=font(26), fill=MUTED)
+
+    def wrap(text, f, width):
+        lines, line = [], ""
+        for w in text.split():
+            t = (line + " " + w).strip()
+            if d.textlength(t, font=f) <= width:
+                line = t
+            else:
+                lines.append(line); line = w
+        lines.append(line)
+        return lines
+
+    x0, y0, x1, y1 = L["headline"]
+    big, small = L["h_sizes"]
+    for sz in range(big, small, -4):
+        f_h = font(sz)
+        lines = wrap(titular, f_h, x1 - x0)
+        lh = int(sz * 1.15)
+        if len(lines) <= L["h_lines"] and len(lines) * lh <= (y1 - y0):
+            break
+    y = y0
+    for ln in lines:
+        d.text((x0, y), ln, font=f_h, fill=INK)
+        y += lh
+
+    if bullets and L.get("bullets_y"):
+        y = L["bullets_y"]
+        for b in bullets[:2]:
+            d.ellipse((80, y + 16, 94, y + 30), fill=ACCENT)
+            for ln in wrap(b, font(38), 860):
+                d.text((118, y), ln, font=font(38), fill=INK)
+                y += 48
+            y += 22
+
+    img.save(out, "JPEG", quality=88, optimize=True)
+    return out
+```
+
 Then upload with `POST /api/admin/blog/images` (multipart field `images`) and
 pass the returned URL as `imageUrl` in the publish body — or, for the feed, as
 the post's `coverImage` (PATCH). **The story endpoint has no caption field**:
@@ -99,6 +207,8 @@ the viewer gets.
 pip install Pillow
 python scripts/make-instagram-template.py public/instagram/template-1080x1350.jpg public/instagram/Inter-Bold.ttf feed
 python scripts/make-instagram-template.py public/instagram/template-story-1080x1920.jpg public/instagram/Inter-Bold.ttf story
+python scripts/make-instagram-template.py public/instagram/template-radar-story-1080x1920.jpg public/instagram/Inter-Bold.ttf radar
+python scripts/make-instagram-template.py public/instagram/template-radar-photo-story-1080x1920.jpg public/instagram/Inter-Bold.ttf radar-photo
 ```
 
 Edit the `LAYOUTS` dict in `scripts/make-instagram-template.py` to change the
