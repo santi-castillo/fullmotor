@@ -7,6 +7,16 @@ import { Button } from './ui/Button'
 
 interface RequireAuthProps {
   children: React.ReactNode
+  /** Headline of the dismissed-modal fallback. Defaults to a generic one. */
+  title?: string
+  /** Line under it, to say what signing in unlocks here. */
+  description?: string
+  /**
+   * Heading level of that fallback. 1 by default, because on most gated pages
+   * the fallback replaces the whole page and is its only heading. Pass 2 where
+   * the page keeps its own `h1` above the gate.
+   */
+  headingLevel?: 1 | 2
 }
 
 /**
@@ -18,7 +28,12 @@ interface RequireAuthProps {
  * page renders as soon as `user` arrives — no destination to carry around, and
  * no `next` param that would need validating against open redirects.
  */
-export default function RequireAuth({ children }: RequireAuthProps) {
+export default function RequireAuth({
+  children,
+  title = 'Necesitás una cuenta para seguir',
+  description = 'Iniciá sesión con Google y volvés justo a esta página.',
+  headingLevel = 1,
+}: RequireAuthProps) {
   const { user, loading, login } = useAuth()
 
   useEffect(() => {
@@ -35,13 +50,14 @@ export default function RequireAuth({ children }: RequireAuthProps) {
 
   // Reachable once the modal is dismissed — without this the page looks broken.
   if (!user) {
+    const Heading = headingLevel === 2 ? 'h2' : 'h1'
     return (
       <div className="max-w-2xl mx-auto px-4 py-20 text-center">
-        <h1 className="font-display text-2xl font-bold text-ink mb-2" style={{ letterSpacing: '-0.02em' }}>
-          Necesitás una cuenta para seguir
-        </h1>
+        <Heading className="font-display text-2xl font-bold text-ink mb-2" style={{ letterSpacing: '-0.02em' }}>
+          {title}
+        </Heading>
         <p className="text-sm text-muted mb-6">
-          Iniciá sesión con Google y volvés justo a esta página.
+          {description}
         </p>
         <Button onClick={login} iconLeft={<LogIn size={16} aria-hidden="true" />}>
           Iniciá sesión
