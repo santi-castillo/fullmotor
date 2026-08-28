@@ -6,6 +6,7 @@ import { getGuideIndex, getResolvedCurated, salesMeta } from '@/lib/buying-guide
 import { GUIDE_PATH } from '@/lib/buying-guide/url-state'
 import { absoluteUrl, SITE_URL } from '@/lib/site'
 import JsonLd from '@/app/components/JsonLd'
+import RequireAuth from '@/app/components/RequireAuth'
 import GuideWizard from '@/app/components/guide/GuideWizard'
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>
@@ -70,7 +71,16 @@ export default async function GuiaDeCompraPage() {
         </div>
       ) : (
         <Suspense fallback={<div className="gd__wizard" aria-busy="true" />}>
-          <GuideWizard index={index} curated={curated} salesMeta={salesMeta} />
+          {/* The wizard needs an account; the heading and lead above stay open
+              so the page still says what it is — to someone deciding whether
+              to sign up, and to a crawler. */}
+          <RequireAuth
+            headingLevel={2}
+            title="Creá tu cuenta para usar la guía"
+            description="Iniciá sesión con Google y respondé las seis preguntas. Volvés justo a esta página."
+          >
+            <GuideWizard index={index} curated={curated} salesMeta={salesMeta} />
+          </RequireAuth>
         </Suspense>
       )}
     </div>
