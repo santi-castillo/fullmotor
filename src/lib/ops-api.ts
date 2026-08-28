@@ -256,3 +256,122 @@ export async function uploadVehicleImages(
   if (!response.ok) await handleApiError(response)
   return response.json()
 }
+
+// ============================================
+// Blog
+// ============================================
+
+export type BlogStatus = 'draft' | 'published'
+
+export interface AdminBlogPost {
+  id: string
+  slug: string
+  countryCode: string
+  title: string
+  excerpt?: string | null
+  contentMarkdown: string
+  coverImage?: string | null
+  tags: string[]
+  authorId: string
+  status: BlogStatus
+  publishedAt?: string | null
+  updatedAt: string
+  createdAt: string
+  sponsored?: boolean
+  instagramMediaId?: string | null
+}
+
+export async function fetchBlogPosts(
+  params: { status?: BlogStatus | 'all'; page?: number; limit?: number } = {}
+): Promise<{ data: AdminBlogPost[]; meta: PaginationMeta }> {
+  const search = new URLSearchParams()
+  if (params.status && params.status !== 'all') search.set('status', params.status)
+  search.set('countryCode', COUNTRY)
+  if (params.page) search.set('page', String(params.page))
+  search.set('limit', String(params.limit ?? 50))
+
+  const response = await opsFetch(`/blog?${search}`)
+  return response.json()
+}
+
+export interface CreateBlogPostPayload {
+  slug: string
+  countryCode: string
+  title: string
+  contentMarkdown: string
+  authorId: string
+  excerpt?: string
+  coverImage?: string
+  tags?: string[]
+  status?: BlogStatus
+}
+
+export async function createBlogPost(payload: CreateBlogPostPayload): Promise<AdminBlogPost> {
+  const response = await opsFetch('/blog', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  })
+  const json = await response.json()
+  // The blog handlers wrap single resources in { data }, unlike the moderation
+  // ones. Tolerating both keeps this working if that is ever unified.
+  return json.data ?? json
+}
+
+export async function updateBlogPost(
+  slug: string,
+  patch: Partial<Pick<AdminBlogPost, 'title' | 'excerpt' | 'contentMarkdown' | 'coverImage' | 'tags' | 'status'>>
+): Promise<AdminBlogPost> {
+  const response = await opsFetch(`/blog/${encodeURIComponent(slug)}`, {
+    method: 'PATCH',
+    body: JSON.stringify(patch),
+  })
+  const json = await response.json()
+  return json.data ?? json
+}
+
+export async function deleteBlogPost(slug: string): Promise<void> {
+  await opsFetch(`/blog/${encodeURIComponent(slug)}`, { method: 'DELETE' })
+}
+
+/**
+ * Upload a cover image and return its URL.
+ *
+ * Standalone from the post on purpose — the API exposes it that way so a cover
+ * can be uploaded before the post it belongs to exists. Attaching it is a
+ * separate PATCH of `coverImage`.
+ */
+export async function uploadBlogImage(file: File): Promise<string> {
+  const body = new FormData()
+  body.append('images', file)
+
+  const response = await fetch(`${API_URL}/api/ops/blog/images`, {
+    method: 'POST',
+    headers: authHeaders(),
+    body,
+  })
+  if (!response.ok) await handleApiError(response)
+  const json = await response.json()
+  const data = json.data ?? json
+  const url = data.uploaded?.[0]?.url
+  if (!url) throw new ApiError('La subida no devolvió una URL', 500)
+  return url
+}
+
+/**
+ * Slug from a title: lowercase, accents stripped, non-alphanumerics collapsed
+ * to single hyphens.
+ *
+ * Mirrors what the API does when a routine omits one, so a post created here
+ * and one created by the daily routine end up with the same address for the
+ * same headline. Editable in the form regardless — the slug is the public URL
+ * and is not editable after creation.
+ */
+export function slugFromTitle(title: string): string {
+  return title
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 80)
+}

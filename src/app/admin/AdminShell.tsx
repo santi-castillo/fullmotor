@@ -7,6 +7,7 @@ import { useAuth } from '../components/AuthProvider'
 
 const SECTIONS = [
   { href: '/admin', label: 'Imágenes' },
+  { href: '/admin/blog', label: 'Blog' },
   { href: '/admin/usuarios', label: 'Usuarios' },
   { href: '/admin/comentarios', label: 'Comentarios' },
   { href: '/admin/clasificados', label: 'Clasificados' },
