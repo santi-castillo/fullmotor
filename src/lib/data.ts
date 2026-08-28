@@ -4,23 +4,60 @@ import { fetchVehicles, fetchVehicleBySlug as apiFetchVehicleBySlug, fetchCarous
 // Re-export CATEGORIES for components that need it
 export { CATEGORIES }
 
+const CATALOGUE_PAGE_SIZE = 100
+
+/** Attempts per catalogue page before the whole walk gives up. */
+const PAGE_ATTEMPTS = 3
+
+/** Backoff between attempts on the same page. */
+const RETRY_DELAY_MS = 250
+
+async function fetchVehiclePage(page: number) {
+  let lastError: unknown
+  for (let attempt = 1; attempt <= PAGE_ATTEMPTS; attempt++) {
+    try {
+      return await fetchVehicles({ page, limit: CATALOGUE_PAGE_SIZE, retryAttempt: attempt })
+    } catch (error) {
+      lastError = error
+      console.warn(`[data] catalogue page ${page} failed (attempt ${attempt}/${PAGE_ATTEMPTS}):`, error)
+      if (attempt < PAGE_ATTEMPTS) {
+        await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS * attempt))
+      }
+    }
+  }
+  throw lastError
+}
+
+/**
+ * The whole catalogue, page by page — around a dozen requests.
+ *
+ * Throws if any page still fails after its retries. A partial catalogue is
+ * indistinguishable from a catalogue that shrank, so callers that cache the
+ * result would happily cache the truncated one; failing loudly lets them
+ * decide, and lets them retry instead.
+ */
+export async function fetchAllVehicles(): Promise<Vehicle[]> {
+  const allVehicles: Vehicle[] = []
+  let page = 1
+
+  while (true) {
+    const { vehicles, meta } = await fetchVehiclePage(page)
+    allVehicles.push(...vehicles)
+    if (page >= meta.lastPage) break
+    page++
+  }
+
+  return allVehicles
+}
+
 export async function getAllVehicles(): Promise<Vehicle[]> {
   try {
-    const allVehicles: Vehicle[] = []
-    let page = 1
-    const limit = 100
-
-    while (true) {
-      const { vehicles, meta } = await fetchVehicles({ page, limit })
-      allVehicles.push(...vehicles)
-      if (page >= meta.lastPage) break
-      page++
-    }
-
-    return allVehicles
+    return await fetchAllVehicles()
   } catch (error) {
     // Swallowing this keeps the build green but silently empties the sitemap
     // and skips every prerendered vehicle — log loudly so it shows up in CI.
+    // Callers that cache their result should use fetchAllVehicles instead, so
+    // an API blip is not stored as "the catalogue is empty".
     console.error("[data] getAllVehicles failed — sitemap and prerendered vehicles will be empty:", error)
     return []
   }

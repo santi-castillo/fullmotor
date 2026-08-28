@@ -198,6 +198,17 @@ interface FetchVehiclesParams {
     maxPrice?: number
     sort?: 'newest' | 'oldest' | 'price_asc' | 'price_desc' | 'power_asc' | 'power_desc' | 'value_asc' | 'value_desc'
     vehicleType?: string
+    /**
+     * Which retry this call is (1 = the first, untagged try).
+     *
+     * Retrying is otherwise pointless: same URL, same options, so Next answers
+     * every attempt inside one render from the memoised first failure and the
+     * API is never asked again — and `cache: 'no-store'` does not help, because
+     * inside `unstable_cache` it is ignored. Tagging the request with a header
+     * changes the cache key, which is what actually forces a fresh request.
+     * The header itself is inert: servers ignore request headers they don't know.
+     */
+    retryAttempt?: number
 }
 
 export async function fetchVehicles(params: FetchVehiclesParams = {}): Promise<{ vehicles: Vehicle[]; meta: VehiclesResponse['meta'] }> {
@@ -216,9 +227,14 @@ export async function fetchVehicles(params: FetchVehiclesParams = {}): Promise<{
     // Use category to set the X-Vehicle-Type header (backend uses vehicleType for filtering)
     const vehicleTypeHeader = params.category ? categoryToVehicleType[params.category] : params.vehicleType || 'all'
 
+    const retry = params.retryAttempt && params.retryAttempt > 1 ? params.retryAttempt : undefined
+
     const response = await fetch(url, {
-        next: { revalidate: 60 },
-        headers: getHeaders(vehicleTypeHeader)
+        ...(retry ? { cache: 'no-store' as const } : { next: { revalidate: 60 } }),
+        headers: {
+            ...getHeaders(vehicleTypeHeader),
+            ...(retry ? { 'X-Retry-Attempt': String(retry) } : {}),
+        },
     })
 
     if (!response.ok) {
