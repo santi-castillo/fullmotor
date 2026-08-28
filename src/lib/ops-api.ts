@@ -220,3 +220,39 @@ export async function restoreClassified(id: string): Promise<AdminClassified> {
   const response = await opsFetch(`/classifieds/${id}/restore`, { method: 'POST' })
   return response.json()
 }
+
+// ============================================
+// Catalogue images
+// ============================================
+
+export interface VehicleImageUpload {
+  uploaded: { url: string }[]
+  totalImages: number
+}
+
+/**
+ * Attach photos to a vehicle.
+ *
+ * Goes to the API rather than the Next `/api/upload` route, which only ever
+ * put a file in blob storage and handed back a URL somebody had to paste into
+ * the vehicle by hand. This writes the vehicle too, which is what "subir una
+ * imagen" was always supposed to mean.
+ *
+ * No Content-Type header: the browser has to set the multipart boundary
+ * itself, and naming the type here silently strips it.
+ */
+export async function uploadVehicleImages(
+  vehicleId: string,
+  files: File[]
+): Promise<VehicleImageUpload> {
+  const body = new FormData()
+  for (const file of files) body.append('images', file)
+
+  const response = await fetch(`${API_URL}/api/ops/vehicles/${vehicleId}/images`, {
+    method: 'POST',
+    headers: authHeaders(),
+    body,
+  })
+  if (!response.ok) await handleApiError(response)
+  return response.json()
+}

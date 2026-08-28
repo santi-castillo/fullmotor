@@ -83,14 +83,19 @@ export default function UserMenu() {
                         </Link>
                     )}
 
+                    {/* One entry, pointing at the panel rather than at one of
+                        its screens. Reviewing automotoras is a section inside
+                        /admin like usuarios or comentarios, and a menu item
+                        that jumped straight into it made the other four
+                        unreachable unless you knew their URLs. */}
                     {user.role === 'admin' && (
                         <Link
-                            href="/admin/automotoras"
+                            href="/admin"
                             onClick={() => setOpen(false)}
                             className="w-full px-4 py-3 text-left text-sm text-body hover:bg-sunken transition-colors flex items-center gap-2 border-t border-hairline"
                         >
                             <ShieldCheck size={15} aria-hidden="true" />
-                            Revisar automotoras
+                            Admin
                         </Link>
                     )}
 
